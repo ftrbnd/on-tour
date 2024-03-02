@@ -4,7 +4,7 @@ import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import React from "react";
 import { AppState, View } from "react-native";
-import { Button, Text } from "react-native-paper";
+import { Button } from "react-native-paper";
 
 import { supabase } from "../utils/supabase";
 
@@ -44,10 +44,7 @@ const performOAuth = async () => {
   });
   if (error) throw error;
 
-  const res = await WebBrowser.openAuthSessionAsync(
-    data?.url ?? "",
-    redirectTo,
-  );
+  const res = await WebBrowser.openAuthSessionAsync(data?.url ?? "", redirectTo);
 
   if (res.type === "success") {
     const { url } = res;

@@ -1,8 +1,5 @@
 import { Stack } from "expo-router";
-import {
-  MD3LightTheme as DefaultTheme,
-  PaperProvider,
-} from "react-native-paper";
+import { MD3LightTheme as DefaultTheme, PaperProvider } from "react-native-paper";
 
 const theme = {
   ...DefaultTheme,

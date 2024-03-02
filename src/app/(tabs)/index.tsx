@@ -1,7 +1,5 @@
 import { Session } from "@supabase/supabase-js";
 import { useState, useEffect } from "react";
-import "react-native-url-polyfill/auto";
-
 import { View } from "react-native";
 
 import Account from "@/src/components/Account";
