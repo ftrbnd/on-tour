@@ -1,4 +1,3 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AuthSession } from "@supabase/supabase-js";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
@@ -6,6 +5,7 @@ import { openAuthSessionAsync } from "expo-web-browser";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { AppState } from "react-native";
 
+import { env } from "../utils/env";
 import { supabase } from "../utils/supabase";
 
 interface AuthUser {
@@ -51,7 +51,10 @@ const redirectTo = makeRedirectUri();
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
+
   const [providerToken, setProviderToken] = useState<string | null>(null);
+  const [providerRefreshToken, setProviderRefreshToken] = useState<string | null>(null);
+  const [providerExpiresIn, setProviderExpiresIn] = useState<number | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -60,16 +63,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { params, errorCode } = QueryParams.getQueryParams(url);
     if (errorCode) throw new Error(errorCode);
 
-    const { access_token, refresh_token, provider_token, provider_refresh_token } = params;
+    const { access_token, refresh_token, provider_token, provider_refresh_token, expires_in } =
+      params;
     if (!access_token) return;
 
     const { data, error } = await supabase.auth.setSession({
       access_token,
       refresh_token,
     });
-    await AsyncStorage.setItem("oauth_provider_token", provider_token);
-    await AsyncStorage.setItem("oauth_provider_refresh_token", provider_refresh_token);
     if (error) throw error;
+    setProviderToken(provider_token);
+    setProviderRefreshToken(provider_refresh_token);
+    setProviderExpiresIn(parseInt(expires_in, 10));
 
     return data.session;
   };
@@ -117,29 +122,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setSession(null);
     setUser(null);
-
-    await AsyncStorage.removeItem("oauth_provider_token");
-    await AsyncStorage.removeItem("oauth_provider_refresh_token");
+    setProviderToken(null);
+    setProviderRefreshToken(null);
+    setProviderExpiresIn(null);
 
     if (error) {
       console.error(error);
     }
   };
 
-  const getAccessToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("oauth_provider_token");
-      return token;
-    } catch (error: unknown) {
-      console.error(error);
-    }
-  };
-
   useEffect(() => {
-    getAccessToken().then((token) => {
-      if (token) setProviderToken(token);
-    });
-
     supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
 
@@ -154,6 +146,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
   }, []);
+
+  useEffect(() => {
+    if (!providerRefreshToken || !providerExpiresIn) return;
+    // https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens
+    const interval = setInterval(
+      async () => {
+        const body = await fetch('https://accounts.spotify.com/api/token"', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            grant_type: "refresh_token",
+            refresh_token: providerRefreshToken,
+            client_id: env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID,
+          }),
+        });
+
+        const response = await body.json();
+        setProviderToken(response.accessToken);
+      },
+      (providerExpiresIn - 60) * 1000,
+    );
+
+    return () => clearInterval(interval);
+  }, [providerRefreshToken, providerExpiresIn]);
 
   return (
     <AuthContext.Provider
