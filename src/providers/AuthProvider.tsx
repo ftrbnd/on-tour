@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AuthSession } from "@supabase/supabase-js";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
@@ -16,6 +17,7 @@ interface AuthUser {
 interface AuthContextProps {
   session: AuthSession | null;
   user: AuthUser | null;
+  providerToken: string | null;
   isLoading: boolean;
   error: string;
   signIn: () => void;
@@ -33,6 +35,7 @@ AppState.addEventListener("change", (state) => {
 export const AuthContext = createContext<AuthContextProps>({
   session: null,
   user: null,
+  providerToken: null,
   isLoading: false,
   error: "",
   signIn: () => {},
@@ -43,9 +46,13 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
+const redirectTo = makeRedirectUri();
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
+  const [providerToken, setProviderToken] = useState<string | null>(null);
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -53,13 +60,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { params, errorCode } = QueryParams.getQueryParams(url);
     if (errorCode) throw new Error(errorCode);
 
-    const { access_token, refresh_token } = params;
+    const { access_token, refresh_token, provider_token, provider_refresh_token } = params;
     if (!access_token) return;
 
     const { data, error } = await supabase.auth.setSession({
       access_token,
       refresh_token,
     });
+    await AsyncStorage.setItem("oauth_provider_token", provider_token);
+    await AsyncStorage.setItem("oauth_provider_refresh_token", provider_refresh_token);
     if (error) throw error;
 
     return data.session;
@@ -69,13 +78,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setIsLoading(true);
 
-      const redirectTo = makeRedirectUri();
-
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "spotify",
         options: {
           redirectTo,
           skipBrowserRedirect: true,
+          scopes: "user-follow-read user-top-read",
         },
       });
       if (error) throw error;
@@ -84,8 +92,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (res.type === "success") {
         const { url } = res;
-        const session = await createSessionFromUrl(url);
 
+        const session = await createSessionFromUrl(url);
         if (!session) throw Error("Session not found");
 
         setSession(session);
@@ -104,31 +112,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  async function signOut() {
+  const signOut = async () => {
     const { error } = await supabase.auth.signOut();
 
     setSession(null);
     setUser(null);
 
+    await AsyncStorage.removeItem("oauth_provider_token");
+    await AsyncStorage.removeItem("oauth_provider_refresh_token");
+
     if (error) {
       console.error(error);
     }
-  }
+  };
+
+  const getAccessToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem("oauth_provider_token");
+      return token;
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    getAccessToken().then((token) => {
+      if (token) setProviderToken(token);
     });
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser({
-        avatar_url: user?.user_metadata.avatar_url,
-        email: user?.user_metadata.email,
-        username: user?.user_metadata.full_name,
-      });
-    });
-
-    supabase.auth.onAuthStateChange((_event, session) => {
+    supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
 
       if (session?.user) {
@@ -148,6 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         session,
         user,
+        providerToken,
         isLoading,
         error,
         signIn,

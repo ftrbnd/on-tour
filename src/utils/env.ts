@@ -1,14 +1,11 @@
 import z from "zod";
 
 const envSchema = z.object({
-  EXPO_PUBLIC_SUPABASE_URL: z.string(),
+  EXPO_PUBLIC_SUPABASE_URL: z.string().url(),
   EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string(),
+  EXPO_PUBLIC_SETLIST_FM_API_KEY: z.string(),
+  EXPO_PUBLIC_SPOTIFY_CLIENT_ID: z.string(),
+  EXPO_PUBLIC_SPOTIFY_CLIENT_SECRET: z.string(),
 });
 
-type EnvSchemaType = z.infer<typeof envSchema>;
-
-declare global {
-  namespace NodeJS {
-    interface ProcessEnv extends EnvSchemaType {}
-  }
-}
+export const env = envSchema.parse(process.env);
