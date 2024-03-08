@@ -56,12 +56,14 @@ export interface Error {
   timestamp: string;
 }
 
+export interface BasicSet {
+  name: string;
+  encore?: number;
+  song: Song[];
+}
+
 export interface Set {
-  set: {
-    name: string;
-    encore: number;
-    song: Song[];
-  }[];
+  set: BasicSet[];
 }
 
 export interface Setlist {

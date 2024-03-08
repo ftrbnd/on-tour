@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         options: {
           redirectTo,
           skipBrowserRedirect: true,
-          scopes: "user-follow-read user-top-read",
+          scopes: "user-follow-read user-top-read playlist-modify-public playlist-modify-private",
         },
       });
       if (error) throw error;

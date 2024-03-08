@@ -29,6 +29,7 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen name="artist" options={{ href: null }} />
+      <Tabs.Screen name="setlist" options={{ href: null }} />
     </Tabs>
   );
 }

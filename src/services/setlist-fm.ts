@@ -24,3 +24,25 @@ export async function searchArtistSetlist(query: string | undefined): Promise<Se
     throw error;
   }
 }
+
+export async function getOneSetlist(id: string | undefined): Promise<Setlist> {
+  try {
+    if (!id) throw Error("Setlist id required");
+
+    const res = await fetch(`${ENDPOINT}/setlist/${id}`, {
+      headers: {
+        Accept: "application/json",
+        "x-api-key": env.EXPO_PUBLIC_SETLIST_FM_API_KEY,
+      },
+    });
+    if (!res.ok) throw Error(`Failed to fetch setlist with id "${id}" from setlist.fm`);
+
+    const data: Setlist = await res.json();
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
