@@ -57,17 +57,19 @@ export interface Error {
 }
 
 export interface Set {
-  name: string;
-  encore: number;
-  song: Song[];
+  set: {
+    name: string;
+    encore: number;
+    song: Song[];
+  }[];
 }
 
 export interface Setlist {
   artist: Artist;
   venue: Venue;
-  tour: Tour;
-  set: Set[];
-  info: string;
+  tour?: Tour;
+  sets: Set;
+  info?: string;
   url: string;
   id: string;
   versionId: string;

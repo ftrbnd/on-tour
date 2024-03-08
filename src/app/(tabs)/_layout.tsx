@@ -28,6 +28,7 @@ export default function TabLayout() {
           tabBarIcon: () => <Ionicons name="person" size={24} />,
         }}
       />
+      <Tabs.Screen name="artist" options={{ href: null }} />
     </Tabs>
   );
 }

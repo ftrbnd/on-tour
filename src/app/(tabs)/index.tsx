@@ -13,11 +13,6 @@ const styles = StyleSheet.create({
   list: {
     padding: 8,
   },
-  divider: {
-    padding: 0,
-    margin: 0,
-    borderWidth: 0,
-  },
 });
 
 export default function Index() {

@@ -21,6 +21,25 @@ export async function getTopArtists(token: string | null | undefined): Promise<A
   }
 }
 
+export async function getOneArtist(token: string | null | undefined, id: string): Promise<Artist> {
+  try {
+    if (!token) throw Error("Provider token required");
+
+    const res = await fetch(`${ENDPOINT}/artists/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw Error(`Failed to fetch artist with id "${id}"`);
+
+    const artist: Artist = await res.json();
+    return artist;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 // https://api.spotify.com/v1/artists/0TnOYISbd1XYRBk9myaseg/related-artists
 export async function getRelatedArtists(
   token: string | null | undefined,

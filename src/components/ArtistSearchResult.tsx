@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Avatar, Card, Text } from "react-native-paper";
 
@@ -14,8 +15,13 @@ const styles = StyleSheet.create({
 });
 
 export default function ArtistSearchResult({ artist }: { artist: Artist }) {
+  const router = useRouter();
+
+  const openArtistPage = () => {
+    router.push(`/(tabs)/artist/${artist.id}`);
+  };
   return (
-    <Card style={styles.card}>
+    <Card style={styles.card} onPress={openArtistPage}>
       <Card.Title
         style={styles.title}
         title={
@@ -23,7 +29,7 @@ export default function ArtistSearchResult({ artist }: { artist: Artist }) {
             {artist.name}
           </Text>
         }
-        left={() => <Avatar.Image size={48} source={{ uri: artist.images[0].url }} />}
+        left={() => <Avatar.Image size={48} source={{ uri: artist.images[0]?.url }} />}
         right={() => <Ionicons size={24} name="arrow-forward-outline" />}
       />
     </Card>

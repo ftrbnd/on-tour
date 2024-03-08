@@ -15,11 +15,6 @@ const styles = StyleSheet.create({
   list: {
     padding: 8,
   },
-  divider: {
-    padding: 0,
-    margin: 0,
-    borderWidth: 0,
-  },
 });
 
 export default function Search() {
@@ -34,9 +29,9 @@ export default function Search() {
   }, 1000);
 
   return (
-    <View>
+    <View style={styles.container}>
       <Searchbar
-        placeholder="Search"
+        placeholder="Search for an artist"
         onChangeText={(text) => {
           setSearchQuery(text);
           debounced(text);

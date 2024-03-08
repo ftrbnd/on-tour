@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
 
@@ -17,8 +18,14 @@ const styles = StyleSheet.create({
 });
 
 export default function ArtistPreview({ artist }: { artist: Artist }) {
+  const router = useRouter();
+
+  const openArtistPage = () => {
+    router.push(`/(tabs)/artist/${artist.id}`);
+  };
+
   return (
-    <Card style={styles.card}>
+    <Card style={styles.card} onPress={openArtistPage}>
       <Card.Cover source={{ uri: artist.images[0].url }} style={styles.cover} />
       <Card.Title
         title={
