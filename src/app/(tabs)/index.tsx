@@ -7,6 +7,9 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { getTopArtists, getRelatedArtists } from "@/src/services/spotify";
 
 const styles = StyleSheet.create({
+  container: {
+    padding: 8,
+  },
   list: {
     padding: 8,
   },
@@ -33,7 +36,7 @@ export default function Index() {
   });
 
   return (
-    <View>
+    <View style={styles.container}>
       {error && <Text>{error.message}</Text>}
 
       <Text variant="displayMedium">Your Artists</Text>

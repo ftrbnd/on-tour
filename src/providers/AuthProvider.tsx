@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { AuthSession } from "@supabase/supabase-js";
 import { makeRedirectUri } from "expo-auth-session";
 import * as QueryParams from "expo-auth-session/build/QueryParams";
@@ -72,6 +73,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refresh_token,
     });
     if (error) throw error;
+
+    await AsyncStorage.setItem("spotify_access_token", provider_token);
+    await AsyncStorage.setItem("spotify_refresh_token", provider_refresh_token);
+
     setProviderToken(provider_token);
     setProviderRefreshToken(provider_refresh_token);
     setProviderExpiresIn(parseInt(expires_in, 10));
@@ -126,12 +131,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProviderRefreshToken(null);
     setProviderExpiresIn(null);
 
+    await AsyncStorage.removeItem("spotify_access_token");
+    await AsyncStorage.removeItem("spotify_refresh_token");
+
     if (error) {
       console.error(error);
     }
   };
 
+  const getTokens = async () => {
+    try {
+      const spotifyAccessToken = await AsyncStorage.getItem("spotify_access_token");
+      const spotifyRefreshToken = await AsyncStorage.getItem("spotify_refresh_token");
+
+      if (spotifyAccessToken && spotifyRefreshToken) {
+        setProviderToken(spotifyAccessToken);
+        setProviderRefreshToken(spotifyRefreshToken);
+      }
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
+    getTokens();
+
     supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
 

@@ -1,4 +1,4 @@
-import { Artist } from "../utils/spotify-types";
+import { Artist, Page } from "../utils/spotify-types";
 
 const ENDPOINT = `https://api.spotify.com/v1`;
 
@@ -38,6 +38,29 @@ export async function getRelatedArtists(
 
     const { artists }: { artists: Artist[] } = await res.json();
     return artists;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function searchForArtists(
+  token: string | null | undefined,
+  query: string,
+): Promise<Artist[]> {
+  try {
+    if (!token) throw Error("Provider token required");
+    if (!query) return [];
+
+    const res = await fetch(`${ENDPOINT}/search?q=${query}&type=artist&limit=10`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw Error(`Failed to search for "${query}"`);
+
+    const { artists }: { artists: Page<Artist> } = await res.json();
+    return artists.items;
   } catch (error) {
     console.error(error);
     throw error;
