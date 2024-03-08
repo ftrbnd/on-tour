@@ -1,29 +1,45 @@
-import { env } from "../utils/env";
+import { Artist } from "../utils/spotify-types";
 
 const ENDPOINT = `https://api.spotify.com/v1`;
 
-export async function getTopArtists(token: string | null | undefined) {
+export async function getTopArtists(token: string | null | undefined): Promise<Artist[]> {
   try {
     if (!token) throw Error("Provider token required");
-    console.log({ token });
 
-    const res = await fetch(
-      `${ENDPOINT}/me/top/artists?client_id=${env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID}&scope=user-top-read`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const res = await fetch(`${ENDPOINT}/me/top/artists?limit=20`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
-    );
+    });
     if (!res.ok) throw Error(`Failed to fetch your top artists`);
 
-    const data = await res.json();
-    console.log({ data });
-
-    return data;
+    const { items }: { items: Artist[] } = await res.json();
+    return items;
   } catch (error) {
-    console.log({ error });
+    console.error(error);
+    throw error;
+  }
+}
 
+// https://api.spotify.com/v1/artists/0TnOYISbd1XYRBk9myaseg/related-artists
+export async function getRelatedArtists(
+  token: string | null | undefined,
+  artistId: string | null | undefined,
+): Promise<Artist[]> {
+  try {
+    if (!token) throw Error("Provider token required");
+
+    const res = await fetch(`${ENDPOINT}/artists/${artistId}/related-artists`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw Error(`Failed to fetch related artists`);
+
+    const { artists }: { artists: Artist[] } = await res.json();
+    return artists;
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 }

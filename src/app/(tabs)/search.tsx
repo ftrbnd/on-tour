@@ -1,9 +1,9 @@
 import { View, Text } from "react-native";
 
-export default function Nearby() {
+export default function Search() {
   return (
     <View>
-      <Text>Nearby</Text>
+      <Text>Search</Text>
     </View>
   );
 }

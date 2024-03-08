@@ -9,7 +9,7 @@ export default function Profile() {
   const auth = useAuth();
 
   const { data, refetch, error } = useQuery({
-    queryKey: ["artists"],
+    queryKey: ["top-artists"],
     queryFn: () => getTopArtists(auth.providerToken),
     enabled: auth.providerToken != null,
   });
