@@ -9,7 +9,12 @@ export default function TabLayout() {
         options={{
           href: "/",
           tabBarLabel: "Home",
-          tabBarIcon: () => <Ionicons name="home" size={24} />,
+          tabBarIcon: ({ focused }) =>
+            focused ? (
+              <Ionicons name="home" size={24} color="black" />
+            ) : (
+              <Ionicons name="home-outline" size={24} color="black" />
+            ),
         }}
       />
       <Tabs.Screen
@@ -17,7 +22,12 @@ export default function TabLayout() {
         options={{
           href: "/search",
           tabBarLabel: "Search",
-          tabBarIcon: () => <Ionicons name="search" size={24} />,
+          tabBarIcon: ({ focused }) =>
+            focused ? (
+              <Ionicons name="search" size={24} color="black" />
+            ) : (
+              <Ionicons name="search-outline" size={24} color="black" />
+            ),
         }}
       />
       <Tabs.Screen
@@ -25,7 +35,12 @@ export default function TabLayout() {
         options={{
           href: "/profile",
           tabBarLabel: "Me",
-          tabBarIcon: () => <Ionicons name="person" size={24} />,
+          tabBarIcon: ({ focused }) =>
+            focused ? (
+              <Ionicons name="person" size={24} color="black" />
+            ) : (
+              <Ionicons name="person-outline" size={24} color="black" />
+            ),
         }}
       />
       <Tabs.Screen name="artist" options={{ href: null }} />

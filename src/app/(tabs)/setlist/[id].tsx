@@ -1,12 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
+import moment from "moment";
 import { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { Button, Text } from "react-native-paper";
 
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getOneSetlist } from "@/src/services/setlist-fm";
-import { createPlaylist, getCurrentUser } from "@/src/services/spotify";
+import { CreatePlaylistRequestBody, createPlaylist } from "@/src/services/spotify";
 import { BasicSet } from "@/src/utils/setlist-fm-types";
 
 const styles = StyleSheet.create({
@@ -18,14 +19,7 @@ const styles = StyleSheet.create({
   },
 });
 
-interface MutationVars {
-  userId: string;
-  name: string;
-  description?: string;
-  public?: boolean;
-}
-
-// add button to open setlist on web
+// TODO: add button to open setlist on web
 export default function SetlistPage() {
   const [primary, setPrimary] = useState<BasicSet | null>(null);
   const [encore, setEncore] = useState<BasicSet | null>(null);
@@ -39,13 +33,9 @@ export default function SetlistPage() {
     enabled: id !== null,
   });
 
-  const playlistMutation = useMutation({
-    mutationFn: (variables: MutationVars) =>
-      createPlaylist(session?.accessToken, variables.userId, {
-        name: variables.name,
-        description: variables.description,
-        public: variables.public,
-      }),
+  const createPlaylistMutation = useMutation({
+    mutationFn: (body: CreatePlaylistRequestBody) =>
+      createPlaylist(session?.accessToken, session?.user?.id, body),
     onSuccess: () => {
       console.log("Created playlist");
 
@@ -64,15 +54,26 @@ export default function SetlistPage() {
     }
   }, [setlist]);
 
-  const handleCreatePlaylist = async () => {
-    const currentUser = await getCurrentUser(session?.accessToken);
+  const createPlaylistName = () => {
+    if (!setlist) return "";
 
-    await playlistMutation.mutateAsync({
-      userId: currentUser.id,
-      name: "Sample name",
-      description: "sample description",
-      public: false,
-    });
+    const location = setlist.tour ? setlist.tour.name : setlist.venue.name;
+
+    return `${setlist.artist.name} - ${location}`;
+  };
+
+  const handleCreatePlaylist = async () => {
+    try {
+      if (!session?.user) throw new Error("User must be logged in");
+
+      await createPlaylistMutation.mutateAsync({
+        name: createPlaylistName(),
+        description: `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}`,
+        public: false,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

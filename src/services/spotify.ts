@@ -1,4 +1,4 @@
-import { Artist, Page, Playlist, User } from "../utils/spotify-types";
+import { Artist, Page, Playlist } from "../utils/spotify-types";
 
 const ENDPOINT = `https://api.spotify.com/v1`;
 
@@ -86,26 +86,7 @@ export async function searchForArtists(
   }
 }
 
-export async function getCurrentUser(token: string | null | undefined): Promise<User> {
-  try {
-    if (!token) throw Error("Provider token required");
-
-    const res = await fetch(`${ENDPOINT}/me`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (!res.ok) throw Error(`Failed to fetch current user`);
-
-    const user: User = await res.json();
-    return user;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-
-interface CreatePlaylistRequestBody {
+export interface CreatePlaylistRequestBody {
   name: string;
   description?: string;
   public?: boolean;
@@ -113,7 +94,7 @@ interface CreatePlaylistRequestBody {
 
 export async function createPlaylist(
   token: string | null | undefined,
-  userId: string,
+  userId: string | undefined,
   body: CreatePlaylistRequestBody,
 ): Promise<Playlist> {
   try {
