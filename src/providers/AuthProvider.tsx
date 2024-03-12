@@ -1,215 +1,189 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { AuthSession } from "@supabase/supabase-js";
-import { makeRedirectUri } from "expo-auth-session";
-import * as QueryParams from "expo-auth-session/build/QueryParams";
-import { openAuthSessionAsync } from "expo-web-browser";
-import { ReactNode, createContext, useContext, useEffect, useState } from "react";
-import { AppState } from "react-native";
+import {
+  CodeChallengeMethod,
+  TokenResponse,
+  TokenResponseConfig,
+  exchangeCodeAsync,
+  makeRedirectUri,
+  useAuthRequest,
+} from "expo-auth-session";
+import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
+import { useStorageState } from "../hooks/useStorageState";
 import { env } from "../utils/env";
-import { supabase } from "../utils/supabase";
 
-interface AuthUser {
-  avatar_url: string;
-  email: string;
-  username: string;
-}
-
-interface AuthContextProps {
-  session: AuthSession | null;
-  user: AuthUser | null;
+const AuthContext = createContext<{
   providerToken: string | null;
-  isLoading: boolean;
-  error: string;
   signIn: () => void;
-  signOut: () => void;
-}
-
-AppState.addEventListener("change", (state) => {
-  if (state === "active") {
-    supabase.auth.startAutoRefresh();
-  } else {
-    supabase.auth.stopAutoRefresh();
-  }
-});
-
-export const AuthContext = createContext<AuthContextProps>({
-  session: null,
-  user: null,
+}>({
   providerToken: null,
-  isLoading: false,
-  error: "",
   signIn: () => {},
-  signOut: () => {},
 });
 
+const redirectUri = makeRedirectUri({
+  scheme: "on.tour",
+});
+
+const authorizationEndpoint = "https://accounts.spotify.com/authorize";
+const tokenEndpoint = "https://accounts.spotify.com/api/token";
+
+const discovery = {
+  authorizationEndpoint,
+  tokenEndpoint,
+};
+
+// const generateRandomString = (length: number) => {
+//   const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+//   const values = getRandomValues(new Uint8Array(length));
+//   return values.reduce((acc, x) => acc + possible[x % possible.length], "");
+// };
+
+// const codeVerifier = generateRandomString(64);
+
+// const sha256Hash = async (plain: string) => {
+//   const data = Buffer.from(plain, "utf-8");
+//   return digest(CryptoDigestAlgorithm.SHA256, data);
+// };
+
+// const base64encode = (input: ArrayBuffer) => {
+//   const buf = Buffer.from(String.fromCharCode(...new Uint8Array(input)), "base64");
+//   const a = buf.toString("base64").replace(/=/g, "").replace(/\+/g, "-").replace(/\//g, "_");
+
+//   return a;
+// };
+
+// This hook can be used to access the user info.
 export function useAuth() {
-  return useContext(AuthContext);
+  const value = useContext(AuthContext);
+  if (process.env.NODE_ENV !== "production") {
+    if (!value) {
+      throw new Error("useAuth must be wrapped in a <AuthProvider />");
+    }
+  }
+
+  return value;
 }
 
-const redirectTo = makeRedirectUri();
+export function AuthProvider(props: PropsWithChildren) {
+  const [[, accessToken], setAccessToken] = useStorageState("access_token");
+  const [[, refreshToken], setRefreshToken] = useStorageState("refresh_token");
 
-export function AuthProvider({ children }: { children: ReactNode }) {
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [codeChallenge, setCodeChallenge] = useState<string>();
 
-  const [providerToken, setProviderToken] = useState<string | null>(null);
-  const [providerRefreshToken, setProviderRefreshToken] = useState<string | null>(null);
-  const [providerExpiresIn, setProviderExpiresIn] = useState<number | null>(null);
+  const [request, response, promptAsync] = useAuthRequest(
+    {
+      clientId: env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID,
+      scopes: [
+        "user-follow-read",
+        "user-top-read",
+        "playlist-modify-public",
+        "playlist-modify-private",
+      ],
+      usePKCE: false,
+      redirectUri,
+      responseType: "code",
+      codeChallengeMethod: CodeChallengeMethod.S256,
+      codeChallenge,
+    },
+    discovery,
+  );
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  // const readTokenFromStorage = async () => {
+  //   const tokenConfig: TokenResponseConfig = JSON.parse(tokenString);
+  //   if (tokenConfig) {
+  //     // instantiate a new token response object which will allow us to refresh
+  //     let tokenResponse = new TokenResponse(tokenConfig);
 
-  const createSessionFromUrl = async (url: string) => {
-    const { params, errorCode } = QueryParams.getQueryParams(url);
-    if (errorCode) throw new Error(errorCode);
+  //     // shouldRefresh checks the expiration and makes sure there is a refresh token
+  //     if (tokenResponse.shouldRefresh()) {
+  //       // All we need here is the clientID and refreshToken because the function handles setting our grant type based on
+  //       // the type of request configuration (refreshtokenrequestconfig in our example)
+  //       const refreshConfig: RefreshTokenRequestConfig = {
+  //         clientId: auth0ClientId,
+  //         refreshToken: tokenConfig.refreshToken,
+  //       };
+  //       const endpointConfig: Pick<AuthSession.DiscoveryDocument, "tokenEndpoint"> = {
+  //         tokenEndpoint,
+  //       };
 
-    const { access_token, refresh_token, provider_token, provider_refresh_token, expires_in } =
-      params;
-    if (!access_token) return;
+  //       // pass our refresh token and get a new access token and new refresh token
+  //       tokenResponse = await tokenResponse.refreshAsync(refreshConfig, endpointConfig);
+  //     }
+  //     // cache the token for next time
+  //     setToken(JSON.stringify(tokenResponse.getRequestConfig()));
 
-    const { data, error } = await supabase.auth.setSession({
-      access_token,
-      refresh_token,
-    });
-    if (error) throw error;
+  //     // decode the jwt for getting profile information
+  //     const decoded = jwtDecode(tokenResponse.accessToken);
+  //     // storing token in state
+  //     setUser({ jwtToken: tokenResponse.accessToken, decoded });
+  //   }
+  // };
 
-    await AsyncStorage.setItem("spotify_access_token", provider_token);
-    await AsyncStorage.setItem("spotify_refresh_token", provider_refresh_token);
-
-    setProviderToken(provider_token);
-    setProviderRefreshToken(provider_refresh_token);
-    setProviderExpiresIn(parseInt(expires_in, 10));
-
-    return data.session;
-  };
-
-  const signIn = async () => {
+  const getToken = async (code: string) => {
     try {
-      setIsLoading(true);
+      console.log("exchanging code for token...");
 
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "spotify",
-        options: {
-          redirectTo,
-          skipBrowserRedirect: true,
-          scopes: "user-follow-read user-top-read playlist-modify-public playlist-modify-private",
+      const tokenResponse: TokenResponse = await exchangeCodeAsync(
+        {
+          code,
+          redirectUri,
+          clientId: env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID,
+          extraParams: request?.codeVerifier ? { code_verifier: request?.codeVerifier } : undefined,
         },
-      });
-      if (error) throw error;
+        { tokenEndpoint },
+      );
+      console.log({ tokenResponse });
 
-      const res = await openAuthSessionAsync(data?.url ?? "", redirectTo);
+      // get the config from our response to cache for later refresh
+      const tokenConfig: TokenResponseConfig = tokenResponse?.getRequestConfig();
+      console.log({ tokenConfig });
 
-      if (res.type === "success") {
-        const { url } = res;
+      // get the access token to use
+      const token = tokenConfig.accessToken;
+      setAccessToken(token);
 
-        const session = await createSessionFromUrl(url);
-        if (!session) throw Error("Session not found");
+      // caching the token for later
+      // setToken(JSON.stringify(tokenConfig));
 
-        setSession(session);
-        setUser({
-          avatar_url: session.user.user_metadata.avatar_url,
-          email: session.user.user_metadata.email,
-          username: session.user.user_metadata.full_name,
-        });
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        setError(error.message);
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-
-    setSession(null);
-    setUser(null);
-    setProviderToken(null);
-    setProviderRefreshToken(null);
-    setProviderExpiresIn(null);
-
-    await AsyncStorage.removeItem("spotify_access_token");
-    await AsyncStorage.removeItem("spotify_refresh_token");
-
-    if (error) {
-      console.error(error);
-    }
-  };
-
-  const getTokens = async () => {
-    try {
-      const spotifyAccessToken = await AsyncStorage.getItem("spotify_access_token");
-      const spotifyRefreshToken = await AsyncStorage.getItem("spotify_refresh_token");
-
-      if (spotifyAccessToken && spotifyRefreshToken) {
-        setProviderToken(spotifyAccessToken);
-        setProviderRefreshToken(spotifyRefreshToken);
-      }
+      // decoding the token for getting user profile information
+      // const decoded = jwtDecode(jwtToken);
+      // setUser({ jwtToken, decoded })
     } catch (error) {
       console.error(error);
-      throw error;
     }
   };
 
   useEffect(() => {
-    getTokens();
-
-    supabase.auth.onAuthStateChange(async (_event, session) => {
-      setSession(session);
-
-      if (session?.user) {
-        setUser({
-          avatar_url: session.user.user_metadata.avatar_url,
-          email: session.user.user_metadata.email,
-          username: session.user.user_metadata.full_name,
-        });
-      } else {
-        setUser(null);
-      }
-    });
+    // readTokenFromStorage();
   }, []);
 
   useEffect(() => {
-    if (!providerRefreshToken || !providerExpiresIn) return;
-    // https://developer.spotify.com/documentation/web-api/tutorials/refreshing-tokens
-    const interval = setInterval(
-      async () => {
-        const body = await fetch('https://accounts.spotify.com/api/token"', {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({
-            grant_type: "refresh_token",
-            refresh_token: providerRefreshToken,
-            client_id: env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID,
-          }),
-        });
+    if (response?.type === "success") {
+      console.log({ response });
 
-        const response = await body.json();
-        setProviderToken(response.accessToken);
-      },
-      (providerExpiresIn - 60) * 1000,
-    );
+      const { code } = response.params;
+      console.log({ code });
 
-    return () => clearInterval(interval);
-  }, [providerRefreshToken, providerExpiresIn]);
+      if (code) {
+        getToken(code);
+      }
+    }
+  }, [response]);
+
+  const signIn = async () => {
+    try {
+      await promptAsync();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <AuthContext.Provider
       value={{
-        session,
-        user,
-        providerToken,
-        isLoading,
-        error,
+        providerToken: accessToken,
         signIn,
-        signOut,
       }}>
-      {children}
+      {props.children}
     </AuthContext.Provider>
   );
 }
