@@ -31,7 +31,7 @@ export default function SetlistPage() {
   const [encore, setEncore] = useState<BasicSet | null>(null);
 
   const { id }: { id: string } = useLocalSearchParams();
-  const auth = useAuth();
+  const { session } = useAuth();
 
   const { data: setlist } = useQuery({
     queryKey: ["setlist", id],
@@ -41,7 +41,7 @@ export default function SetlistPage() {
 
   const playlistMutation = useMutation({
     mutationFn: (variables: MutationVars) =>
-      createPlaylist(auth.providerToken, variables.userId, {
+      createPlaylist(session?.accessToken, variables.userId, {
         name: variables.name,
         description: variables.description,
         public: variables.public,
@@ -65,7 +65,7 @@ export default function SetlistPage() {
   }, [setlist]);
 
   const handleCreatePlaylist = async () => {
-    const currentUser = await getCurrentUser(auth.providerToken);
+    const currentUser = await getCurrentUser(session?.accessToken);
 
     await playlistMutation.mutateAsync({
       userId: currentUser.id,

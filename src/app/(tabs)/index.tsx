@@ -16,18 +16,18 @@ const styles = StyleSheet.create({
 });
 
 export default function Index() {
-  const auth = useAuth();
+  const { session } = useAuth();
 
   const { data: topArtists, error } = useQuery({
     queryKey: ["top-artists"],
-    queryFn: () => getTopArtists(auth.providerToken),
-    enabled: auth.providerToken != null,
+    queryFn: () => getTopArtists(session?.accessToken),
+    enabled: session !== null && session !== undefined,
   });
 
   const { data: relatedArtists } = useQuery({
     queryKey: ["related-artists"],
-    queryFn: () => getRelatedArtists(auth.providerToken, topArtists ? topArtists[0].id : null),
-    enabled: auth.providerToken != null && topArtists !== undefined,
+    queryFn: () => getRelatedArtists(session?.accessToken, topArtists ? topArtists[0].id : null),
+    enabled: session !== null && session !== undefined && topArtists !== undefined,
   });
 
   return (

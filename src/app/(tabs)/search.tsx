@@ -21,10 +21,10 @@ export default function Search() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Artist[]>([]);
 
-  const auth = useAuth();
+  const { session } = useAuth();
 
   const debounced = useDebouncedCallback(async (query) => {
-    const results = await searchForArtists(auth.providerToken, query);
+    const results = await searchForArtists(session?.accessToken, query);
     setSearchResults(results);
   }, 1000);
 

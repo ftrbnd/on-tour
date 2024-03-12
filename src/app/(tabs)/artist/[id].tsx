@@ -18,12 +18,12 @@ const styles = StyleSheet.create({
 
 export default function ArtistPage() {
   const { id }: { id: string } = useLocalSearchParams();
-  const auth = useAuth();
+  const { session } = useAuth();
 
   const { data: artist } = useQuery({
     queryKey: ["artist", id],
-    queryFn: () => getOneArtist(auth.providerToken, id),
-    enabled: auth.providerToken != null,
+    queryFn: () => getOneArtist(session?.accessToken, id),
+    enabled: session?.accessToken != null,
   });
 
   const { data: setlists } = useQuery({

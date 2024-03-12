@@ -18,7 +18,7 @@ export async function setStorageItemAsync(key: string, value: string | null) {
   }
 }
 
-export function useStorageState(key: string): UseStateHook<string> {
+export function useSecureStore(key: string): UseStateHook<string> {
   const [state, setState] = useAsyncState<string>();
 
   useEffect(() => {

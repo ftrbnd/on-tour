@@ -6,27 +6,27 @@ import { useAuth } from "@/src/providers/AuthProvider";
 import { getTopArtists } from "@/src/services/spotify";
 
 export default function Profile() {
-  const auth = useAuth();
+  const { session, signIn, signOut } = useAuth();
 
   const { data, refetch, error } = useQuery({
     queryKey: ["top-artists"],
-    queryFn: () => getTopArtists(auth.providerToken),
-    enabled: auth.providerToken != null,
+    queryFn: () => getTopArtists(session?.accessToken),
+    enabled: session?.accessToken != null,
   });
 
   return (
     <View>
-      <Text>{auth.session ? auth.user?.username : "not signed in"}</Text>
-      {!auth.session ? (
-        <Button onPress={() => auth.signIn()}>Sign in with Spotify</Button>
+      <Text>{session ? session.user?.display_name : "not signed in"}</Text>
+      {!session ? (
+        <Button onPress={() => signIn()}>Sign in with Spotify</Button>
       ) : (
         <>
-          {auth.user?.avatar_url ? (
-            <Avatar.Image size={48} source={{ uri: auth.user?.avatar_url }} />
+          {session.user?.images[0] ? (
+            <Avatar.Image size={48} source={{ uri: session.user?.images[0].url }} />
           ) : (
             <Avatar.Icon size={48} icon="account" />
           )}
-          <Button onPress={() => auth.signOut()}>Sign Out</Button>
+          <Button onPress={() => signOut()}>Sign Out</Button>
           <Button onPress={() => refetch()}>Refetch</Button>
           <HelperText type="error" visible={error != null}>
             {error?.message}

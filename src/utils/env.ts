@@ -1,8 +1,6 @@
 import z from "zod";
 
 const envSchema = z.object({
-  EXPO_PUBLIC_SUPABASE_URL: z.string().url(),
-  EXPO_PUBLIC_SUPABASE_ANON_KEY: z.string(),
   EXPO_PUBLIC_SETLIST_FM_API_KEY: z.string(),
   EXPO_PUBLIC_SPOTIFY_CLIENT_ID: z.string(),
   EXPO_PUBLIC_SPOTIFY_CLIENT_SECRET: z.string(),
