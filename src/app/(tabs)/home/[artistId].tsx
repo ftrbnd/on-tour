@@ -17,13 +17,13 @@ const styles = StyleSheet.create({
 });
 
 export default function ArtistPage() {
-  const { id }: { id: string } = useLocalSearchParams();
+  const { artistId }: { artistId: string } = useLocalSearchParams();
   const { session } = useAuth();
   const router = useRouter();
 
   const { data: artist } = useQuery({
-    queryKey: ["artist", id],
-    queryFn: () => getOneArtist(session?.accessToken, id),
+    queryKey: ["artist", artistId],
+    queryFn: () => getOneArtist(session?.accessToken, artistId),
     enabled: session?.accessToken != null,
   });
 

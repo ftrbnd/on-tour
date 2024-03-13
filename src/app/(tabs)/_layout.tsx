@@ -5,11 +5,10 @@ export default function TabLayout() {
   return (
     <Tabs>
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
-          href: "/",
           tabBarLabel: "Home",
-          headerTitle: "On Tour",
+          headerShown: false,
           tabBarIcon: ({ focused, color }) =>
             focused ? (
               <Ionicons name="home" size={24} color={color} />
@@ -21,7 +20,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="explore"
         options={{
-          href: "/explore",
           tabBarLabel: "Explore",
           headerTitle: "Explore",
           tabBarIcon: ({ focused, color }) =>
@@ -35,7 +33,6 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          href: "/profile",
           tabBarLabel: "Me",
           tabBarIcon: ({ focused, color }) =>
             focused ? (

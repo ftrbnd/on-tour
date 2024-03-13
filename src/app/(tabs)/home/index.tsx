@@ -27,7 +27,7 @@ export default function Home() {
   });
 
   const openArtistPage = (artistId: string) => {
-    router.push(`/artist/${artistId}`);
+    router.push(`/home/${artistId}`);
   };
 
   return (
