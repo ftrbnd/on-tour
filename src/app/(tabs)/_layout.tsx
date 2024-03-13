@@ -9,24 +9,26 @@ export default function TabLayout() {
         options={{
           href: "/",
           tabBarLabel: "Home",
-          tabBarIcon: ({ focused }) =>
+          headerTitle: "On Tour",
+          tabBarIcon: ({ focused, color }) =>
             focused ? (
-              <Ionicons name="home" size={24} color="black" />
+              <Ionicons name="home" size={24} color={color} />
             ) : (
-              <Ionicons name="home-outline" size={24} color="black" />
+              <Ionicons name="home-outline" size={24} color={color} />
             ),
         }}
       />
       <Tabs.Screen
-        name="search"
+        name="explore"
         options={{
-          href: "/search",
-          tabBarLabel: "Search",
-          tabBarIcon: ({ focused }) =>
+          href: "/explore",
+          tabBarLabel: "Explore",
+          headerTitle: "Explore",
+          tabBarIcon: ({ focused, color }) =>
             focused ? (
-              <Ionicons name="search" size={24} color="black" />
+              <Ionicons name="search" size={24} color={color} />
             ) : (
-              <Ionicons name="search-outline" size={24} color="black" />
+              <Ionicons name="search-outline" size={24} color={color} />
             ),
         }}
       />
@@ -35,16 +37,16 @@ export default function TabLayout() {
         options={{
           href: "/profile",
           tabBarLabel: "Me",
-          tabBarIcon: ({ focused }) =>
+          tabBarIcon: ({ focused, color }) =>
             focused ? (
-              <Ionicons name="person" size={24} color="black" />
+              <Ionicons name="person" size={24} color={color} />
             ) : (
-              <Ionicons name="person-outline" size={24} color="black" />
+              <Ionicons name="person-outline" size={24} color={color} />
             ),
         }}
       />
-      <Tabs.Screen name="artist" options={{ href: null }} />
-      <Tabs.Screen name="setlist" options={{ href: null }} />
+      <Tabs.Screen name="artist" options={{ href: null, headerShown: false }} />
+      <Tabs.Screen name="setlist" options={{ href: null, headerShown: false }} />
     </Tabs>
   );
 }

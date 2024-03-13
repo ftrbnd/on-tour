@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
@@ -57,9 +57,11 @@ export default function SetlistPage() {
   const updatePlaylistMutation = useMutation({
     mutationFn: (body: UpdatePlaylistRequestBody) =>
       addSongsToPlaylist(session?.accessToken, { playlistId: body.playlistId, uris: body.uris }),
-    onSuccess: (updatedPlaylist) => {
+    onSuccess: (updatedPlaylist, body) => {
       console.log("Updated playlist!");
       console.log({ updatedPlaylist });
+
+      console.log(`Found ${body.found}/${body.expected} songs`);
     },
     onError: (error) => {
       console.error("Update mutation failed", error);
@@ -110,7 +112,12 @@ export default function SetlistPage() {
         uris.push(uri);
       }
 
-      await updatePlaylistMutation.mutateAsync({ playlistId: playlist.id, uris });
+      await updatePlaylistMutation.mutateAsync({
+        playlistId: playlist.id,
+        uris,
+        expected: allSongs.length,
+        found: uris.length,
+      });
     } catch (error) {
       console.error(error);
     }
@@ -130,6 +137,7 @@ export default function SetlistPage() {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ headerTitle: createPlaylistName() }} />
       <Text>Setlist</Text>
 
       <FlatList

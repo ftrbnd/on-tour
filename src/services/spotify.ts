@@ -17,7 +17,6 @@ export async function getTopArtists(token: string | null | undefined): Promise<A
     const { items }: { items: Artist[] } = await res.json();
     return items;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }
@@ -36,7 +35,6 @@ export async function getOneArtist(token: string | null | undefined, id: string)
     const artist: Artist = await res.json();
     return artist;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }
@@ -59,7 +57,6 @@ export async function getRelatedArtists(
     const { artists }: { artists: Artist[] } = await res.json();
     return artists;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }
@@ -82,7 +79,6 @@ export async function searchForArtists(
     const { artists }: { artists: Page<Artist> } = await res.json();
     return artists.items;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }
@@ -115,7 +111,6 @@ export async function createPlaylist(
 
     return playlist;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }
@@ -137,21 +132,22 @@ export async function getUriFromSetlistFmSong(
         },
       },
     );
-    if (!res.ok) throw Error(`Failed to search for "${artistToSearch + " " + song.name}"`);
+    if (!res.ok) throw Error(`Failed to search for "${artistToSearch} - ${song.name}"`);
 
     const { tracks }: { tracks: Page<Track> } = await res.json();
     const uri = tracks.items[0].uri;
 
     return uri;
   } catch (error) {
-    console.error(error);
-    throw error;
+    throw Error(`No uri found for "${artistToSearch} - ${song.name}"`);
   }
 }
 
 export interface UpdatePlaylistRequestBody {
   playlistId: string;
   uris: string[];
+  expected?: number;
+  found?: number;
 }
 
 export async function addSongsToPlaylist(
@@ -162,8 +158,6 @@ export async function addSongsToPlaylist(
   if (body.uris.length === 0) throw Error("At least one uri is required");
 
   try {
-    // TODO: handle songs with apostrophes and other potentially troubling characters
-
     const res = await fetch(`${ENDPOINT}/playlists/${body.playlistId}/tracks`, {
       method: "POST",
       body: JSON.stringify({ uris: body.uris }),
@@ -176,7 +170,6 @@ export async function addSongsToPlaylist(
     const snapshot: SnapshotReference = await res.json();
     return snapshot.snapshot_id;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 }

@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { FlatList, StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 
 import ArtistPreview from "@/src/components/ArtistPreview";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { getTopArtists, getRelatedArtists } from "@/src/services/spotify";
+import { getTopArtists } from "@/src/services/spotify";
 
 const styles = StyleSheet.create({
   container: {
@@ -15,8 +16,9 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function Index() {
+export default function Home() {
   const { session } = useAuth();
+  const router = useRouter();
 
   const { data: topArtists } = useQuery({
     queryKey: ["top-artists"],
@@ -24,31 +26,22 @@ export default function Index() {
     enabled: session !== null && session !== undefined,
   });
 
-  const { data: relatedArtists } = useQuery({
-    queryKey: ["related-artists"],
-    queryFn: () => getRelatedArtists(session?.accessToken, topArtists ? topArtists[0].id : null),
-    enabled: session !== null && session !== undefined && topArtists !== undefined,
-  });
+  const openArtistPage = (artistId: string) => {
+    router.push(`/artist/${artistId}`);
+  };
 
   return (
     <View style={styles.container}>
       <Text variant="displayMedium">Your Artists</Text>
+
       <FlatList
         style={styles.list}
         horizontal
         showsHorizontalScrollIndicator={false}
         data={topArtists ?? []}
-        renderItem={({ item }) => <ArtistPreview artist={item} />}
-        keyExtractor={(artist) => artist.id}
-      />
-
-      <Text variant="displayMedium">Explore</Text>
-      <FlatList
-        style={styles.list}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        data={relatedArtists ?? []}
-        renderItem={({ item }) => <ArtistPreview artist={item} />}
+        renderItem={({ item }) => (
+          <ArtistPreview onPress={() => openArtistPage(item.id)} artist={item} />
+        )}
         keyExtractor={(artist) => artist.id}
       />
     </View>

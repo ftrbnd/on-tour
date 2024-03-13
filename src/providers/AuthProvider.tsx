@@ -64,19 +64,16 @@ export function AuthProvider(props: PropsWithChildren) {
   );
 
   useEffect(() => {
-    console.log("readTokenFromStorage()");
     readTokenFromStorage();
-  }, [tokenConfig]);
+    // TODO: created expiresAt state to run in separate useEffect to refresh tokens
 
-  useEffect(() => {
     if (response?.type === "success") {
       const { code } = response.params;
       if (code) {
-        console.log(`exchangeCodeForToken()`);
         exchangeCodeForToken(code);
       }
     }
-  }, [response]);
+  }, [response, tokenConfig]);
 
   const updateContext = async (tokenResponse: TokenResponse) => {
     try {
@@ -88,6 +85,8 @@ export function AuthProvider(props: PropsWithChildren) {
         { userInfoEndpoint: "https://api.spotify.com/v1/me" },
       )) as User;
 
+      // TODO: add user info to db on sign-up
+
       setTokenConfig(JSON.stringify(tokenConfig));
       setSession({ accessToken, user });
     } catch (error) {
@@ -97,6 +96,7 @@ export function AuthProvider(props: PropsWithChildren) {
 
   const readTokenFromStorage = async () => {
     if (!tokenConfig) return;
+    console.log(`readTokenFromStorage()`);
 
     try {
       const config: TokenResponseConfig = JSON.parse(tokenConfig);
@@ -130,6 +130,8 @@ export function AuthProvider(props: PropsWithChildren) {
   };
 
   const exchangeCodeForToken = async (code: string) => {
+    console.log(`exchangeCodeForToken()`);
+
     try {
       const tokenResponse: TokenResponse = await exchangeCodeAsync(
         {

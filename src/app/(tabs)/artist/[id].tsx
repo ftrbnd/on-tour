@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { View, FlatList, StyleSheet } from "react-native";
 
 import SetlistPreview from "@/src/components/SetlistPreview";
@@ -19,6 +19,7 @@ const styles = StyleSheet.create({
 export default function ArtistPage() {
   const { id }: { id: string } = useLocalSearchParams();
   const { session } = useAuth();
+  const router = useRouter();
 
   const { data: artist } = useQuery({
     queryKey: ["artist", id],
@@ -32,12 +33,19 @@ export default function ArtistPage() {
     enabled: artist?.name !== null,
   });
 
+  const openSetlistPage = (setlistId: string) => {
+    router.push(`/setlist/${setlistId}`);
+  };
+
   return (
     <View style={styles.container}>
+      <Stack.Screen options={{ headerTitle: artist?.name }} />
       <FlatList
         style={styles.list}
         data={setlists ?? []}
-        renderItem={({ item }) => <SetlistPreview setlist={item} />}
+        renderItem={({ item }) => (
+          <SetlistPreview onPress={() => openSetlistPage(item.id)} setlist={item} />
+        )}
         keyExtractor={(setlist) => setlist.id}
       />
     </View>

@@ -1,4 +1,3 @@
-import { useRouter } from "expo-router";
 import moment from "moment";
 import { StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
@@ -11,15 +10,15 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function SetlistPreview({ setlist }: { setlist: Setlist }) {
-  const router = useRouter();
-
-  const openSetlistPage = () => {
-    router.push(`/(tabs)/setlist/${setlist.id}`);
-  };
-
+export default function SetlistPreview({
+  setlist,
+  onPress,
+}: {
+  setlist: Setlist;
+  onPress: () => void;
+}) {
   return (
-    <Card style={styles.card} onPress={openSetlistPage}>
+    <Card style={styles.card} onPress={onPress}>
       <Card.Content>
         <Text variant="titleLarge">{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>
         {setlist.tour && <Text>{setlist.tour?.name}</Text>}
