@@ -89,10 +89,10 @@ export interface Setlists {
 
 export interface Song {
   name: string;
-  with: Artist;
-  cover: Artist;
-  info: string;
-  tape: boolean;
+  with?: Artist;
+  cover?: Artist;
+  info?: string;
+  tape?: boolean;
 }
 
 export interface Tour {

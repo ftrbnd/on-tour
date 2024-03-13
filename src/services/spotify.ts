@@ -1,10 +1,11 @@
-import { Artist, Page, Playlist } from "../utils/spotify-types";
+import { Song } from "../utils/setlist-fm-types";
+import { Artist, Page, Playlist, SnapshotReference, Track } from "../utils/spotify-types";
 
 const ENDPOINT = `https://api.spotify.com/v1`;
 
 export async function getTopArtists(token: string | null | undefined): Promise<Artist[]> {
   try {
-    if (!token) throw Error("Provider token required");
+    if (!token) throw Error("Access token required");
 
     const res = await fetch(`${ENDPOINT}/me/top/artists?limit=20`, {
       headers: {
@@ -23,7 +24,7 @@ export async function getTopArtists(token: string | null | undefined): Promise<A
 
 export async function getOneArtist(token: string | null | undefined, id: string): Promise<Artist> {
   try {
-    if (!token) throw Error("Provider token required");
+    if (!token) throw Error("Access token required");
 
     const res = await fetch(`${ENDPOINT}/artists/${id}`, {
       headers: {
@@ -46,7 +47,7 @@ export async function getRelatedArtists(
   artistId: string | null | undefined,
 ): Promise<Artist[]> {
   try {
-    if (!token) throw Error("Provider token required");
+    if (!token) throw Error("Access token required");
 
     const res = await fetch(`${ENDPOINT}/artists/${artistId}/related-artists`, {
       headers: {
@@ -68,7 +69,7 @@ export async function searchForArtists(
   query: string,
 ): Promise<Artist[]> {
   try {
-    if (!token) throw Error("Provider token required");
+    if (!token) throw Error("Access token required");
     if (!query) return [];
 
     const res = await fetch(`${ENDPOINT}/search?q=${query}&type=artist&limit=10`, {
@@ -98,7 +99,7 @@ export async function createPlaylist(
   body: CreatePlaylistRequestBody,
 ): Promise<Playlist> {
   try {
-    if (!token) throw Error("Provider token required");
+    if (!token) throw Error("Access token required");
     if (!userId) throw Error("User id required");
 
     const res = await fetch(`${ENDPOINT}/users/${userId}/playlists`, {
@@ -111,9 +112,69 @@ export async function createPlaylist(
     if (!res.ok) throw Error(`Failed to create playlist`);
 
     const playlist: Playlist = await res.json();
-    console.log(playlist);
 
     return playlist;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getUriFromSetlistFmSong(
+  token: string | null | undefined,
+  artistToSearch: string | undefined,
+  song: Song,
+): Promise<string> {
+  if (!token) throw Error("Access token required");
+  if (!artistToSearch) throw Error("Artist name is required");
+
+  try {
+    const res = await fetch(
+      `${ENDPOINT}/search?q=artist:"${artistToSearch}" track:"${song.name}"&type=track&limit=1`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    if (!res.ok) throw Error(`Failed to search for "${artistToSearch + " " + song.name}"`);
+
+    const { tracks }: { tracks: Page<Track> } = await res.json();
+    const uri = tracks.items[0].uri;
+
+    return uri;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export interface UpdatePlaylistRequestBody {
+  playlistId: string;
+  uris: string[];
+}
+
+export async function addSongsToPlaylist(
+  token: string | null | undefined,
+  body: UpdatePlaylistRequestBody,
+) {
+  if (!token) throw Error("Access token required");
+  if (body.uris.length === 0) throw Error("At least one uri is required");
+
+  try {
+    // TODO: handle songs with apostrophes and other potentially troubling characters
+
+    const res = await fetch(`${ENDPOINT}/playlists/${body.playlistId}/tracks`, {
+      method: "POST",
+      body: JSON.stringify({ uris: body.uris }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw Error(`Failed to add tracks to playlist`);
+
+    const snapshot: SnapshotReference = await res.json();
+    return snapshot.snapshot_id;
   } catch (error) {
     console.error(error);
     throw error;

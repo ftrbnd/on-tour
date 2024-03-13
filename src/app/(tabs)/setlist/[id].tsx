@@ -7,8 +7,15 @@ import { Button, Text } from "react-native-paper";
 
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getOneSetlist } from "@/src/services/setlist-fm";
-import { CreatePlaylistRequestBody, createPlaylist } from "@/src/services/spotify";
-import { BasicSet } from "@/src/utils/setlist-fm-types";
+import {
+  CreatePlaylistRequestBody,
+  UpdatePlaylistRequestBody,
+  addSongsToPlaylist,
+  createPlaylist,
+  getUriFromSetlistFmSong,
+} from "@/src/services/spotify";
+import { BasicSet, Song } from "@/src/utils/setlist-fm-types";
+import { Playlist } from "@/src/utils/spotify-types";
 
 const styles = StyleSheet.create({
   container: {
@@ -36,14 +43,26 @@ export default function SetlistPage() {
   const createPlaylistMutation = useMutation({
     mutationFn: (body: CreatePlaylistRequestBody) =>
       createPlaylist(session?.accessToken, session?.user?.id, body),
-    onSuccess: () => {
-      console.log("Created playlist");
+    onSuccess: async (createdPlaylist) => {
+      console.log("Created playlist!");
+      console.log({ createdPlaylist });
 
-      // TODO: get spotify links for each song in the setlist
-      // TODO: add to created playlist
+      await handleUpdatePlaylist(createdPlaylist);
     },
     onError: (error) => {
-      console.error("Mutation failed", error);
+      console.error("Create mutation failed", error);
+    },
+  });
+
+  const updatePlaylistMutation = useMutation({
+    mutationFn: (body: UpdatePlaylistRequestBody) =>
+      addSongsToPlaylist(session?.accessToken, { playlistId: body.playlistId, uris: body.uris }),
+    onSuccess: (updatedPlaylist) => {
+      console.log("Updated playlist!");
+      console.log({ updatedPlaylist });
+    },
+    onError: (error) => {
+      console.error("Update mutation failed", error);
     },
   });
 
@@ -71,6 +90,39 @@ export default function SetlistPage() {
         description: `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}`,
         public: false,
       });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUpdatePlaylist = async (playlist: Playlist) => {
+    try {
+      const p = primary?.song ?? [];
+      const e = encore?.song ?? [];
+      const allSongs = [...p, ...e];
+
+      const uris: string[] = [];
+
+      for (const song of allSongs) {
+        const uri = await getSpotifyUri(song);
+        if (!uri) continue;
+
+        uris.push(uri);
+      }
+
+      await updatePlaylistMutation.mutateAsync({ playlistId: playlist.id, uris });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getSpotifyUri = async (song: Song) => {
+    try {
+      const artistToSearch = song.cover ? song.cover.name : setlist?.artist.name;
+
+      const uri = await getUriFromSetlistFmSong(session?.accessToken, artistToSearch, song);
+
+      return uri;
     } catch (error) {
       console.error(error);
     }

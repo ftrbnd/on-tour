@@ -38,8 +38,6 @@ export async function getOneSetlist(id: string | undefined): Promise<Setlist> {
     if (!res.ok) throw Error(`Failed to fetch setlist with id "${id}" from setlist.fm`);
 
     const data: Setlist = await res.json();
-    console.log(data);
-
     return data;
   } catch (error) {
     console.error(error);
