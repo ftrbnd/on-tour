@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
 export default function Index() {
   const { session } = useAuth();
 
-  const { data: topArtists, error } = useQuery({
+  const { data: topArtists } = useQuery({
     queryKey: ["top-artists"],
     queryFn: () => getTopArtists(session?.accessToken),
     enabled: session !== null && session !== undefined,
@@ -32,8 +32,6 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      {error && <Text>{error.message}</Text>}
-
       <Text variant="displayMedium">Your Artists</Text>
       <FlatList
         style={styles.list}
