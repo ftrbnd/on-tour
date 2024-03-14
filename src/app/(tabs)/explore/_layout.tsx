@@ -1,9 +1,9 @@
 import { Stack } from "expo-router";
 
-export default function HomeLayout() {
+export default function ExploreLayout() {
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ headerTitle: "On Tour" }} />
+      <Stack.Screen name="index" options={{ headerTitle: "Explore" }} />
       <Stack.Screen name="[artistId]" />
     </Stack>
   );

@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Stack } from "expo-router";
 import { View, StyleSheet } from "react-native";
 import { Button, Text, Avatar } from "react-native-paper";
 
@@ -18,7 +18,7 @@ export default function Profile() {
 
   return (
     <View>
-      <Tabs.Screen options={{ headerTitle: session?.user ? session?.user.display_name : "You" }} />
+      <Stack.Screen options={{ headerTitle: session?.user ? session?.user.display_name : "You" }} />
       <View style={styles.container}>
         {session ? (
           <Avatar.Image size={120} source={{ uri: session.user?.images[1].url }} />

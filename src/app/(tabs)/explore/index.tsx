@@ -45,7 +45,7 @@ export default function Explore() {
   });
 
   const openArtistPage = (artistId: string) => {
-    router.push(`/artist/${artistId}`);
+    router.push(`/explore/${artistId}`);
   };
 
   return (
