@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { randomUUID } from "expo-crypto";
+import { Stack } from "expo-router";
 import { useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
 import { Searchbar, Text } from "react-native-paper";
@@ -25,7 +26,6 @@ export default function Explore() {
   const [searchResults, setSearchResults] = useState<Artist[]>([]);
 
   const { session } = useAuth();
-  const router = useRouter();
 
   const debounced = useDebouncedCallback(async (query) => {
     const results = await searchForArtists(session?.accessToken, query);
@@ -44,44 +44,41 @@ export default function Explore() {
     enabled: session !== null && session !== undefined && topArtists !== undefined,
   });
 
-  const openArtistPage = (artistId: string) => {
-    router.push(`/explore/${artistId}`);
-  };
-
   return (
-    <View style={styles.container}>
-      <Searchbar
-        placeholder="Search for an artist"
-        onChangeText={(text) => {
-          setSearchQuery(text);
-          debounced(text);
-        }}
-        value={searchQuery}
-      />
-
-      {searchResults.length > 0 ? (
-        <FlatList
-          style={styles.list}
-          showsVerticalScrollIndicator={false}
-          data={searchResults ?? []}
-          renderItem={({ item }) => <ArtistSearchResult artist={item} />}
-          keyExtractor={(artist) => artist.id}
+    <>
+      <Stack.Screen options={{ headerTitle: "Explore" }} />
+      <View style={styles.container}>
+        <Searchbar
+          placeholder="Search for an artist"
+          onChangeText={(text) => {
+            setSearchQuery(text);
+            debounced(text);
+          }}
+          value={searchQuery}
         />
-      ) : (
-        <>
-          <Text variant="displayMedium">Explore</Text>
+
+        {searchResults.length > 0 ? (
           <FlatList
             style={styles.list}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={relatedArtists ?? []}
-            renderItem={({ item }) => (
-              <ArtistPreview onPress={() => openArtistPage(item.id)} artist={item} />
-            )}
+            showsVerticalScrollIndicator={false}
+            data={searchResults ?? []}
+            renderItem={({ item }) => <ArtistSearchResult artist={item} />}
             keyExtractor={(artist) => artist.id}
           />
-        </>
-      )}
-    </View>
+        ) : (
+          <>
+            <Text variant="displayMedium">Explore</Text>
+            <FlatList
+              style={styles.list}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              data={relatedArtists ?? []}
+              renderItem={({ item }) => <ArtistPreview artist={item} />}
+              keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
+            />
+          </>
+        )}
+      </View>
+    </>
   );
 }

@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { randomUUID } from "expo-crypto";
+import { Stack, useLocalSearchParams, useRouter, useSegments } from "expo-router";
 import { View, FlatList, StyleSheet } from "react-native";
 
 import SetlistPreview from "@/src/components/SetlistPreview";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { searchArtistSetlist } from "@/src/services/setlist-fm";
 import { getOneArtist } from "@/src/services/spotify";
+import { SharedSegment } from "@/src/utils/types";
 
 const styles = StyleSheet.create({
   container: {
@@ -19,6 +21,8 @@ const styles = StyleSheet.create({
 export default function ArtistPage() {
   const { artistId }: { artistId: string } = useLocalSearchParams();
   const { session } = useAuth();
+  const [segment] = useSegments() as [SharedSegment];
+
   const router = useRouter();
 
   const { data: artist } = useQuery({
@@ -34,7 +38,7 @@ export default function ArtistPage() {
   });
 
   const openSetlistPage = (setlistId: string) => {
-    router.push(`/setlist/${setlistId}`);
+    router.push(`/${segment}/${setlistId}`);
   };
 
   return (
@@ -46,7 +50,7 @@ export default function ArtistPage() {
         renderItem={({ item }) => (
           <SetlistPreview onPress={() => openSetlistPage(item.id)} setlist={item} />
         )}
-        keyExtractor={(setlist) => setlist.id}
+        keyExtractor={(setlist) => `${setlist.id}-${randomUUID()}`}
       />
     </View>
   );

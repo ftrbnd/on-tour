@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { randomUUID } from "expo-crypto";
 import { Stack, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { useEffect, useState } from "react";
@@ -31,13 +32,13 @@ export default function SetlistPage() {
   const [primary, setPrimary] = useState<BasicSet | null>(null);
   const [encore, setEncore] = useState<BasicSet | null>(null);
 
-  const { id }: { id: string } = useLocalSearchParams();
+  const { setlistId }: { setlistId: string } = useLocalSearchParams();
   const { session } = useAuth();
 
   const { data: setlist } = useQuery({
-    queryKey: ["setlist", id],
-    queryFn: () => getOneSetlist(id),
-    enabled: id !== null,
+    queryKey: ["setlist", setlistId],
+    queryFn: () => getOneSetlist(setlistId),
+    enabled: setlistId !== null,
   });
 
   const createPlaylistMutation = useMutation({
@@ -154,7 +155,7 @@ export default function SetlistPage() {
             style={styles.list}
             data={encore?.song}
             renderItem={({ item }) => <Text>{item.name}</Text>}
-            keyExtractor={(song) => song.name}
+            keyExtractor={(song) => `${song.name}-${randomUUID()}`}
           />
         </>
       )}

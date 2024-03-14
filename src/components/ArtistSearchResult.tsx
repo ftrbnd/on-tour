@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Avatar, Card, Text } from "react-native-paper";
 
 import { Artist } from "../utils/spotify-types";
+import { SharedSegment } from "../utils/types";
 
 const styles = StyleSheet.create({
   card: {
@@ -15,10 +16,11 @@ const styles = StyleSheet.create({
 });
 
 export default function ArtistSearchResult({ artist }: { artist: Artist }) {
+  const [segment] = useSegments() as [SharedSegment];
   const router = useRouter();
 
   const openArtistPage = () => {
-    router.push(`/(tabs)/artist/${artist.id}`);
+    router.push(`/${segment}/artist/${artist.id}`);
   };
   return (
     <Card style={styles.card} onPress={openArtistPage}>

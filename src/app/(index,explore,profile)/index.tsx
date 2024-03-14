@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
+import { randomUUID } from "expo-crypto";
+import { Stack } from "expo-router";
 import { FlatList, StyleSheet, View } from "react-native";
 import { Text } from "react-native-paper";
 
@@ -18,7 +19,6 @@ const styles = StyleSheet.create({
 
 export default function Home() {
   const { session } = useAuth();
-  const router = useRouter();
 
   const { data: topArtists } = useQuery({
     queryKey: ["top-artists"],
@@ -26,24 +26,21 @@ export default function Home() {
     enabled: session !== null && session !== undefined,
   });
 
-  const openArtistPage = (artistId: string) => {
-    router.push(`/home/${artistId}`);
-  };
-
   return (
-    <View style={styles.container}>
-      <Text variant="displayMedium">Your Artists</Text>
+    <>
+      <Stack.Screen options={{ title: "On Tour" }} />
+      <View style={styles.container}>
+        <Text variant="displayMedium">Your Artists</Text>
 
-      <FlatList
-        style={styles.list}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        data={topArtists ?? []}
-        renderItem={({ item }) => (
-          <ArtistPreview onPress={() => openArtistPage(item.id)} artist={item} />
-        )}
-        keyExtractor={(artist) => artist.id}
-      />
-    </View>
+        <FlatList
+          style={styles.list}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={topArtists ?? []}
+          renderItem={({ item }) => <ArtistPreview artist={item} />}
+          keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
+        />
+      </View>
+    </>
   );
 }
