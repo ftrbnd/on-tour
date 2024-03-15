@@ -1,9 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { Stack, useLocalSearchParams } from "expo-router";
+import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
+import { useMMKVObject } from "react-native-mmkv";
 import { Button, Text } from "react-native-paper";
 
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -13,10 +15,11 @@ import {
   UpdatePlaylistRequestBody,
   addSongsToPlaylist,
   createPlaylist,
+  getOnePlaylist,
   getUriFromSetlistFmSong,
 } from "@/src/services/spotify";
 import { BasicSet, Song } from "@/src/utils/setlist-fm-types";
-import { Playlist } from "@/src/utils/spotify-types";
+import { Playlist, TrackItem } from "@/src/utils/spotify-types";
 
 const styles = StyleSheet.create({
   container: {
@@ -27,13 +30,15 @@ const styles = StyleSheet.create({
   },
 });
 
-// TODO: add button to open setlist on web
 export default function SetlistPage() {
   const [primary, setPrimary] = useState<BasicSet | null>(null);
   const [encore, setEncore] = useState<BasicSet | null>(null);
 
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
   const { session } = useAuth();
+
+  const [createdPlaylist, setCreatedPlaylist] = useState<Playlist<TrackItem> | null>(null);
+  const [, setCreatedPlaylists] = useMMKVObject<Playlist<TrackItem>[]>("created.playlists");
 
   const { data: setlist } = useQuery({
     queryKey: ["setlist", setlistId],
@@ -45,9 +50,6 @@ export default function SetlistPage() {
     mutationFn: (body: CreatePlaylistRequestBody) =>
       createPlaylist(session?.accessToken, session?.user?.id, body),
     onSuccess: async (createdPlaylist) => {
-      console.log("Created playlist!");
-      console.log({ createdPlaylist });
-
       await handleUpdatePlaylist(createdPlaylist);
     },
     onError: (error) => {
@@ -58,15 +60,19 @@ export default function SetlistPage() {
   const updatePlaylistMutation = useMutation({
     mutationFn: (body: UpdatePlaylistRequestBody) =>
       addSongsToPlaylist(session?.accessToken, { playlistId: body.playlistId, uris: body.uris }),
-    onSuccess: (updatedPlaylist, body) => {
-      console.log("Updated playlist!");
-      console.log({ updatedPlaylist });
-
+    onSuccess: (_updatedPlaylist, body) => {
+      // TODO: show this message as an alert?
       console.log(`Found ${body.found}/${body.expected} songs`);
     },
     onError: (error) => {
       console.error("Update mutation failed", error);
     },
+  });
+
+  const { data: finalPlaylist } = useQuery({
+    queryKey: ["playlist", createdPlaylist?.id],
+    queryFn: () => getOnePlaylist(session?.accessToken, createdPlaylist?.id),
+    enabled: createdPlaylist !== undefined,
   });
 
   useEffect(() => {
@@ -75,6 +81,12 @@ export default function SetlistPage() {
       setEncore(setlist.sets.set[1]);
     }
   }, [setlist]);
+
+  useEffect(() => {
+    if (finalPlaylist) {
+      setCreatedPlaylists((prev) => (prev ? prev.concat(finalPlaylist) : []));
+    }
+  }, [finalPlaylist]);
 
   const createPlaylistName = () => {
     if (!setlist) return "";
@@ -119,6 +131,8 @@ export default function SetlistPage() {
         expected: allSongs.length,
         found: uris.length,
       });
+
+      setCreatedPlaylist(playlist);
     } catch (error) {
       console.error(error);
     }
@@ -131,6 +145,14 @@ export default function SetlistPage() {
       const uri = await getUriFromSetlistFmSong(session?.accessToken, artistToSearch, song);
 
       return uri;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const openSetlistFmPage = async () => {
+    try {
+      if (setlist) await openBrowserAsync(setlist.url);
     } catch (error) {
       console.error(error);
     }
@@ -160,6 +182,7 @@ export default function SetlistPage() {
         </>
       )}
 
+      <Button onPress={openSetlistFmPage}>View on setlist.fm</Button>
       <Button onPress={handleCreatePlaylist}>Create Playlist</Button>
     </View>
   );

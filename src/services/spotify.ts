@@ -177,3 +177,24 @@ export async function addSongsToPlaylist(
     throw error;
   }
 }
+
+export async function getOnePlaylist(
+  token: string | null | undefined,
+  id: string | undefined,
+): Promise<Playlist> {
+  try {
+    if (!token) throw Error("Access token required");
+
+    const res = await fetch(`${ENDPOINT}/playlists/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok) throw Error(`Failed to fetch playlist with id "${id}"`);
+
+    const playlist: Playlist = await res.json();
+    return playlist;
+  } catch (error) {
+    throw error;
+  }
+}
