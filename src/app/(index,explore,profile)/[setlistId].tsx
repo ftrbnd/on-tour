@@ -4,7 +4,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList, Alert } from "react-native";
 import { useMMKVObject } from "react-native-mmkv";
 import { Button, Text } from "react-native-paper";
 
@@ -62,7 +62,9 @@ export default function SetlistPage() {
       addSongsToPlaylist(session?.accessToken, { playlistId: body.playlistId, uris: body.uris }),
     onSuccess: (_updatedPlaylist, body) => {
       // TODO: show this message as an alert?
-      console.log(`Found ${body.found}/${body.expected} songs`);
+      // TODO: link setlist ids to playlist ids in storage
+      // if a user has already created a playlist for this setlist, show a button that can take them to the playlist
+      Alert.alert("Playlist created!", `Found ${body.found}/${body.expected} songs`);
     },
     onError: (error) => {
       console.error("Update mutation failed", error);
@@ -167,7 +169,7 @@ export default function SetlistPage() {
         style={styles.list}
         data={primary?.song}
         renderItem={({ item }) => <Text>{item.name}</Text>}
-        keyExtractor={(song) => song.name}
+        keyExtractor={(song) => `${song.name}-${randomUUID()}`}
       />
 
       {encore && (
