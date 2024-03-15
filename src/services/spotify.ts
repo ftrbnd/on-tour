@@ -3,19 +3,23 @@ import { Artist, Page, Playlist, SnapshotReference, Track } from "../utils/spoti
 
 const ENDPOINT = `https://api.spotify.com/v1`;
 
-export async function getTopArtists(token: string | null | undefined): Promise<Artist[]> {
+export async function getTopArtists(
+  token: string | null | undefined,
+  next?: string | null | undefined,
+): Promise<{ topArtists: Artist[]; next: string | null }> {
   try {
     if (!token) throw Error("Access token required");
 
-    const res = await fetch(`${ENDPOINT}/me/top/artists?limit=20`, {
+    const res = await fetch(next ?? `${ENDPOINT}/me/top/artists?limit=10`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     if (!res.ok) throw Error(`Failed to fetch your top artists`);
 
-    const { items }: { items: Artist[] } = await res.json();
-    return items;
+    const data: Page<Artist> = await res.json();
+
+    return { topArtists: data.items, next: data.next };
   } catch (error) {
     throw error;
   }

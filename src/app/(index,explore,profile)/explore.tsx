@@ -32,7 +32,7 @@ export default function Explore() {
     setSearchResults(results);
   }, 1000);
 
-  const { data: topArtists } = useQuery({
+  const { data } = useQuery({
     queryKey: ["top-artists"],
     queryFn: () => getTopArtists(session?.accessToken),
     enabled: session !== null && session !== undefined,
@@ -40,8 +40,9 @@ export default function Explore() {
 
   const { data: relatedArtists } = useQuery({
     queryKey: ["related-artists"],
-    queryFn: () => getRelatedArtists(session?.accessToken, topArtists ? topArtists[0].id : null),
-    enabled: session !== null && session !== undefined && topArtists !== undefined,
+    queryFn: () =>
+      getRelatedArtists(session?.accessToken, data?.topArtists ? data?.topArtists[0].id : null),
+    enabled: session !== null && session !== undefined && data?.topArtists !== undefined,
   });
 
   return (
@@ -70,8 +71,6 @@ export default function Explore() {
             <Text variant="displayMedium">Explore</Text>
             <FlatList
               style={styles.list}
-              horizontal
-              showsHorizontalScrollIndicator={false}
               data={relatedArtists ?? []}
               renderItem={({ item }) => <ArtistPreview artist={item} />}
               keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
