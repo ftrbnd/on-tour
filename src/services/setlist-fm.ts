@@ -1,5 +1,8 @@
+import moment from "moment";
+
 import { env } from "../utils/env";
 import { Setlist, Setlists } from "../utils/setlist-fm-types";
+import { Artist } from "../utils/spotify-types";
 
 const ENDPOINT = "https://api.setlist.fm/rest/1.0";
 
@@ -39,6 +42,29 @@ export async function getOneSetlist(id: string | undefined): Promise<Setlist> {
 
     const data: Setlist = await res.json();
     return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getRecentShows(artists: Artist[] | undefined): Promise<Setlist[]> {
+  try {
+    if (!artists) throw Error("Artists are required");
+    if (artists.length === 0) return [];
+
+    const recentSetlists: Setlist[] = [];
+
+    for (const artist of artists) {
+      const setlists = await searchArtistSetlist(artist.name);
+      recentSetlists.push(...setlists);
+    }
+
+    return recentSetlists.sort((a, b) => {
+      return (
+        moment(b.eventDate, "DD-MM-YYYY").valueOf() - moment(a.eventDate, "DD-MM-YYYY").valueOf()
+      );
+    });
   } catch (error) {
     console.error(error);
     throw error;
