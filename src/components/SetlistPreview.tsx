@@ -12,7 +12,13 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function SetlistPreview({ setlist }: { setlist: Setlist }) {
+export default function SetlistPreview({
+  setlist,
+  displayArtist,
+}: {
+  setlist: Setlist;
+  displayArtist?: boolean;
+}) {
   const router = useRouter();
   const [segment] = useSegments() as [SharedSegment];
 
@@ -23,12 +29,15 @@ export default function SetlistPreview({ setlist }: { setlist: Setlist }) {
   return (
     <Card style={styles.card} onPress={openSetlistPage}>
       <Card.Content>
-        <Text variant="titleLarge">{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>
+        {displayArtist && <Text variant="titleLarge">{setlist.artist.name}</Text>}
+        <Text variant="titleMedium">{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>
         {setlist.tour && <Text>{setlist.tour?.name}</Text>}
       </Card.Content>
       <Card.Title
         title={`${setlist.venue.name}`}
+        titleVariant="bodyMedium"
         subtitle={moment(setlist.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}
+        subtitleVariant="bodySmall"
       />
     </Card>
   );

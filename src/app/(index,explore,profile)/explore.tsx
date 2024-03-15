@@ -3,7 +3,7 @@ import { randomUUID } from "expo-crypto";
 import { Stack } from "expo-router";
 import { useState } from "react";
 import { FlatList, StyleSheet, View } from "react-native";
-import { Searchbar, Text } from "react-native-paper";
+import { Searchbar } from "react-native-paper";
 import { useDebouncedCallback } from "use-debounce";
 
 import ArtistPreview from "@/src/components/ArtistPreview";
@@ -67,15 +67,12 @@ export default function Explore() {
             keyExtractor={(artist) => artist.id}
           />
         ) : (
-          <>
-            <Text variant="displayMedium">Explore</Text>
-            <FlatList
-              style={styles.list}
-              data={relatedArtists ?? []}
-              renderItem={({ item }) => <ArtistPreview artist={item} />}
-              keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
-            />
-          </>
+          <FlatList
+            style={styles.list}
+            data={relatedArtists ?? []}
+            renderItem={({ item }) => <ArtistPreview artist={item} />}
+            keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
+          />
         )}
       </View>
     </>
