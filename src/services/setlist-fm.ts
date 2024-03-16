@@ -6,11 +6,14 @@ import { Artist } from "../utils/spotify-types";
 
 const ENDPOINT = "https://api.setlist.fm/rest/1.0";
 
-export async function searchArtistSetlist(query: string | undefined): Promise<Setlist[]> {
+export async function searchArtistSetlist(
+  query: string | undefined,
+  page?: number,
+): Promise<{ setlists: Setlist[]; nextPage?: number }> {
   try {
-    if (!query) return [];
+    if (!query) return { setlists: [] };
 
-    const res = await fetch(`${ENDPOINT}/search/setlists?artistName=${query}`, {
+    const res = await fetch(`${ENDPOINT}/search/setlists?artistName=${query}&p=${page ?? 1}`, {
       headers: {
         Accept: "application/json",
         "x-api-key": env.EXPO_PUBLIC_SETLIST_FM_API_KEY,
@@ -19,9 +22,19 @@ export async function searchArtistSetlist(query: string | undefined): Promise<Se
     if (!res.ok) throw Error(`Failed to fetch "${query}" from setlist.fm`);
 
     const setlists: Setlists = await res.json();
-    const nonEmpty = setlists.setlist.filter((s) => s.sets.set.length > 0);
 
-    return nonEmpty;
+    const nonEmpty = setlists.setlist
+      .filter((s) => s.sets.set.length > 0)
+      .sort((a, b) => {
+        return (
+          moment(b.eventDate, "DD-MM-YYYY").valueOf() - moment(a.eventDate, "DD-MM-YYYY").valueOf()
+        );
+      });
+
+    return {
+      setlists: nonEmpty,
+      nextPage: setlists.page + 1,
+    };
   } catch (error) {
     console.error(error);
     throw error;
@@ -56,7 +69,7 @@ export async function getRecentShows(artists: Artist[] | undefined): Promise<Set
     const recentSetlists: Setlist[] = [];
 
     for (const artist of artists) {
-      const setlists = await searchArtistSetlist(artist.name);
+      const { setlists } = await searchArtistSetlist(artist.name);
       recentSetlists.push(...setlists);
     }
 
