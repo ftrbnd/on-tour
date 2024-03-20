@@ -1,170 +1,117 @@
-import {
-  RefreshTokenRequestConfig,
-  TokenResponse,
-  TokenResponseConfig,
-  exchangeCodeAsync,
-  fetchUserInfoAsync,
-  makeRedirectUri,
-  useAuthRequest,
-} from "expo-auth-session";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 
 import { useSecureStore } from "../hooks/useSecureStore";
-import { env } from "../utils/env";
-import { User } from "../utils/spotify-types";
+import { User as SpotifyUser } from "../utils/spotify-types";
 
 interface Session {
-  accessToken: string | null;
-  user: User | null;
+  sessionToken: string;
+  accessToken: string;
 }
 
 interface AuthContextProps {
   session: Session | null;
+  user: SpotifyUser | null;
   signIn: () => void;
   signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   session: null,
+  user: null,
   signIn: () => {},
   signOut: () => {},
 });
 
-const requestConfig = {
-  redirectUri: makeRedirectUri({
-    native: "on.tour://",
-  }),
-  discovery: {
-    authorizationEndpoint: "https://accounts.spotify.com/authorize",
-    tokenEndpoint: "https://accounts.spotify.com/api/token",
-  },
-};
+const apiUrl = "http://localhost:3000/api";
 
 export function AuthProvider(props: PropsWithChildren) {
+  const [[, sessionToken], setSessionToken] = useSecureStore("session_token");
+  const [[, accessToken], setAccessToken] = useSecureStore("access_token");
+
   const [session, setSession] = useState<Session | null>(null);
-  const [[, tokenConfig], setTokenConfig] = useSecureStore("token_config");
+  const [user, setUser] = useState<SpotifyUser | null>(null);
 
-  const [request, response, promptAsync] = useAuthRequest(
-    {
-      clientId: env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID,
-      clientSecret: env.EXPO_PUBLIC_SPOTIFY_CLIENT_SECRET,
-      redirectUri: requestConfig.redirectUri,
-      scopes: [
-        "user-follow-read",
-        "user-top-read",
-        "playlist-modify-public",
-        "playlist-modify-private",
-      ],
-      usePKCE: false,
-    },
-    {
-      authorizationEndpoint: requestConfig.discovery.authorizationEndpoint,
-      tokenEndpoint: requestConfig.discovery.tokenEndpoint,
-    },
-  );
+  const redirectURL = Linking.createURL("profile");
 
-  useEffect(() => {
-    readTokenFromStorage();
-    // TODO: created expiresAt state to run in separate useEffect to refresh tokens
+  const getUser = async (accessToken: string): Promise<SpotifyUser | null> => {
+    const res = await fetch(`https://api.spotify.com/v1/me`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    if (!res.ok) return null;
 
-    if (response?.type === "success") {
-      const { code } = response.params;
-      if (code) {
-        exchangeCodeForToken(code);
-      }
-    }
-  }, [response, tokenConfig]);
-
-  const updateContext = async (tokenResponse: TokenResponse) => {
-    try {
-      const tokenConfig = tokenResponse.getRequestConfig();
-      const { accessToken } = tokenConfig;
-
-      const user = (await fetchUserInfoAsync(
-        { accessToken },
-        { userInfoEndpoint: "https://api.spotify.com/v1/me" },
-      )) as User;
-
-      // TODO: add user info to db on sign-up
-
-      setTokenConfig(JSON.stringify(tokenConfig));
-      setSession({ accessToken, user });
-    } catch (error) {
-      console.error("updateContext()", error);
-    }
-  };
-
-  const readTokenFromStorage = async () => {
-    if (!tokenConfig) return;
-    console.log(`readTokenFromStorage()`);
-
-    try {
-      const config: TokenResponseConfig = JSON.parse(tokenConfig);
-
-      let tokenResponse = new TokenResponse(config);
-
-      if (tokenResponse.shouldRefresh()) {
-        const refreshConfig: RefreshTokenRequestConfig = {
-          clientId: env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID,
-          clientSecret: env.EXPO_PUBLIC_SPOTIFY_CLIENT_SECRET,
-          refreshToken: config.refreshToken,
-        };
-
-        tokenResponse = await tokenResponse.refreshAsync(refreshConfig, {
-          tokenEndpoint: requestConfig.discovery.tokenEndpoint,
-        });
-      }
-
-      updateContext(tokenResponse);
-    } catch (error) {
-      console.error("readTokenFromStorage()", error);
-    }
+    return await res.json();
   };
 
   const signIn = async () => {
     try {
-      await promptAsync();
-    } catch (error) {
-      console.error("signIn()", error);
-    }
-  };
-
-  const exchangeCodeForToken = async (code: string) => {
-    console.log(`exchangeCodeForToken()`);
-
-    try {
-      const tokenResponse: TokenResponse = await exchangeCodeAsync(
-        {
-          clientId: env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID,
-          clientSecret: env.EXPO_PUBLIC_SPOTIFY_CLIENT_SECRET,
-          code,
-          extraParams: request?.codeVerifier ? { code_verifier: request?.codeVerifier } : undefined,
-          redirectUri: requestConfig.redirectUri,
-        },
-        {
-          tokenEndpoint: requestConfig.discovery.tokenEndpoint,
-        },
+      const result = await WebBrowser.openAuthSessionAsync(
+        `${apiUrl}/auth/login/spotify`,
+        redirectURL,
       );
-      if (!tokenResponse) throw new Error("No token response from code");
+      if (result.type !== "success") return;
 
-      updateContext(tokenResponse);
-    } catch (error) {
-      console.error("exchangeCodeForToken()", error);
+      const url = Linking.parse(result.url);
+      const sessionToken = url.queryParams?.session_token?.toString() ?? null;
+      const accessToken = url.queryParams?.access_token?.toString() ?? null;
+
+      if (!sessionToken || !accessToken) return;
+      const user = await getUser(accessToken);
+
+      setSessionToken(sessionToken);
+      setAccessToken(accessToken);
+      setUser(user);
+    } catch (e) {
+      console.error(e);
     }
   };
 
   const signOut = async () => {
-    try {
-      setSession(null);
-    } catch (error) {
-      console.error("signOut()", error);
-    }
+    const response = await fetch(`${apiUrl}/auth/logout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${sessionToken}`,
+      },
+    });
+
+    if (!response.ok) return;
+
+    setSessionToken(null);
+    setAccessToken(null);
+    setUser(null);
   };
+
+  // TODO: does the backend handle refreshing of access tokens?
+  useEffect(() => {
+    const setup = async () => {
+      let user: SpotifyUser | null = null;
+
+      if (accessToken) {
+        user = await getUser(accessToken);
+      }
+
+      setUser(user);
+    };
+
+    setup();
+  }, []);
+
+  useEffect(() => {
+    if (sessionToken && accessToken) {
+      setSession({ sessionToken, accessToken });
+    } else {
+      setSession(null);
+    }
+  }, [sessionToken, accessToken]);
 
   return (
     <AuthContext.Provider
       value={{
         session,
+        user,
         signIn,
         signOut,
       }}>

@@ -35,7 +35,7 @@ export default function SetlistPage() {
   const [encore, setEncore] = useState<BasicSet | null>(null);
 
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
-  const { session } = useAuth();
+  const { session, user } = useAuth();
 
   const [createdPlaylist, setCreatedPlaylist] = useState<Playlist<TrackItem> | null>(null);
   const [, setCreatedPlaylists] = useMMKVObject<Playlist<TrackItem>[]>("created.playlists");
@@ -48,7 +48,7 @@ export default function SetlistPage() {
 
   const createPlaylistMutation = useMutation({
     mutationFn: (body: CreatePlaylistRequestBody) =>
-      createPlaylist(session?.accessToken, session?.user?.id, body),
+      createPlaylist(session?.accessToken, user?.id, body),
     onSuccess: async (createdPlaylist) => {
       await handleUpdatePlaylist(createdPlaylist);
     },
@@ -100,7 +100,7 @@ export default function SetlistPage() {
 
   const handleCreatePlaylist = async () => {
     try {
-      if (!session?.user) throw new Error("User must be logged in");
+      if (!user) throw new Error("User must be logged in");
 
       await createPlaylistMutation.mutateAsync({
         name: createPlaylistName(),

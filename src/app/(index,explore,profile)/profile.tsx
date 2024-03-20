@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
 });
 
 export default function Profile() {
-  const { session, signIn, signOut } = useAuth();
+  const { session, user, signIn, signOut } = useAuth();
   // TODO: figure out how to sync with user's spotify playlists in case they were deleted:
   const [createdPlaylists] = useMMKVObject<Playlist<TrackItem>[]>("created.playlists");
 
@@ -32,18 +32,14 @@ export default function Profile() {
 
   return (
     <View>
-      <Stack.Screen
-        options={{ headerTitle: session?.user ? session?.user.display_name : "My Library" }}
-      />
+      <Stack.Screen options={{ headerTitle: user ? user.display_name : "My Library" }} />
       <View style={styles.container}>
         {session ? (
-          <Avatar.Image size={120} source={{ uri: session.user?.images[1].url }} />
+          <Avatar.Image size={120} source={{ uri: user?.images[1].url }} />
         ) : (
           <Avatar.Icon size={120} icon="account" />
         )}
-        <Text variant="displayMedium">
-          {session ? session.user?.display_name : "not signed in"}
-        </Text>
+        <Text variant="displayMedium">{user ? user?.display_name : "not signed in"}</Text>
       </View>
 
       {!session ? (

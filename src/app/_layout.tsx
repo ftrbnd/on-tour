@@ -4,6 +4,7 @@ import { Tabs } from "expo-router";
 import { MD3LightTheme as DefaultTheme, PaperProvider } from "react-native-paper";
 
 import { AuthProvider } from "../providers/AuthProvider";
+import { useColorScheme } from "react-native";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,8 @@ const theme = {
 };
 
 export default function AppLayout() {
+  const colorScheme = useColorScheme();
+
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
