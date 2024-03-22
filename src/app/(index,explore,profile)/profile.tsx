@@ -33,7 +33,7 @@ export default function Profile() {
   return (
     <View>
       <Stack.Screen
-        options={{ headerTitle: user?.displayName ? user.displayName : "My Library" }}
+        options={{ headerTitle: user ? user.displayName ?? user.providerId : "My Library" }}
       />
       <View style={styles.container}>
         {user ? (
@@ -41,7 +41,9 @@ export default function Profile() {
         ) : (
           <Avatar.Icon size={120} icon="account" />
         )}
-        <Text variant="displayMedium">{user ? user?.displayName : "not signed in"}</Text>
+        <Text variant="displayMedium">
+          {user ? user.displayName ?? user.providerId : "not signed in"}
+        </Text>
       </View>
 
       {user ? (

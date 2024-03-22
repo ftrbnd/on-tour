@@ -5,24 +5,34 @@ import { PropsWithChildren, createContext, useContext, useEffect, useState } fro
 
 import { env } from "../utils/env";
 
-type Session = {
-  id: string;
-};
+interface ServerResponse {
+  session: {
+    id: string;
+  };
+  account: {
+    providerId: string;
+    accessToken: string;
+  };
+  user: {
+    displayName: string | null;
+    avatar: string | null;
+  };
+}
 
-type User = {
-  displayName: string | null;
-  avatar: string | null;
-};
-
-type Account = {
-  providerId: string;
+interface AuthSession {
+  token: string;
   accessToken: string;
-};
+}
+
+interface AuthUser {
+  displayName: string | null;
+  providerId: string;
+  avatar: string | null;
+}
 
 interface AuthContextProps {
-  session: Session | null;
-  user: User | null;
-  account: Account | null;
+  session: AuthSession | null;
+  user: AuthUser | null;
   signIn: () => void;
   signOut: () => void;
 }
@@ -30,7 +40,6 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps>({
   session: null,
   user: null,
-  account: null,
   signIn: () => {},
   signOut: () => {},
 });
@@ -38,9 +47,8 @@ const AuthContext = createContext<AuthContextProps>({
 const API_URL = env.EXPO_PUBLIC_FASTIFY_SERVER_URL;
 
 export function AuthProvider(props: PropsWithChildren) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [account, setAccount] = useState<Account | null>(null);
+  const [session, setSession] = useState<AuthSession | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const redirectURL = Linking.createURL("profile");
 
@@ -59,7 +67,7 @@ export function AuthProvider(props: PropsWithChildren) {
 
   const updateContext = async () => {
     const now = new Date();
-    console.log(`Updating context... ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`);
+    console.log(`Updating context at ${now.toLocaleTimeString()}`);
 
     try {
       const sessionToken = await SecureStore.getItemAsync("session_token");
@@ -71,20 +79,22 @@ export function AuthProvider(props: PropsWithChildren) {
             Authorization: `Bearer ${sessionToken}`,
           },
         });
-        if (!res.ok) return null;
+        if (!res.ok) throw new Error("Invalid session token");
 
-        const { session, user, account }: { session: Session; user: User; account: Account } =
-          await res.json();
+        const { session, user, account }: ServerResponse = await res.json();
 
-        console.log({ session, user, account });
-
-        setSession(session);
-        setUser(user);
-        setAccount(account);
+        setSession({
+          token: session.id,
+          accessToken: account.accessToken,
+        });
+        setUser({
+          displayName: user.displayName,
+          providerId: account.providerId,
+          avatar: user.avatar,
+        });
       } else {
         setSession(null);
         setUser(null);
-        setAccount(null);
       }
     } catch (e) {
       console.error(e);
@@ -97,13 +107,13 @@ export function AuthProvider(props: PropsWithChildren) {
         `${API_URL}/auth/login/spotify`,
         redirectURL,
       );
-      if (result.type !== "success") return;
+      if (result.type !== "success") throw new Error("Authentication failed");
 
       const url = Linking.parse(result.url);
       const sessionToken = url.queryParams?.session_token?.toString() ?? null;
       const accessToken = url.queryParams?.access_token?.toString() ?? null;
 
-      if (!sessionToken || !accessToken) return;
+      if (!sessionToken || !accessToken) throw new Error("Missing session or access token");
 
       await SecureStore.setItemAsync("session_token", sessionToken);
       await SecureStore.setItemAsync("access_token", accessToken);
@@ -117,7 +127,7 @@ export function AuthProvider(props: PropsWithChildren) {
   const signOut = async () => {
     try {
       const sessionToken = await SecureStore.getItemAsync("session_token");
-      if (!sessionToken) return;
+      if (!sessionToken) throw new Error("Missing session token");
 
       const response = await fetch(`${API_URL}/auth/logout`, {
         method: "POST",
@@ -125,8 +135,7 @@ export function AuthProvider(props: PropsWithChildren) {
           Authorization: `Bearer ${sessionToken}`,
         },
       });
-
-      if (!response.ok) return;
+      if (!response.ok) throw new Error("Failed to log out");
 
       await SecureStore.deleteItemAsync("session_token");
       await SecureStore.deleteItemAsync("access_token");
@@ -142,7 +151,6 @@ export function AuthProvider(props: PropsWithChildren) {
       value={{
         session,
         user,
-        account,
         signIn,
         signOut,
       }}>
