@@ -71,9 +71,8 @@ export function AuthProvider(props: PropsWithChildren) {
 
     try {
       const sessionToken = await SecureStore.getItemAsync("session_token");
-      const accessToken = await SecureStore.getItemAsync("access_token");
 
-      if (sessionToken && accessToken) {
+      if (sessionToken) {
         const res = await fetch(`${API_URL}/auth/me`, {
           headers: {
             Authorization: `Bearer ${sessionToken}`,
@@ -111,12 +110,10 @@ export function AuthProvider(props: PropsWithChildren) {
 
       const url = Linking.parse(result.url);
       const sessionToken = url.queryParams?.session_token?.toString() ?? null;
-      const accessToken = url.queryParams?.access_token?.toString() ?? null;
 
-      if (!sessionToken || !accessToken) throw new Error("Missing session or access token");
+      if (!sessionToken) throw new Error("Missing session token");
 
       await SecureStore.setItemAsync("session_token", sessionToken);
-      await SecureStore.setItemAsync("access_token", accessToken);
 
       await updateContext();
     } catch (e) {
@@ -138,7 +135,6 @@ export function AuthProvider(props: PropsWithChildren) {
       if (!response.ok) throw new Error("Failed to log out");
 
       await SecureStore.deleteItemAsync("session_token");
-      await SecureStore.deleteItemAsync("access_token");
 
       await updateContext();
     } catch (e) {
