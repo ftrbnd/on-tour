@@ -22,7 +22,7 @@ export default function Recent() {
   const { data } = useQuery({
     queryKey: ["top-artists"],
     queryFn: () => getTopArtists(session?.accessToken),
-    enabled: session !== null && session !== undefined,
+    enabled: session !== null,
   });
 
   const { data: recentShows } = useQuery({

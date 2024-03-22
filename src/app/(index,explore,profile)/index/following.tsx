@@ -26,7 +26,7 @@ export default function Following() {
   const { data, isPlaceholderData } = useQuery({
     queryKey: ["top-artists", next],
     queryFn: () => getTopArtists(session?.accessToken, next),
-    enabled: session !== null && session !== undefined,
+    enabled: session !== null,
     placeholderData: keepPreviousData,
   });
 

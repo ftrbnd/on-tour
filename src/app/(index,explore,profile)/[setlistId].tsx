@@ -48,7 +48,7 @@ export default function SetlistPage() {
 
   const createPlaylistMutation = useMutation({
     mutationFn: (body: CreatePlaylistRequestBody) =>
-      createPlaylist(session?.accessToken, user?.id, body),
+      createPlaylist(session?.accessToken, user?.spotifyId, body),
     onSuccess: async (createdPlaylist) => {
       await handleUpdatePlaylist(createdPlaylist);
     },

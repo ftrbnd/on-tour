@@ -35,14 +35,14 @@ export default function Explore() {
   const { data } = useQuery({
     queryKey: ["top-artists"],
     queryFn: () => getTopArtists(session?.accessToken),
-    enabled: session !== null && session !== undefined,
+    enabled: session !== null,
   });
 
   const { data: relatedArtists } = useQuery({
     queryKey: ["related-artists"],
     queryFn: () =>
       getRelatedArtists(session?.accessToken, data?.topArtists ? data?.topArtists[0].id : null),
-    enabled: session !== null && session !== undefined && data?.topArtists !== undefined,
+    enabled: session !== null && data?.topArtists !== undefined,
   });
 
   return (
