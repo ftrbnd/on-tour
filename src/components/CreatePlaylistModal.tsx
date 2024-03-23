@@ -1,10 +1,12 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { Alert, StyleSheet } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import { useMMKVObject } from "react-native-mmkv";
-import { Button, Modal, Portal } from "react-native-paper";
+import { Button, Modal, Portal, TextInput } from "react-native-paper";
 
+import ImageViewer from "./ImageViewer";
 import { useAuth } from "../providers/AuthProvider";
 import {
   CreatePlaylistRequestBody,
@@ -22,6 +24,10 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     margin: 20,
+  },
+  imageContainer: {
+    flex: 1,
+    paddingTop: 58,
   },
 });
 
@@ -45,6 +51,8 @@ export default function CreatePlaylistModal({
   const { session, user } = useAuth();
 
   const [createdPlaylist, setCreatedPlaylist] = useState<Playlist<TrackItem> | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
 
   const [, setCreatedPlaylists] = useMMKVObject<Playlist<TrackItem>[]>("created.playlists");
 
@@ -85,13 +93,20 @@ export default function CreatePlaylistModal({
     }
   }, [finalPlaylist]);
 
+  useEffect(() => {
+    setDescription(
+      `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}`,
+    );
+  }, []);
+
   const handleCreatePlaylist = async () => {
     try {
       if (!user) throw new Error("User must be logged in");
+      setVisible(false);
 
       await createPlaylistMutation.mutateAsync({
         name: playlistName,
-        description: `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}`,
+        description: description ?? "",
         public: false,
       });
     } catch (error) {
@@ -139,13 +154,41 @@ export default function CreatePlaylistModal({
     }
   };
 
+  const pickImageAsync = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      console.log(result);
+      setSelectedImage(result.assets[0].uri);
+    } else {
+      console.log("No image selected");
+    }
+  };
+
   return (
     <Portal>
       <Modal
         visible={visible}
         onDismiss={() => setVisible(false)}
         contentContainerStyle={styles.modal}>
-        <Button onPress={handleCreatePlaylist}>Create playlist</Button>
+        <Button onPress={pickImageAsync}>Upload cover image</Button>
+        {selectedImage && (
+          <View style={styles.imageContainer}>
+            <ImageViewer selectedImage={selectedImage} />
+          </View>
+        )}
+
+        <TextInput
+          label="Description"
+          value={description ?? ""}
+          onChangeText={(text) => setDescription(text)}
+          multiline
+        />
+
+        <Button onPress={handleCreatePlaylist}>Create</Button>
       </Modal>
     </Portal>
   );
