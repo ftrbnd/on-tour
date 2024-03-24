@@ -1,12 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Alert, StyleSheet, View } from "react-native";
 import { useMMKVObject } from "react-native-mmkv";
-import { Button, Modal, Portal, TextInput } from "react-native-paper";
+import { Button, Modal, Portal, Text, TextInput } from "react-native-paper";
 
-import ImageViewer from "./ImageViewer";
 import { useAuth } from "../providers/AuthProvider";
 import {
   CreatePlaylistRequestBody,
@@ -24,10 +25,31 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     padding: 20,
     margin: 20,
+    display: "flex",
+    gap: 12,
+    borderRadius: 20,
   },
-  imageContainer: {
-    flex: 1,
-    paddingTop: 58,
+  header: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: 75,
+  },
+  image: {
+    width: 75,
+    height: 75,
+    borderRadius: 10,
+    backgroundColor: "lightgray",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  buttons: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
   },
 });
 
@@ -51,8 +73,13 @@ export default function CreatePlaylistModal({
   const { session, user } = useAuth();
 
   const [createdPlaylist, setCreatedPlaylist] = useState<Playlist<TrackItem> | null>(null);
+
+  const [name, setName] = useState<string | null>(playlistName ?? null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [description, setDescription] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(
+    `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}` ??
+      null,
+  );
 
   const [, setCreatedPlaylists] = useMMKVObject<Playlist<TrackItem>[]>("created.playlists");
 
@@ -92,12 +119,6 @@ export default function CreatePlaylistModal({
       setCreatedPlaylists((prev) => (prev ? prev.concat(finalPlaylist) : []));
     }
   }, [finalPlaylist]);
-
-  useEffect(() => {
-    setDescription(
-      `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}`,
-    );
-  }, []);
 
   const handleCreatePlaylist = async () => {
     try {
@@ -161,7 +182,7 @@ export default function CreatePlaylistModal({
     });
 
     if (!result.canceled) {
-      console.log(result);
+      console.log("got an image!", result);
       setSelectedImage(result.assets[0].uri);
     } else {
       console.log("No image selected");
@@ -174,13 +195,32 @@ export default function CreatePlaylistModal({
         visible={visible}
         onDismiss={() => setVisible(false)}
         contentContainerStyle={styles.modal}>
-        <Button onPress={pickImageAsync}>Upload cover image</Button>
-        {selectedImage && (
-          <View style={styles.imageContainer}>
-            <ImageViewer selectedImage={selectedImage} />
-          </View>
-        )}
+        <View style={styles.header}>
+          <Text variant="headlineLarge">Playlist Details</Text>
+          {selectedImage ? (
+            <Image
+              source={{
+                uri: selectedImage,
+                width: styles.image.width,
+                height: styles.image.height,
+              }}
+              contentFit="cover"
+              style={styles.image}
+              transition={1000}
+            />
+          ) : (
+            <View style={styles.image}>
+              <Ionicons name="musical-notes" size={styles.image.height * 0.66} color="black" />
+            </View>
+          )}
+        </View>
 
+        <TextInput
+          label="Name"
+          value={name ?? ""}
+          onChangeText={(text) => setName(text)}
+          multiline
+        />
         <TextInput
           label="Description"
           value={description ?? ""}
@@ -188,7 +228,14 @@ export default function CreatePlaylistModal({
           multiline
         />
 
-        <Button onPress={handleCreatePlaylist}>Create</Button>
+        <View style={styles.buttons}>
+          <Button onPress={pickImageAsync} mode="outlined">
+            Upload image
+          </Button>
+          <Button onPress={handleCreatePlaylist} mode="outlined">
+            Create
+          </Button>
+        </View>
       </Modal>
     </Portal>
   );

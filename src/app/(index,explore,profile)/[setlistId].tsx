@@ -80,14 +80,16 @@ export default function SetlistPage() {
         </>
       )}
 
-      <CreatePlaylistModal
-        visible={modalVisible}
-        setVisible={setModalVisible}
-        setlist={setlist}
-        primary={primary}
-        encore={encore}
-        playlistName={createPlaylistName()}
-      />
+      {setlist && (
+        <CreatePlaylistModal
+          visible={modalVisible}
+          setVisible={setModalVisible}
+          setlist={setlist}
+          primary={primary}
+          encore={encore}
+          playlistName={createPlaylistName()}
+        />
+      )}
 
       <Button onPress={openSetlistFmPage}>View on setlist.fm</Button>
       <Button onPress={() => setModalVisible(true)}>Create Playlist</Button>
