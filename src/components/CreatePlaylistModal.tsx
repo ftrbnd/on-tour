@@ -1,11 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
+import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
-import { useEffect, useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
-import { useMMKVObject } from "react-native-mmkv";
+import { useState } from "react";
+import { StyleSheet, View } from "react-native";
 import { Button, Modal, Portal, Text, TextInput } from "react-native-paper";
 
 import { useAuth } from "../providers/AuthProvider";
@@ -15,7 +15,8 @@ import {
   UpdatePlaylistRequestBody,
   addSongsToPlaylist,
   getUriFromSetlistFmSong,
-  getOnePlaylist,
+  addPlaylistCoverImage,
+  UpdatePlaylistImageRequestBody,
 } from "../services/spotify";
 import { BasicSet, Setlist, Song } from "../utils/setlist-fm-types";
 import { Playlist, TrackItem } from "../utils/spotify-types";
@@ -51,6 +52,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     alignItems: "center",
   },
+  info: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
 });
 
 interface ModalProps {
@@ -70,29 +77,24 @@ export default function CreatePlaylistModal({
   encore,
   playlistName,
 }: ModalProps) {
-  const { session, user } = useAuth();
-
-  const [createdPlaylist, setCreatedPlaylist] = useState<Playlist<TrackItem> | null>(null);
-
   const [name, setName] = useState<string | null>(playlistName ?? null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(
     `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}` ??
       null,
   );
+  const [selectedImage, setSelectedImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
+  const [createdPlaylist, setCreatedPlaylist] = useState<Playlist<TrackItem> | null>(null);
+  const [helperText, setHelperText] = useState<string | null>(null);
 
-  const [, setCreatedPlaylists] = useMMKVObject<Playlist<TrackItem>[]>("created.playlists");
+  const { session, user } = useAuth();
 
-  const { data: finalPlaylist } = useQuery({
-    queryKey: ["playlist", createdPlaylist?.id],
-    queryFn: () => getOnePlaylist(session?.accessToken, createdPlaylist?.id),
-    enabled: createdPlaylist !== undefined && createdPlaylist !== null,
-  });
-
+  // TODO: separate playlist/setlist logic into dedicated hooks
   const createPlaylistMutation = useMutation({
     mutationFn: (body: CreatePlaylistRequestBody) =>
       createPlaylist(session?.accessToken, user?.providerId, body),
     onSuccess: async (createdPlaylist) => {
+      console.log("Playlist created!");
+      setCreatedPlaylist(createdPlaylist);
       await handleUpdatePlaylist(createdPlaylist);
     },
     onError: (error) => {
@@ -103,27 +105,57 @@ export default function CreatePlaylistModal({
   const updatePlaylistMutation = useMutation({
     mutationFn: (body: UpdatePlaylistRequestBody) =>
       addSongsToPlaylist(session?.accessToken, { playlistId: body.playlistId, uris: body.uris }),
-    onSuccess: (_updatedPlaylist, body) => {
+    onSuccess: async (_updatedPlaylist, body) => {
       // TODO: show this message as an alert?
-      // TODO: link setlist ids to playlist ids in storage
+      // TODO: link setlist ids to playlist ids in mmkv or neondb
       // if a user has already created a playlist for this setlist, show a button that can take them to the playlist
-      Alert.alert("Playlist created!", `Found ${body.found}/${body.expected} songs`);
+      console.log("Playlist tracks updated!");
+      setHelperText(`Found ${body.found}/${body.expected} songs`);
+
+      if (selectedImage) {
+        await updatePlaylistImageMutation.mutateAsync({
+          playlistId: body.playlistId,
+          base64: selectedImage.base64,
+        });
+      } else {
+        console.log("Skipped image upload");
+      }
     },
     onError: (error) => {
       console.error("Update mutation failed", error);
     },
   });
 
-  useEffect(() => {
-    if (finalPlaylist) {
-      setCreatedPlaylists((prev) => (prev ? prev.concat(finalPlaylist) : []));
-    }
-  }, [finalPlaylist]);
+  const updatePlaylistImageMutation = useMutation({
+    mutationFn: (body: UpdatePlaylistImageRequestBody) =>
+      addPlaylistCoverImage(session?.accessToken, {
+        playlistId: body.playlistId,
+        base64: body.base64,
+      }),
+    onSuccess: (_, body) => {
+      console.log("Playlist image updated!");
+    },
+    onError: (error) => {
+      console.error("Playlist image mutation failed", error);
+    },
+  });
+
+  const mutationsPending =
+    createPlaylistMutation.isPending ||
+    updatePlaylistMutation.isPending ||
+    updatePlaylistImageMutation.isPending;
+
+  const getCurrentOperation = () => {
+    if (updatePlaylistImageMutation.isPending) return "Adding cover image...";
+    if (updatePlaylistMutation.isPending) return "Adding tracks...";
+    if (createPlaylistMutation.isPending) return "Creating playlist...";
+
+    return "Please wait...";
+  };
 
   const handleCreatePlaylist = async () => {
     try {
       if (!user) throw new Error("User must be logged in");
-      setVisible(false);
 
       await createPlaylistMutation.mutateAsync({
         name: playlistName,
@@ -156,8 +188,6 @@ export default function CreatePlaylistModal({
         expected: allSongs.length,
         found: uris.length,
       });
-
-      setCreatedPlaylist(playlist);
     } catch (error) {
       console.error(error);
     }
@@ -176,16 +206,28 @@ export default function CreatePlaylistModal({
   };
 
   const pickImageAsync = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      quality: 1,
-    });
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        quality: 0.5,
+        base64: true,
+      });
+      console.log("size:", result.assets && result.assets[0].fileSize);
+      // TODO: Determine fileSize and get to highest possbile under 256 kb
 
-    if (!result.canceled) {
-      console.log("got an image!", result);
-      setSelectedImage(result.assets[0].uri);
-    } else {
-      console.log("No image selected");
+      if (!result.canceled) {
+        setSelectedImage(result.assets[0]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const openSpotifyPlaylist = async () => {
+    try {
+      if (createdPlaylist) await openBrowserAsync(createdPlaylist.external_urls.spotify);
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -200,7 +242,7 @@ export default function CreatePlaylistModal({
           {selectedImage ? (
             <Image
               source={{
-                uri: selectedImage,
+                uri: selectedImage.uri,
                 width: styles.image.width,
                 height: styles.image.height,
               }}
@@ -229,13 +271,24 @@ export default function CreatePlaylistModal({
         />
 
         <View style={styles.buttons}>
-          <Button onPress={pickImageAsync} mode="outlined">
-            Upload image
+          <Button onPress={pickImageAsync} mode="outlined" disabled={mutationsPending}>
+            {selectedImage ? "New image" : "Upload image"}
           </Button>
-          <Button onPress={handleCreatePlaylist} mode="outlined">
-            Create
+          <Button
+            onPress={handleCreatePlaylist}
+            mode="outlined"
+            loading={mutationsPending}
+            disabled={mutationsPending}>
+            {mutationsPending ? getCurrentOperation() : "Create"}
           </Button>
         </View>
+
+        {createdPlaylist && (
+          <View style={styles.info}>
+            <Text variant="labelMedium">{helperText}</Text>
+            <Button onPress={openSpotifyPlaylist}>View your playlist</Button>
+          </View>
+        )}
       </Modal>
     </Portal>
   );

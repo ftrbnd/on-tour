@@ -198,3 +198,33 @@ export async function getOnePlaylist(
     throw error;
   }
 }
+
+export interface UpdatePlaylistImageRequestBody {
+  playlistId: string;
+  base64: string | null | undefined;
+}
+
+export async function addPlaylistCoverImage(
+  token: string | null | undefined,
+  body: UpdatePlaylistImageRequestBody,
+) {
+  try {
+    if (!token) throw new Error("Access token required");
+    if (!body.base64) throw new Error("Base64 image data required");
+
+    const res = await fetch(`${ENDPOINT}/playlists/${body.playlistId}/images`, {
+      method: "PUT",
+      body: body.base64,
+      headers: {
+        "Content-Type": "image/jpeg",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!res.ok)
+      throw new Error(`Failed to add cover image to playlist with id "${body.playlistId}"`);
+
+    // receive 202 code - Accepted (empty response)
+  } catch (error) {
+    throw error;
+  }
+}
