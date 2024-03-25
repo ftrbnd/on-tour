@@ -1,5 +1,6 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Entypo } from "@expo/vector-icons";
 import { useMutation } from "@tanstack/react-query";
+import * as FileSystem from "expo-file-system";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
 import { openBrowserAsync } from "expo-web-browser";
@@ -85,6 +86,7 @@ export default function CreatePlaylistModal({
   const [selectedImage, setSelectedImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [createdPlaylist, setCreatedPlaylist] = useState<Playlist<TrackItem> | null>(null);
   const [helperText, setHelperText] = useState<string | null>(null);
+  const [createDisabled, setCreateDisabled] = useState<boolean>(false);
 
   const { session, user } = useAuth();
 
@@ -209,14 +211,28 @@ export default function CreatePlaylistModal({
     try {
       const result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
+        aspect: [1, 1],
         quality: 0.5,
         base64: true,
       });
-      console.log("size:", result.assets && result.assets[0].fileSize);
-      // TODO: Determine fileSize and get to highest possbile under 256 kb
+      if (!result.assets) return;
+
+      const fileInfo = await FileSystem.getInfoAsync(result.assets[0].uri, {
+        size: true,
+      });
+      // TODO: https://docs.expo.dev/versions/latest/sdk/filesystem/#fileinfo
+      const fileSize = fileInfo.size;
+      if (fileSize >= 256 * 1000) {
+        setSelectedImage(null);
+        setCreateDisabled(true);
+        setHelperText("Image size is too big!");
+        return;
+      }
 
       if (!result.canceled) {
         setSelectedImage(result.assets[0]);
+        setCreateDisabled(false);
+        setHelperText(null);
       }
     } catch (error) {
       console.error(error);
@@ -238,7 +254,9 @@ export default function CreatePlaylistModal({
         onDismiss={() => setVisible(false)}
         contentContainerStyle={styles.modal}>
         <View style={styles.header}>
-          <Text variant="headlineLarge">Playlist Details</Text>
+          <Text variant="headlineLarge">
+            {createdPlaylist ? "Playlist Created!" : "Playlist Details"}
+          </Text>
           {selectedImage ? (
             <Image
               source={{
@@ -257,38 +275,53 @@ export default function CreatePlaylistModal({
           )}
         </View>
 
-        <TextInput
-          label="Name"
-          value={name ?? ""}
-          onChangeText={(text) => setName(text)}
-          multiline
-        />
-        <TextInput
-          label="Description"
-          value={description ?? ""}
-          onChangeText={(text) => setDescription(text)}
-          multiline
-        />
+        {createdPlaylist ? (
+          <Text variant="labelLarge">{name}</Text>
+        ) : (
+          <TextInput
+            label="Name"
+            value={name ?? ""}
+            onChangeText={(text) => setName(text)}
+            multiline
+          />
+        )}
+        {createdPlaylist ? (
+          <Text variant="labelMedium">{description}</Text>
+        ) : (
+          <TextInput
+            label="Description"
+            value={description ?? ""}
+            onChangeText={(text) => setDescription(text)}
+            multiline
+          />
+        )}
 
-        <View style={styles.buttons}>
-          <Button onPress={pickImageAsync} mode="outlined" disabled={mutationsPending}>
-            {selectedImage ? "New image" : "Upload image"}
-          </Button>
-          <Button
-            onPress={handleCreatePlaylist}
-            mode="outlined"
-            loading={mutationsPending}
-            disabled={mutationsPending}>
-            {mutationsPending ? getCurrentOperation() : "Create"}
-          </Button>
-        </View>
-
-        {createdPlaylist && (
-          <View style={styles.info}>
-            <Text variant="labelMedium">{helperText}</Text>
-            <Button onPress={openSpotifyPlaylist}>View your playlist</Button>
+        {!createdPlaylist && (
+          <View style={styles.buttons}>
+            <Button onPress={pickImageAsync} mode="outlined" disabled={mutationsPending}>
+              {selectedImage ? "New image" : "Upload image"}
+            </Button>
+            <Button
+              onPress={handleCreatePlaylist}
+              mode="outlined"
+              loading={mutationsPending}
+              disabled={mutationsPending || createDisabled}>
+              {mutationsPending ? getCurrentOperation() : "Create"}
+            </Button>
           </View>
         )}
+
+        <View style={styles.info}>
+          {helperText && <Text variant="labelMedium">{helperText}</Text>}
+          {createdPlaylist && (
+            <Button
+              mode="contained"
+              onPress={openSpotifyPlaylist}
+              icon={() => <Entypo name="spotify" size={24} color="black" />}>
+              View your playlist
+            </Button>
+          )}
+        </View>
       </Modal>
     </Portal>
   );
