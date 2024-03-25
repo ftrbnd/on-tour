@@ -1,26 +1,12 @@
 import { Ionicons, Entypo } from "@expo/vector-icons";
-import { useMutation } from "@tanstack/react-query";
 import * as FileSystem from "expo-file-system";
 import { Image } from "expo-image";
 import * as ImagePicker from "expo-image-picker";
-import { openBrowserAsync } from "expo-web-browser";
-import moment from "moment";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, Modal, Portal, Text, TextInput } from "react-native-paper";
 
-import { useAuth } from "../providers/AuthProvider";
-import {
-  CreatePlaylistRequestBody,
-  createPlaylist,
-  UpdatePlaylistRequestBody,
-  addSongsToPlaylist,
-  getUriFromSetlistFmSong,
-  addPlaylistCoverImage,
-  UpdatePlaylistImageRequestBody,
-} from "../services/spotify";
-import { BasicSet, Setlist, Song } from "../utils/setlist-fm-types";
-import { Playlist, TrackItem } from "../utils/spotify-types";
+import usePlaylist from "../hooks/usePlaylist";
 
 const styles = StyleSheet.create({
   modal: {
@@ -64,148 +50,15 @@ const styles = StyleSheet.create({
 interface ModalProps {
   visible: boolean;
   setVisible: (vis: boolean) => void;
-  setlist?: Setlist;
-  primary?: BasicSet | null;
-  encore?: BasicSet | null;
-  playlistName: string;
+  setlistId: string;
 }
 
-export default function CreatePlaylistModal({
-  visible,
-  setVisible,
-  setlist,
-  primary,
-  encore,
-  playlistName,
-}: ModalProps) {
-  const [name, setName] = useState<string | null>(playlistName ?? null);
-  const [description, setDescription] = useState<string | null>(
-    `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}` ??
-      null,
-  );
+export default function CreatePlaylistModal({ visible, setVisible, setlistId }: ModalProps) {
+  const playlist = usePlaylist(setlistId);
+
   const [selectedImage, setSelectedImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
-  const [createdPlaylist, setCreatedPlaylist] = useState<Playlist<TrackItem> | null>(null);
   const [helperText, setHelperText] = useState<string | null>(null);
   const [createDisabled, setCreateDisabled] = useState<boolean>(false);
-
-  const { session, user } = useAuth();
-
-  // TODO: separate playlist/setlist logic into dedicated hooks
-  const createPlaylistMutation = useMutation({
-    mutationFn: (body: CreatePlaylistRequestBody) =>
-      createPlaylist(session?.accessToken, user?.providerId, body),
-    onSuccess: async (createdPlaylist) => {
-      console.log("Playlist created!");
-      setCreatedPlaylist(createdPlaylist);
-      await handleUpdatePlaylist(createdPlaylist);
-    },
-    onError: (error) => {
-      console.error("Create mutation failed", error);
-    },
-  });
-
-  const updatePlaylistMutation = useMutation({
-    mutationFn: (body: UpdatePlaylistRequestBody) =>
-      addSongsToPlaylist(session?.accessToken, { playlistId: body.playlistId, uris: body.uris }),
-    onSuccess: async (_updatedPlaylist, body) => {
-      // TODO: show this message as an alert?
-      // TODO: link setlist ids to playlist ids in mmkv or neondb
-      // if a user has already created a playlist for this setlist, show a button that can take them to the playlist
-      console.log("Playlist tracks updated!");
-      setHelperText(`Found ${body.found}/${body.expected} songs`);
-
-      if (selectedImage) {
-        await updatePlaylistImageMutation.mutateAsync({
-          playlistId: body.playlistId,
-          base64: selectedImage.base64,
-        });
-      } else {
-        console.log("Skipped image upload");
-      }
-    },
-    onError: (error) => {
-      console.error("Update mutation failed", error);
-    },
-  });
-
-  const updatePlaylistImageMutation = useMutation({
-    mutationFn: (body: UpdatePlaylistImageRequestBody) =>
-      addPlaylistCoverImage(session?.accessToken, {
-        playlistId: body.playlistId,
-        base64: body.base64,
-      }),
-    onSuccess: (_, body) => {
-      console.log("Playlist image updated!");
-    },
-    onError: (error) => {
-      console.error("Playlist image mutation failed", error);
-    },
-  });
-
-  const mutationsPending =
-    createPlaylistMutation.isPending ||
-    updatePlaylistMutation.isPending ||
-    updatePlaylistImageMutation.isPending;
-
-  const getCurrentOperation = () => {
-    if (updatePlaylistImageMutation.isPending) return "Adding cover image...";
-    if (updatePlaylistMutation.isPending) return "Adding tracks...";
-    if (createPlaylistMutation.isPending) return "Creating playlist...";
-
-    return "Please wait...";
-  };
-
-  const handleCreatePlaylist = async () => {
-    try {
-      if (!user) throw new Error("User must be logged in");
-
-      await createPlaylistMutation.mutateAsync({
-        name: playlistName,
-        description: description ?? "",
-        public: false,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleUpdatePlaylist = async (playlist: Playlist) => {
-    try {
-      const p = primary?.song ?? [];
-      const e = encore?.song ?? [];
-      const allSongs = [...p, ...e];
-
-      const uris: string[] = [];
-
-      for (const song of allSongs) {
-        const uri = await getSpotifyUri(song);
-        if (!uri) continue;
-
-        uris.push(uri);
-      }
-
-      await updatePlaylistMutation.mutateAsync({
-        playlistId: playlist.id,
-        uris,
-        expected: allSongs.length,
-        found: uris.length,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getSpotifyUri = async (song: Song) => {
-    try {
-      const artistToSearch = song.cover ? song.cover.name : setlist?.artist.name;
-
-      const uri = await getUriFromSetlistFmSong(session?.accessToken, artistToSearch, song);
-
-      return uri;
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const pickImageAsync = async () => {
     try {
@@ -239,14 +92,6 @@ export default function CreatePlaylistModal({
     }
   };
 
-  const openSpotifyPlaylist = async () => {
-    try {
-      if (createdPlaylist) await openBrowserAsync(createdPlaylist.external_urls.spotify);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <Portal>
       <Modal
@@ -255,7 +100,7 @@ export default function CreatePlaylistModal({
         contentContainerStyle={styles.modal}>
         <View style={styles.header}>
           <Text variant="headlineLarge">
-            {createdPlaylist ? "Playlist Created!" : "Playlist Details"}
+            {playlist.addedTracks ? "Playlist Created!" : "Playlist Details"}
           </Text>
           {selectedImage ? (
             <Image
@@ -275,48 +120,48 @@ export default function CreatePlaylistModal({
           )}
         </View>
 
-        {createdPlaylist ? (
-          <Text variant="labelLarge">{name}</Text>
+        {playlist.addedTracks ? (
+          <Text variant="labelLarge">{playlist.name}</Text>
         ) : (
           <TextInput
             label="Name"
-            value={name ?? ""}
-            onChangeText={(text) => setName(text)}
+            value={playlist.name ?? ""}
+            onChangeText={(text) => playlist.setName(text)}
             multiline
           />
         )}
-        {createdPlaylist ? (
-          <Text variant="labelMedium">{description}</Text>
+        {playlist.addedTracks ? (
+          <Text variant="labelMedium">{playlist.description}</Text>
         ) : (
           <TextInput
             label="Description"
-            value={description ?? ""}
-            onChangeText={(text) => setDescription(text)}
+            value={playlist.description ?? ""}
+            onChangeText={(text) => playlist.setDescription(text)}
             multiline
           />
         )}
 
-        {!createdPlaylist && (
+        {!playlist.addedTracks && (
           <View style={styles.buttons}>
-            <Button onPress={pickImageAsync} mode="outlined" disabled={mutationsPending}>
+            <Button onPress={pickImageAsync} mode="outlined" disabled={playlist.mutationsPending}>
               {selectedImage ? "New image" : "Upload image"}
             </Button>
             <Button
-              onPress={handleCreatePlaylist}
+              onPress={() => playlist.startMutations(selectedImage)}
               mode="outlined"
-              loading={mutationsPending}
-              disabled={mutationsPending || createDisabled}>
-              {mutationsPending ? getCurrentOperation() : "Create"}
+              loading={playlist.mutationsPending}
+              disabled={playlist.mutationsPending || createDisabled}>
+              {playlist.mutationsPending ? playlist.currentOperation : "Create"}
             </Button>
           </View>
         )}
 
         <View style={styles.info}>
           {helperText && <Text variant="labelMedium">{helperText}</Text>}
-          {createdPlaylist && (
+          {playlist.addedTracks && (
             <Button
               mode="contained"
-              onPress={openSpotifyPlaylist}
+              onPress={() => playlist.openWebPage()}
               icon={() => <Entypo name="spotify" size={24} color="black" />}>
               View your playlist
             </Button>

@@ -1,14 +1,12 @@
-import { useQuery } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { openBrowserAsync } from "expo-web-browser";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
 import { Button, Text } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/CreatePlaylistModal";
-import { getOneSetlist } from "@/src/services/setlist-fm";
-import { BasicSet } from "@/src/utils/setlist-fm-types";
+import useSetlist from "@/src/hooks/useSetlist";
+import { createPlaylistName } from "@/src/utils/helpers";
 
 const styles = StyleSheet.create({
   container: {
@@ -21,44 +19,13 @@ const styles = StyleSheet.create({
 
 export default function SetlistPage() {
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
-
-  const [primary, setPrimary] = useState<BasicSet | null>(null);
-  const [encore, setEncore] = useState<BasicSet | null>(null);
+  const { data: setlist, primary, encore, openWebpage } = useSetlist(setlistId);
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const { data: setlist } = useQuery({
-    queryKey: ["setlist", setlistId],
-    queryFn: () => getOneSetlist(setlistId),
-    enabled: setlistId !== null,
-  });
-
-  useEffect(() => {
-    if (setlist) {
-      setPrimary(setlist.sets.set[0]);
-      setEncore(setlist.sets.set[1]);
-    }
-  }, [setlist]);
-
-  const openSetlistFmPage = async () => {
-    try {
-      if (setlist) await openBrowserAsync(setlist.url);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const createPlaylistName = () => {
-    if (!setlist) return "";
-
-    const location = setlist.tour ? setlist.tour.name : setlist.venue.name;
-
-    return `${setlist.artist.name} - ${location}`;
-  };
-
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ headerTitle: createPlaylistName() }} />
+      <Stack.Screen options={{ headerTitle: createPlaylistName(setlist) }} />
 
       <Text>Setlist</Text>
       <FlatList
@@ -84,14 +51,11 @@ export default function SetlistPage() {
         <CreatePlaylistModal
           visible={modalVisible}
           setVisible={setModalVisible}
-          setlist={setlist}
-          primary={primary}
-          encore={encore}
-          playlistName={createPlaylistName()}
+          setlistId={setlistId}
         />
       )}
 
-      <Button onPress={openSetlistFmPage}>View on setlist.fm</Button>
+      <Button onPress={() => openWebpage()}>View on setlist.fm</Button>
       <Button onPress={() => setModalVisible(true)}>Create Playlist</Button>
     </View>
   );
