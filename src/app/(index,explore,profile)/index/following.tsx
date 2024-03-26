@@ -39,8 +39,8 @@ export default function Following() {
     <View>
       <FlatList
         style={styles.list}
-        data={topArtists}
-        renderItem={({ item }) => <ArtistPreview artist={item} />}
+        data={topArtists ?? []}
+        renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={false} />}
         keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
         onEndReached={() => {
           if (!isPlaceholderData && data?.next) {

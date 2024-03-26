@@ -7,7 +7,6 @@ import { Searchbar } from "react-native-paper";
 import { useDebouncedCallback } from "use-debounce";
 
 import ArtistPreview from "@/src/components/ArtistPreview";
-import ArtistSearchResult from "@/src/components/ArtistSearchResult";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getRelatedArtists, getTopArtists, searchForArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";
@@ -63,14 +62,14 @@ export default function Explore() {
             style={styles.list}
             showsVerticalScrollIndicator={false}
             data={searchResults ?? []}
-            renderItem={({ item }) => <ArtistSearchResult artist={item} />}
+            renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult />}
             keyExtractor={(artist) => artist.id}
           />
         ) : (
           <FlatList
             style={styles.list}
             data={relatedArtists ?? []}
-            renderItem={({ item }) => <ArtistPreview artist={item} />}
+            renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={false} />}
             keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
           />
         )}
