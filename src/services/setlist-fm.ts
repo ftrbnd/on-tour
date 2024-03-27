@@ -19,7 +19,7 @@ export async function searchArtistSetlist(
         "x-api-key": env.EXPO_PUBLIC_SETLIST_FM_API_KEY,
       },
     });
-    if (!res.ok) throw Error(`Failed to fetch "${query}" from setlist.fm`);
+    if (!res.ok) throw new Error(`Failed to fetch "${query}" from setlist.fm`);
 
     const setlists: Setlists = await res.json();
 
@@ -43,7 +43,7 @@ export async function searchArtistSetlist(
 
 export async function getOneSetlist(id: string | undefined): Promise<Setlist> {
   try {
-    if (!id) throw Error("Setlist id required");
+    if (!id) throw new Error("Setlist id required");
 
     const res = await fetch(`${ENDPOINT}/setlist/${id}`, {
       headers: {
@@ -51,7 +51,7 @@ export async function getOneSetlist(id: string | undefined): Promise<Setlist> {
         "x-api-key": env.EXPO_PUBLIC_SETLIST_FM_API_KEY,
       },
     });
-    if (!res.ok) throw Error(`Failed to fetch setlist with id "${id}" from setlist.fm`);
+    if (!res.ok) throw new Error(`Failed to fetch setlist with id "${id}" from setlist.fm`);
 
     const data: Setlist = await res.json();
     return data;
@@ -63,7 +63,7 @@ export async function getOneSetlist(id: string | undefined): Promise<Setlist> {
 
 export async function getRecentShows(artists: Artist[] | undefined): Promise<Setlist[]> {
   try {
-    if (!artists) throw Error("Artists are required");
+    if (!artists) throw new Error("Artists are required");
     if (artists.length === 0) return [];
 
     const recentSetlists: Setlist[] = [];

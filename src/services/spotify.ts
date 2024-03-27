@@ -8,14 +8,14 @@ export async function getTopArtists(
   next?: string | null | undefined,
 ): Promise<{ topArtists: Artist[]; next: string | null }> {
   try {
-    if (!token) throw Error("Access token required");
+    if (!token) throw new Error("Access token required");
 
     const res = await fetch(next ?? `${ENDPOINT}/me/top/artists?limit=10`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw Error(`Failed to fetch your top artists`);
+    if (!res.ok) throw new Error(`Failed to fetch your top artists`);
 
     const data: Page<Artist> = await res.json();
 
@@ -27,14 +27,14 @@ export async function getTopArtists(
 
 export async function getOneArtist(token: string | null | undefined, id: string): Promise<Artist> {
   try {
-    if (!token) throw Error("Access token required");
+    if (!token) throw new Error("Access token required");
 
     const res = await fetch(`${ENDPOINT}/artists/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw Error(`Failed to fetch artist with id "${id}"`);
+    if (!res.ok) throw new Error(`Failed to fetch artist with id "${id}"`);
 
     const artist: Artist = await res.json();
     return artist;
@@ -49,14 +49,14 @@ export async function getRelatedArtists(
   artistId: string | null | undefined,
 ): Promise<Artist[]> {
   try {
-    if (!token) throw Error("Access token required");
+    if (!token) throw new Error("Access token required");
 
     const res = await fetch(`${ENDPOINT}/artists/${artistId}/related-artists`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw Error(`Failed to fetch related artists`);
+    if (!res.ok) throw new Error(`Failed to fetch related artists`);
 
     const { artists }: { artists: Artist[] } = await res.json();
     return artists;
@@ -70,7 +70,7 @@ export async function searchForArtists(
   query: string,
 ): Promise<Artist[]> {
   try {
-    if (!token) throw Error("Access token required");
+    if (!token) throw new Error("Access token required");
     if (!query) return [];
 
     const res = await fetch(`${ENDPOINT}/search?q=${query}&type=artist&limit=10`, {
@@ -78,7 +78,7 @@ export async function searchForArtists(
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw Error(`Failed to search for "${query}"`);
+    if (!res.ok) throw new Error(`Failed to search for "${query}"`);
 
     const { artists }: { artists: Page<Artist> } = await res.json();
     return artists.items;
@@ -99,8 +99,8 @@ export async function createPlaylist(
   body: CreatePlaylistRequestBody,
 ): Promise<Playlist> {
   try {
-    if (!token) throw Error("Access token required");
-    if (!userId) throw Error("User id required");
+    if (!token) throw new Error("Access token required");
+    if (!userId) throw new Error("User id required");
 
     const res = await fetch(`${ENDPOINT}/users/${userId}/playlists`, {
       method: "POST",
@@ -109,7 +109,7 @@ export async function createPlaylist(
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw Error(`Failed to create playlist`);
+    if (!res.ok) throw new Error(`Failed to create playlist`);
 
     const playlist: Playlist = await res.json();
 
@@ -124,26 +124,30 @@ export async function getTrackFromSetlistFmSong(
   artistToSearch: string | undefined,
   song: Song,
 ): Promise<Track> {
-  if (!token) throw Error("Access token required");
-  if (!artistToSearch) throw Error("Artist name is required");
+  if (!token) throw new Error("Access token required");
+  if (!artistToSearch) throw new Error("Artist name is required");
+
+  // TODO: find all characters that cause errors
+  const sanitizedSongName = song.name.replaceAll(`'`, "");
 
   try {
     const res = await fetch(
-      `${ENDPOINT}/search?q=artist:"${artistToSearch}" track:"${song.name}"&type=track&limit=1`,
+      `${ENDPOINT}/search?q=artist:"${artistToSearch}"%20track:"${sanitizedSongName}"&type=track&limit=1`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       },
     );
-    if (!res.ok) throw Error(`Failed to search for "${artistToSearch} - ${song.name}"`);
+    if (!res.ok) throw new Error(`Failed to search for "${artistToSearch} - ${sanitizedSongName}"`);
 
     const { tracks }: { tracks: Page<Track> } = await res.json();
     const track = tracks.items[0];
 
     return track;
   } catch (error) {
-    throw Error(`No Spotify track found for "${artistToSearch} - ${song.name}"`);
+    console.log(`No Spotify track found for "${artistToSearch} - ${song.name}"`);
+    throw error;
   }
 }
 
@@ -158,10 +162,8 @@ export async function addSongsToPlaylist(
   token: string | null | undefined,
   body: UpdatePlaylistRequestBody,
 ) {
-  if (!token) throw Error("Access token required");
-  if (body.uris.length === 0) throw Error("At least one uri is required");
-
-  console.log({ uris: body.uris });
+  if (!token) throw new Error("Access token required");
+  if (body.uris.length === 0) throw new Error("At least one uri is required");
 
   try {
     const res = await fetch(`${ENDPOINT}/playlists/${body.playlistId}/tracks`, {
@@ -171,7 +173,7 @@ export async function addSongsToPlaylist(
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw Error(`Failed to add tracks to playlist`);
+    if (!res.ok) throw new Error(`Failed to add tracks to playlist`);
 
     const snapshot: SnapshotReference = await res.json();
     return snapshot.snapshot_id;
@@ -185,14 +187,14 @@ export async function getOnePlaylist(
   id: string | undefined,
 ): Promise<Playlist> {
   try {
-    if (!token) throw Error("Access token required");
+    if (!token) throw new Error("Access token required");
 
     const res = await fetch(`${ENDPOINT}/playlists/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw Error(`Failed to fetch playlist with id "${id}"`);
+    if (!res.ok) throw new Error(`Failed to fetch playlist with id "${id}"`);
 
     const playlist: Playlist = await res.json();
     return playlist;
@@ -251,6 +253,6 @@ export async function getMultipleTracks(
 
     return tracks;
   } catch (error) {
-    console.error(error);
+    throw error;
   }
 }

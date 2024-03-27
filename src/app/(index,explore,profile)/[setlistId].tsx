@@ -19,11 +19,10 @@ const styles = StyleSheet.create({
     gap: 8,
     justifyContent: "flex-start",
   },
-  title: { fontWeight: "bold", textAlign: "center" },
-  card: {
+  cardTitle: { fontWeight: "bold", textAlign: "center" },
+  cardContent: {
     display: "flex",
     gap: 8,
-    padding: 16,
   },
   detail: {
     display: "flex",
@@ -78,8 +77,8 @@ export default function SetlistPage() {
 
       <View style={styles.container}>
         <Card onPress={() => openWebpage()}>
-          {setlist?.tour && <Card.Title title={setlist.tour.name} titleStyle={styles.title} />}
-          <Card.Content style={styles.card}>
+          {setlist?.tour && <Card.Title title={setlist.tour.name} titleStyle={styles.cardTitle} />}
+          <Card.Content style={[styles.cardContent, !setlist?.tour && { padding: 16 }]}>
             <View style={styles.detail}>
               <FontAwesome5 name="building" size={24} color="black" />
               <Text>{`${setlist?.venue.name}`}</Text>
