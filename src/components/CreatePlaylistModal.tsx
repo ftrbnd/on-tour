@@ -68,7 +68,7 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
         quality: 0.5,
         base64: true,
       });
-      if (!result.assets) return;
+      if (!result.assets || result.canceled) return;
 
       const fileInfo = await FileSystem.getInfoAsync(result.assets[0].uri, {
         size: true,
@@ -79,10 +79,7 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
         setSelectedImage(null);
         setCreateDisabled(true);
         setHelperText("Image size is too big!");
-        return;
-      }
-
-      if (!result.canceled) {
+      } else {
         setSelectedImage(result.assets[0]);
         setCreateDisabled(false);
         setHelperText(null);

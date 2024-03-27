@@ -2,12 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { openBrowserAsync } from "expo-web-browser";
 import { useState, useEffect } from "react";
 
+import { useAuth } from "../providers/AuthProvider";
 import { getOneSetlist } from "../services/setlist-fm";
-import { BasicSet } from "../utils/setlist-fm-types";
+import { getMultipleTracks } from "../services/spotify";
+import { Song } from "../utils/setlist-fm-types";
 
 export default function useSetlist(id: string) {
-  const [primary, setPrimary] = useState<BasicSet | null>(null);
-  const [encore, setEncore] = useState<BasicSet | null>(null);
+  const [songs, setSongs] = useState<Song[] | null>(null);
+
+  const { session } = useAuth();
 
   const { data: setlist } = useQuery({
     queryKey: ["setlist", id],
@@ -15,10 +18,19 @@ export default function useSetlist(id: string) {
     enabled: id !== null,
   });
 
+  const { data: spotifyTracks } = useQuery({
+    queryKey: ["spotify-tracks", id],
+    queryFn: () => getMultipleTracks(session?.accessToken, [...(songs ?? [])], setlist),
+    enabled: session !== null && setlist !== undefined && songs !== null,
+  });
+
   useEffect(() => {
     if (setlist) {
-      setPrimary(setlist.sets.set[0]);
-      setEncore(setlist.sets.set[1]);
+      const songs: Song[] = [];
+      for (const set of setlist.sets.set) {
+        songs.push(...set.song);
+      }
+      setSongs(songs);
     }
   }, [setlist]);
 
@@ -32,8 +44,8 @@ export default function useSetlist(id: string) {
 
   return {
     data: setlist,
-    primary,
-    encore,
+    songs,
     openWebpage,
+    spotifyTracks,
   };
 }

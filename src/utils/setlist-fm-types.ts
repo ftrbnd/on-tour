@@ -57,7 +57,7 @@ export interface Error {
 }
 
 export interface BasicSet {
-  name: string;
+  name?: string;
   encore?: number;
   song: Song[];
 }

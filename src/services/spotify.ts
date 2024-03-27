@@ -1,4 +1,4 @@
-import { Song } from "../utils/setlist-fm-types";
+import { Setlist, Song } from "../utils/setlist-fm-types";
 import { Artist, Page, Playlist, SnapshotReference, Track } from "../utils/spotify-types";
 
 const ENDPOINT = `https://api.spotify.com/v1`;
@@ -119,11 +119,11 @@ export async function createPlaylist(
   }
 }
 
-export async function getUriFromSetlistFmSong(
+export async function getTrackFromSetlistFmSong(
   token: string | null | undefined,
   artistToSearch: string | undefined,
   song: Song,
-): Promise<string> {
+): Promise<Track> {
   if (!token) throw Error("Access token required");
   if (!artistToSearch) throw Error("Artist name is required");
 
@@ -139,11 +139,11 @@ export async function getUriFromSetlistFmSong(
     if (!res.ok) throw Error(`Failed to search for "${artistToSearch} - ${song.name}"`);
 
     const { tracks }: { tracks: Page<Track> } = await res.json();
-    const uri = tracks.items[0].uri;
+    const track = tracks.items[0];
 
-    return uri;
+    return track;
   } catch (error) {
-    throw Error(`No uri found for "${artistToSearch} - ${song.name}"`);
+    throw Error(`No Spotify track found for "${artistToSearch} - ${song.name}"`);
   }
 }
 
@@ -160,6 +160,8 @@ export async function addSongsToPlaylist(
 ) {
   if (!token) throw Error("Access token required");
   if (body.uris.length === 0) throw Error("At least one uri is required");
+
+  console.log({ uris: body.uris });
 
   try {
     const res = await fetch(`${ENDPOINT}/playlists/${body.playlistId}/tracks`, {
@@ -226,5 +228,29 @@ export async function addPlaylistCoverImage(
     // receive 202 code - Accepted (empty response)
   } catch (error) {
     throw error;
+  }
+}
+
+export async function getMultipleTracks(
+  token: string | null | undefined,
+  songs: Song[],
+  setlist: Setlist | undefined,
+) {
+  try {
+    if (!token) throw new Error("Access token required");
+    if (!setlist) throw new Error("Setlist required");
+
+    const tracks: Track[] = [];
+
+    for (const song of songs) {
+      const artistToSearch = song.cover ? song.cover.name : setlist?.artist.name;
+
+      const track = await getTrackFromSetlistFmSong(token, artistToSearch, song);
+      tracks.push(track);
+    }
+
+    return tracks;
+  } catch (error) {
+    console.error(error);
   }
 }

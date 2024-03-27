@@ -13,14 +13,12 @@ import {
   addSongsToPlaylist,
   UpdatePlaylistImageRequestBody,
   addPlaylistCoverImage,
-  getUriFromSetlistFmSong,
 } from "../services/spotify";
 import { createPlaylistName } from "../utils/helpers";
-import { Song } from "../utils/setlist-fm-types";
 import { Playlist, TrackItem } from "../utils/spotify-types";
 
 export default function usePlaylist(setlistId: string) {
-  const { data: setlist, primary, encore } = useSetlist(setlistId);
+  const { data: setlist, songs, spotifyTracks } = useSetlist(setlistId);
   const { session, user } = useAuth();
 
   const [playlist, setPlaylist] = useState<Playlist<TrackItem> | null>(null);
@@ -96,24 +94,13 @@ export default function usePlaylist(setlistId: string) {
 
   const handleUpdatePlaylistTracks = async (playlist: Playlist) => {
     try {
-      const p = primary?.song ?? [];
-      const e = encore?.song ?? [];
-      const allSongs = [...p, ...e];
-
-      const uris: string[] = [];
-
-      for (const song of allSongs) {
-        const uri = await getSpotifyUri(song);
-        if (!uri) continue;
-
-        uris.push(uri);
-      }
+      if (!spotifyTracks) return;
 
       await updatePlaylistTracksMutation.mutateAsync({
         playlistId: playlist.id,
-        uris,
-        expected: allSongs.length,
-        found: uris.length,
+        uris: spotifyTracks.filter((t) => t !== undefined).map((t) => t.uri),
+        expected: songs?.length ?? 0,
+        found: spotifyTracks.length,
       });
     } catch (error) {
       console.error(error);
@@ -128,18 +115,6 @@ export default function usePlaylist(setlistId: string) {
         playlistId: playlist.id,
         base64: selectedImage.base64,
       });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getSpotifyUri = async (song: Song) => {
-    try {
-      const artistToSearch = song.cover ? song.cover.name : setlist?.artist.name;
-
-      const uri = await getUriFromSetlistFmSong(session?.accessToken, artistToSearch, song);
-
-      return uri;
     } catch (error) {
       console.error(error);
     }
