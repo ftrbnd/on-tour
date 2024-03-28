@@ -16,6 +16,7 @@ interface ServerResponse {
   user: {
     displayName: string | null;
     avatar: string | null;
+    id: string | null;
   };
 }
 
@@ -28,6 +29,7 @@ interface AuthUser {
   displayName: string | null;
   providerId: string;
   avatar: string | null;
+  id: string | null;
 }
 
 interface AuthContextProps {
@@ -90,6 +92,7 @@ export function AuthProvider(props: PropsWithChildren) {
           displayName: user.displayName,
           providerId: account.providerId,
           avatar: user.avatar,
+          id: user.id,
         });
       } else {
         setSession(null);

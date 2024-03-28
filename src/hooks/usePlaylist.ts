@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ImagePickerAsset } from "expo-image-picker";
 import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import useSetlist from "./useSetlist";
 import { useAuth } from "../providers/AuthProvider";
+import { addPlaylist } from "../services/db";
 import {
   CreatePlaylistRequestBody,
   createPlaylist,
@@ -31,6 +32,8 @@ export default function usePlaylist(setlistId: string) {
 
   const [addedTracks, setAddedTracks] = useState<boolean>(false);
   const [tracksFound, setTracksFound] = useState<number | null>(null);
+
+  const queryClient = useQueryClient();
 
   const createPlaylistMutation = useMutation({
     mutationFn: (body: CreatePlaylistRequestBody) =>
@@ -77,10 +80,19 @@ export default function usePlaylist(setlistId: string) {
     },
   });
 
+  const addToDatabaseMutation = useMutation({
+    mutationFn: () => addPlaylist(session?.token, user?.id, playlist?.id),
+    onSuccess: async () => {
+      console.log("Playlist added to database");
+      await queryClient.invalidateQueries({ queryKey: ["created-playlists"] });
+    },
+  });
+
   const handleCreatePlaylist = async (image?: ImagePickerAsset | null) => {
     try {
       if (!user) throw new Error("User must be logged in");
       if (image) setImage(image);
+      if (!spotifyTracks || spotifyTracks.length === 0) return;
 
       await createPlaylistMutation.mutateAsync({
         name: createPlaylistName(setlist),
@@ -102,6 +114,8 @@ export default function usePlaylist(setlistId: string) {
         expected: songs?.length ?? 0,
         found: spotifyTracks.length,
       });
+
+      await addToDatabaseMutation.mutateAsync();
     } catch (error) {
       console.error(error);
     }
