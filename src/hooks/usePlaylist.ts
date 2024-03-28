@@ -1,12 +1,12 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { ImagePickerAsset } from "expo-image-picker";
 import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
 import { useState } from "react";
 
 import useSetlist from "./useSetlist";
+import useStoredPlaylist from "./useStoredPlaylist";
 import { useAuth } from "../providers/AuthProvider";
-import { addPlaylist } from "../services/db";
 import {
   CreatePlaylistRequestBody,
   createPlaylist,
@@ -16,6 +16,7 @@ import {
   addPlaylistCoverImage,
 } from "../services/spotify";
 import { createPlaylistName } from "../utils/helpers";
+import { storage } from "../utils/mmkv";
 import { Playlist, TrackItem } from "../utils/spotify-types";
 
 export default function usePlaylist(setlistId: string) {
@@ -23,6 +24,8 @@ export default function usePlaylist(setlistId: string) {
   const { session, user } = useAuth();
 
   const [playlist, setPlaylist] = useState<Playlist<TrackItem> | null>(null);
+  const { addToDatabase } = useStoredPlaylist(playlist?.id);
+
   const [name, setName] = useState<string | null>(createPlaylistName(setlist) ?? null);
   const [description, setDescription] = useState<string | null>(
     `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}` ??
@@ -32,8 +35,6 @@ export default function usePlaylist(setlistId: string) {
 
   const [addedTracks, setAddedTracks] = useState<boolean>(false);
   const [tracksFound, setTracksFound] = useState<number | null>(null);
-
-  const queryClient = useQueryClient();
 
   const createPlaylistMutation = useMutation({
     mutationFn: (body: CreatePlaylistRequestBody) =>
@@ -77,14 +78,6 @@ export default function usePlaylist(setlistId: string) {
     },
   });
 
-  const addToDatabaseMutation = useMutation({
-    mutationFn: () => addPlaylist(session?.token, user?.id, playlist?.id),
-    onSuccess: async () => {
-      console.log("Playlist added to database");
-      await queryClient.invalidateQueries({ queryKey: ["created-playlists"] });
-    },
-  });
-
   const handleCreatePlaylist = async (image?: ImagePickerAsset | null) => {
     try {
       if (!user) throw new Error("User must be logged in");
@@ -112,14 +105,16 @@ export default function usePlaylist(setlistId: string) {
         found: spotifyTracks.length,
       });
 
+      await addToDatabase({ playlistId: playlist.id, playlistName: playlist.name, setlistId });
+
       if (image) {
         await updatePlaylistImageMutation.mutateAsync({
           playlistId: playlist.id,
           base64: image.base64,
         });
-      }
 
-      await addToDatabaseMutation.mutateAsync();
+        storage.set(`playlist-${playlist.id}-image`, image.uri);
+      }
     } catch (error) {
       console.error(error);
     }
