@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
+    "@react-navigation/drawer": "^6.6.15",
     "@react-navigation/material-top-tabs": "^6.6.12",
     "@react-navigation/native": "^6.0.2",
     "@tanstack/react-query": "^5.25.0",
@@ -38,6 +39,7 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.73.5",
+    "react-native-gesture-handler": "~2.14.0",
     "react-native-mmkv": "^2.12.2",
     "react-native-pager-view": "6.2.3",
     "react-native-paper": "^5.12.3",

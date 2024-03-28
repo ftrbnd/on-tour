@@ -41,7 +41,7 @@ export default function usePlaylist(setlistId: string) {
     onSuccess: async (playlist) => {
       console.log("Playlist created!");
       setPlaylist(playlist);
-      await handleUpdatePlaylistTracks(playlist);
+      await handleUpdatePlaylist(playlist);
     },
     onError: (error) => {
       console.error("Create mutation failed", error);
@@ -54,9 +54,6 @@ export default function usePlaylist(setlistId: string) {
     onSuccess: async (_updatedPlaylist, body) => {
       setTracksFound(body.found ?? null);
       setAddedTracks(true);
-
-      if (image) handleUpdatePlaylistImage(image);
-
       // TODO: show this message as an alert?
       // TODO: link setlist ids to playlist ids in mmkv or neondb
       // if a user has already created a playlist for this setlist, show a button that can take them to the playlist
@@ -104,7 +101,7 @@ export default function usePlaylist(setlistId: string) {
     }
   };
 
-  const handleUpdatePlaylistTracks = async (playlist: Playlist) => {
+  const handleUpdatePlaylist = async (playlist: Playlist) => {
     try {
       if (!spotifyTracks) return;
 
@@ -115,20 +112,14 @@ export default function usePlaylist(setlistId: string) {
         found: spotifyTracks.length,
       });
 
+      if (image) {
+        await updatePlaylistImageMutation.mutateAsync({
+          playlistId: playlist.id,
+          base64: image.base64,
+        });
+      }
+
       await addToDatabaseMutation.mutateAsync();
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleUpdatePlaylistImage = async (selectedImage: ImagePickerAsset) => {
-    try {
-      if (!playlist) return;
-
-      await updatePlaylistImageMutation.mutateAsync({
-        playlistId: playlist.id,
-        base64: selectedImage.base64,
-      });
     } catch (error) {
       console.error(error);
     }
