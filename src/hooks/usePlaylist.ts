@@ -24,7 +24,7 @@ export default function usePlaylist(setlistId: string) {
   const { session, user } = useAuth();
 
   const [playlist, setPlaylist] = useState<Playlist<TrackItem> | null>(null);
-  const { addToDatabase } = useStoredPlaylist(playlist?.id);
+  const { addToDatabase } = useStoredPlaylist({ playlistId: playlist?.id });
 
   const [name, setName] = useState<string | null>(createPlaylistName(setlist) ?? null);
   const [description, setDescription] = useState<string | null>(

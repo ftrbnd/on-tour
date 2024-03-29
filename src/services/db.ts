@@ -40,11 +40,16 @@ export async function addPlaylist(
 export async function getPlaylists(
   sessionToken: string | null | undefined,
   userId: string | null | undefined,
+  setlistId?: string | null | undefined,
 ) {
   try {
     if (!sessionToken || !userId) throw new Error("Session token and user id required");
 
-    const res = await fetch(`${ENDPOINT}/users/${userId}/playlists`, {
+    const endpoint = setlistId
+      ? `${ENDPOINT}/users/${userId}/playlists?setlistId=${setlistId}`
+      : `${ENDPOINT}/users/${userId}/playlists`;
+
+    const res = await fetch(endpoint, {
       headers: {
         Authorization: `Bearer ${sessionToken}`,
       },

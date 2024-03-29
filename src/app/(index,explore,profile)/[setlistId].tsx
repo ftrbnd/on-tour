@@ -7,7 +7,9 @@ import { View, StyleSheet, FlatList } from "react-native";
 import { Avatar, Card, Divider, FAB, List, Text } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/CreatePlaylistModal";
+import PlaylistExistsModal from "@/src/components/PlaylistExistsModal";
 import useSetlist from "@/src/hooks/useSetlist";
+import useStoredPlaylist from "@/src/hooks/useStoredPlaylist";
 import { Song } from "@/src/utils/setlist-fm-types";
 import { Image } from "@/src/utils/spotify-types";
 
@@ -68,6 +70,7 @@ function SongItem({ item, image }: { item: Song; image: Image | null | undefined
 export default function SetlistPage() {
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
   const { data: setlist, songs, spotifyTracks, openWebpage } = useSetlist(setlistId);
+  const { playlistExists } = useStoredPlaylist({ setlistId });
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
@@ -108,7 +111,14 @@ export default function SetlistPage() {
           keyExtractor={(song) => `${song.name}-${randomUUID()}`}
         />
 
-        {setlist && (
+        {/* TODO: doesn't update when deleted from database */}
+        {setlist && playlistExists && playlistExists?.length > 0 ? (
+          <PlaylistExistsModal
+            visible={modalVisible}
+            setVisible={setModalVisible}
+            playlistId={playlistExists[0].id}
+          />
+        ) : (
           <CreatePlaylistModal
             visible={modalVisible}
             setVisible={setModalVisible}

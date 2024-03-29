@@ -71,7 +71,7 @@ export default function Profile() {
 
 function PlaylistItem({ playlist }: { playlist: StoredPlaylist }) {
   const [playlistImage] = useMMKVString(`playlist-${playlist.id}-image`);
-  const { deleteFromDatabase } = useStoredPlaylist(playlist.id);
+  const { deleteFromDatabase } = useStoredPlaylist({ playlistId: playlist.id });
 
   const openWebPage = async () => {
     try {
