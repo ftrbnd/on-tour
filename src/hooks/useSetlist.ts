@@ -12,7 +12,7 @@ export default function useSetlist(id: string) {
 
   const { session } = useAuth();
 
-  const { data: setlist } = useQuery({
+  const { data: setlist, isLoading } = useQuery({
     queryKey: ["setlist", id],
     queryFn: () => getOneSetlist(id),
     enabled: id !== null,
@@ -44,6 +44,7 @@ export default function useSetlist(id: string) {
 
   return {
     data: setlist,
+    isLoading,
     songs,
     openWebpage,
     spotifyTracks,

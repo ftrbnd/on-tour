@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { ImagePickerAsset } from "expo-image-picker";
 import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import useSetlist from "./useSetlist";
 import useStoredPlaylist from "./useStoredPlaylist";
@@ -26,11 +26,8 @@ export default function usePlaylist(setlistId: string) {
   const [playlist, setPlaylist] = useState<Playlist<TrackItem> | null>(null);
   const { addToDatabase } = useStoredPlaylist({ playlistId: playlist?.id });
 
-  const [name, setName] = useState<string | null>(createPlaylistName(setlist) ?? null);
-  const [description, setDescription] = useState<string | null>(
-    `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}` ??
-      null,
-  );
+  const [name, setName] = useState<string | null>(null);
+  const [description, setDescription] = useState<string | null>(null);
   const [image, setImage] = useState<ImagePickerAsset | null>(null);
 
   const [addedTracks, setAddedTracks] = useState<boolean>(false);
@@ -77,6 +74,15 @@ export default function usePlaylist(setlistId: string) {
       console.error("Image mutation failed", error);
     },
   });
+
+  useEffect(() => {
+    if (setlist) {
+      setName(createPlaylistName(setlist));
+      setDescription(
+        `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}`,
+      );
+    }
+  }, [setlist]);
 
   const handleCreatePlaylist = async (image?: ImagePickerAsset | null) => {
     try {
