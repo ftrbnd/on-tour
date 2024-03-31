@@ -5,11 +5,11 @@ import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { Swipeable } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
-import { Avatar, List, Text } from "react-native-paper";
+import { Avatar, List } from "react-native-paper";
 
 import CreateUpcomingShowModal from "@/src/components/CreateUpcomingShowModal";
+import SwipeableItem from "@/src/components/SwipeableItem";
 import useStoredPlaylist from "@/src/hooks/useStoredPlaylist";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -27,11 +27,6 @@ const styles = StyleSheet.create({
   listItem: {
     padding: 8,
   },
-  swipeDelete: {
-    backgroundColor: "red",
-    padding: 16,
-    color: "white",
-  },
 });
 
 function PlaylistItem({ playlist }: { playlist: StoredPlaylist }) {
@@ -46,16 +41,8 @@ function PlaylistItem({ playlist }: { playlist: StoredPlaylist }) {
     }
   };
 
-  const renderRightActions = () => {
-    return (
-      <Text style={styles.swipeDelete} onPress={() => deleteFromDatabase()}>
-        Delete
-      </Text>
-    );
-  };
-
   return (
-    <Swipeable renderRightActions={renderRightActions}>
+    <SwipeableItem onEdit={() => console.log("edit")} onDelete={deleteFromDatabase}>
       <List.Item
         title={playlist.title}
         titleEllipsizeMode="tail"
@@ -63,25 +50,15 @@ function PlaylistItem({ playlist }: { playlist: StoredPlaylist }) {
         right={() => <Ionicons name="open-outline" size={24} onPress={openWebPage} />}
         style={styles.listItem}
       />
-    </Swipeable>
+    </SwipeableItem>
   );
 }
 
 function UpcomingShowItem({ show }: { show: UpcomingShow }) {
   const [showImage] = useMMKVString(`upcoming-show-${show.id}-image`);
 
-  const renderRightActions = () => {
-    return (
-      <Text
-        style={styles.swipeDelete}
-        onPress={() => console.log("TODO: implement edit and delete")}>
-        Delete
-      </Text>
-    );
-  };
-
   return (
-    <Swipeable renderRightActions={renderRightActions}>
+    <SwipeableItem onEdit={() => console.log("edit")} onDelete={() => console.log("delete")}>
       <List.Item
         title={`${show.artist} - ${show.tour}`}
         description={`${show.venue} / ${show.city} / ${moment(show.date, "YYYY-MM-DD-MM").format("MMMM Do, YYYY")}`}
@@ -89,7 +66,7 @@ function UpcomingShowItem({ show }: { show: UpcomingShow }) {
         left={() => <List.Icon icon={{ uri: showImage }} />}
         style={styles.listItem}
       />
-    </Swipeable>
+    </SwipeableItem>
   );
 }
 
