@@ -1,15 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "expo-router";
 import { Drawer } from "expo-router/drawer";
 import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-import { Avatar, List } from "react-native-paper";
+import { Avatar, Button, Dialog, List, Portal, Snackbar, Text } from "react-native-paper";
 
-import CreateUpcomingShowModal from "@/src/components/CreateUpcomingShowModal";
 import SwipeableItem from "@/src/components/SwipeableItem";
+import UpcomingShowModal from "@/src/components/UpcomingShowModal";
 import useStoredPlaylist from "@/src/hooks/useStoredPlaylist";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -18,9 +19,7 @@ import { UpcomingShow } from "@/src/services/upcomingShows";
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
-    display: "flex",
-    alignItems: "center",
+    flex: 1,
   },
   headerRight: {
     marginRight: 16,
@@ -30,7 +29,38 @@ const styles = StyleSheet.create({
   },
 });
 
-function PlaylistItem({ playlist }: { playlist: StoredPlaylist }) {
+function InfoDialog({
+  visible,
+  setVisible,
+}: {
+  visible: boolean;
+  setVisible: (vis: boolean) => void;
+}) {
+  return (
+    <Portal>
+      <Dialog visible={visible} onDismiss={() => setVisible(false)}>
+        <Dialog.Title>About Spotify's Web API</Dialog.Title>
+        <Dialog.Content>
+          <Text variant="bodyMedium">
+            Spotify's API doesn't allow us to remotely delete playlists - you are only deleting them
+            from our own database. To fully delete the playlist, please go to the Spotify app.
+          </Text>
+        </Dialog.Content>
+        <Dialog.Actions>
+          <Button onPress={() => setVisible(false)}>OK</Button>
+        </Dialog.Actions>
+      </Dialog>
+    </Portal>
+  );
+}
+
+function PlaylistItem({
+  playlist,
+  showSnackbar,
+}: {
+  playlist: StoredPlaylist;
+  showSnackbar: () => void;
+}) {
   const [playlistImage] = useMMKVString(`playlist-${playlist.id}-image`);
   const { deleteFromDatabase } = useStoredPlaylist({ playlistId: playlist.id });
 
@@ -42,13 +72,21 @@ function PlaylistItem({ playlist }: { playlist: StoredPlaylist }) {
     }
   };
 
+  const handleDelete = async () => {
+    try {
+      await deleteFromDatabase();
+      showSnackbar();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
-    <SwipeableItem onEdit={() => console.log("edit")} onDelete={deleteFromDatabase}>
+    <SwipeableItem onEdit={openWebPage} onDelete={handleDelete}>
       <List.Item
         title={playlist.title}
         titleEllipsizeMode="tail"
         left={() => <List.Icon icon={{ uri: playlistImage }} />}
-        right={() => <Ionicons name="open-outline" size={24} onPress={openWebPage} />}
         style={styles.listItem}
       />
     </SwipeableItem>
@@ -74,11 +112,7 @@ function UpcomingShowItem({ show }: { show: UpcomingShow }) {
       </SwipeableItem>
 
       {modalVisible && (
-        <CreateUpcomingShowModal
-          visible={modalVisible}
-          setVisible={setModalVisible}
-          editingShow={show}
-        />
+        <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} editingShow={show} />
       )}
     </>
   );
@@ -92,8 +126,11 @@ export default function Profile() {
     enabled: user !== null,
   });
   const { upcomingShows } = useUpcomingShows();
+  const router = useRouter();
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
+  const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
 
   return (
     <>
@@ -111,10 +148,26 @@ export default function Profile() {
         }}
       />
 
-      <View>
+      <View style={styles.container}>
         <List.AccordionGroup>
           <List.Accordion title={`My Playlists (${playlists?.length ?? 0})`} id="1">
-            {playlists?.map((playlist) => <PlaylistItem key={playlist.id} playlist={playlist} />)}
+            {!playlists ||
+              (playlists?.length === 0 && (
+                <List.Item
+                  onPress={() => router.replace("/(explore)/explore")}
+                  style={styles.listItem}
+                  title="Check out some setlists to get started"
+                  titleStyle={{ fontWeight: "bold" }}
+                  right={() => <List.Icon icon={() => <Ionicons name="search" size={24} />} />}
+                />
+              ))}
+            {playlists?.map((playlist) => (
+              <PlaylistItem
+                key={playlist.id}
+                playlist={playlist}
+                showSnackbar={() => setSnackbarVisible(true)}
+              />
+            ))}
           </List.Accordion>
           <List.Accordion title={`Upcoming Shows (${upcomingShows.length})`} id="2">
             <List.Item
@@ -128,9 +181,20 @@ export default function Profile() {
           </List.Accordion>
         </List.AccordionGroup>
 
-        {modalVisible && (
-          <CreateUpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />
+        {modalVisible && <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />}
+        {infoDialogVisible && (
+          <InfoDialog visible={infoDialogVisible} setVisible={setInfoDialogVisible} />
         )}
+
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={() => setSnackbarVisible(false)}
+          action={{
+            label: "Learn More",
+            onPress: () => setInfoDialogVisible(true),
+          }}>
+          Playlist deleted from On Tour!
+        </Snackbar>
       </View>
     </>
   );

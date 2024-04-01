@@ -60,7 +60,7 @@ interface ModalProps {
   editingShow?: UpcomingShow;
 }
 
-export default function CreateUpcomingShowModal({ visible, setVisible, editingShow }: ModalProps) {
+export default function UpcomingShowModal({ visible, setVisible, editingShow }: ModalProps) {
   const [artist, setArtist] = useState<string>(editingShow?.artist ?? "");
   const [tour, setTour] = useState<string>(editingShow?.tour ?? "");
   const [venue, setVenue] = useState<string>(editingShow?.venue ?? "");

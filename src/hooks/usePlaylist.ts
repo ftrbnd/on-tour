@@ -150,6 +150,7 @@ export default function usePlaylist(setlistId: string) {
   return {
     data: playlist,
     startMutations: handleCreatePlaylist,
+    tracksExist: spotifyTracks !== undefined,
     addedTracks,
     tracksFound,
     openWebPage,

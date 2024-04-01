@@ -47,6 +47,7 @@ interface ModalProps {
 
 export default function CreatePlaylistModal({ visible, setVisible, setlistId }: ModalProps) {
   const playlist = usePlaylist(setlistId);
+
   const { selectedImage, pickImageAsync, warning } = useImagePicker();
 
   return (
@@ -117,7 +118,7 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
                 onPress={() => playlist.startMutations(selectedImage)}
                 mode="outlined"
                 loading={playlist.mutationsPending}
-                disabled={playlist.mutationsPending || !selectedImage}>
+                disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
                 {playlist.mutationsPending ? playlist.currentOperation : "Create"}
               </Button>
             </>
