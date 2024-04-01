@@ -13,7 +13,8 @@ import SwipeableItem from "@/src/components/SwipeableItem";
 import useStoredPlaylist from "@/src/hooks/useStoredPlaylist";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { StoredPlaylist, UpcomingShow, getPlaylists } from "@/src/services/db";
+import { StoredPlaylist, getPlaylists } from "@/src/services/savedPlaylists";
+import { UpcomingShow } from "@/src/services/upcomingShows";
 
 const styles = StyleSheet.create({
   container: {
@@ -56,17 +57,30 @@ function PlaylistItem({ playlist }: { playlist: StoredPlaylist }) {
 
 function UpcomingShowItem({ show }: { show: UpcomingShow }) {
   const [showImage] = useMMKVString(`upcoming-show-${show.id}-image`);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
+  const { deleteShow } = useUpcomingShows();
 
   return (
-    <SwipeableItem onEdit={() => console.log("edit")} onDelete={() => console.log("delete")}>
-      <List.Item
-        title={`${show.artist} - ${show.tour}`}
-        description={`${show.venue} / ${show.city} / ${moment(show.date, "YYYY-MM-DD-MM").format("MMMM Do, YYYY")}`}
-        titleEllipsizeMode="tail"
-        left={() => <List.Icon icon={{ uri: showImage }} />}
-        style={styles.listItem}
-      />
-    </SwipeableItem>
+    <>
+      <SwipeableItem onEdit={() => setModalVisible(true)} onDelete={() => deleteShow(show)}>
+        <List.Item
+          title={`${show.artist} - ${show.tour}`}
+          description={`${show.venue} / ${show.city} / ${moment(show.date, "YYYY-MM-DD-MM").format("MMMM Do, YYYY")}`}
+          titleEllipsizeMode="tail"
+          left={() => <List.Icon icon={{ uri: showImage }} />}
+          style={styles.listItem}
+        />
+      </SwipeableItem>
+
+      {modalVisible && (
+        <CreateUpcomingShowModal
+          visible={modalVisible}
+          setVisible={setModalVisible}
+          editingShow={show}
+        />
+      )}
+    </>
   );
 }
 
@@ -99,10 +113,10 @@ export default function Profile() {
 
       <View>
         <List.AccordionGroup>
-          <List.Accordion title="My Playlists" id="1">
+          <List.Accordion title={`My Playlists (${playlists?.length ?? 0})`} id="1">
             {playlists?.map((playlist) => <PlaylistItem key={playlist.id} playlist={playlist} />)}
           </List.Accordion>
-          <List.Accordion title="Upcoming Shows" id="2">
+          <List.Accordion title={`Upcoming Shows (${upcomingShows.length})`} id="2">
             <List.Item
               onPress={() => setModalVisible(true)}
               style={styles.listItem}
@@ -114,7 +128,9 @@ export default function Profile() {
           </List.Accordion>
         </List.AccordionGroup>
 
-        <CreateUpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />
+        {modalVisible && (
+          <CreateUpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />
+        )}
       </View>
     </>
   );

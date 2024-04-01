@@ -3,11 +3,13 @@ import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/dat
 import { Image } from "expo-image";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { useMMKVString } from "react-native-mmkv";
 import { Button, Card, Modal, Portal, Text, TextInput } from "react-native-paper";
 
 import useImagePicker from "../hooks/useImagePicker";
 import useUpcomingShows from "../hooks/useUpcomingShows";
 import { useAuth } from "../providers/AuthProvider";
+import { UpcomingShow } from "../services/upcomingShows";
 
 const styles = StyleSheet.create({
   modal: {
@@ -55,19 +57,21 @@ const styles = StyleSheet.create({
 interface ModalProps {
   visible: boolean;
   setVisible: (vis: boolean) => void;
+  editingShow?: UpcomingShow;
 }
 
-export default function CreateUpcomingShowModal({ visible, setVisible }: ModalProps) {
-  const [artist, setArtist] = useState<string>("");
-  const [tour, setTour] = useState<string>("");
-  const [venue, setVenue] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [date, setDate] = useState<Date>(new Date());
+export default function CreateUpcomingShowModal({ visible, setVisible, editingShow }: ModalProps) {
+  const [artist, setArtist] = useState<string>(editingShow?.artist ?? "");
+  const [tour, setTour] = useState<string>(editingShow?.tour ?? "");
+  const [venue, setVenue] = useState<string>(editingShow?.venue ?? "");
+  const [city, setCity] = useState<string>(editingShow?.city ?? "");
+  const [date, setDate] = useState<Date>(editingShow ? new Date(editingShow.date) : new Date());
   const disabled = !artist || !tour || !venue || !city || !date;
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
 
   const { selectedImage, pickImageAsync, warning } = useImagePicker();
-  const { addNew } = useUpcomingShows();
+  const { addShow, updateShow } = useUpcomingShows();
+  const [previousShowImage] = useMMKVString(`upcoming-show-${editingShow?.id}-image`);
   const { user } = useAuth();
 
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date | undefined) => {
@@ -79,21 +83,37 @@ export default function CreateUpcomingShowModal({ visible, setVisible }: ModalPr
     // TODO: use react-hook-form or Formik?
     if (!artist || !tour || !venue || !city || !date || !user?.id) return;
 
+    // TODO: fix dates being set to previous day
     const month = `${date.getMonth() + 1}`.padStart(2, "0");
     const day = `${date.getDate()}`.padStart(2, "0");
 
     try {
-      await addNew(
-        {
-          artist,
-          tour,
-          venue,
-          city,
-          date: `${date.getFullYear()}-${month}-${day}`,
-          userId: user.id,
-        },
-        selectedImage,
-      );
+      if (editingShow) {
+        await updateShow(
+          {
+            id: editingShow.id,
+            userId: user.id,
+            artist,
+            tour,
+            venue,
+            city,
+            date: `${date.getFullYear()}-${month}-${day}`,
+          },
+          selectedImage,
+        );
+      } else {
+        await addShow(
+          {
+            artist,
+            tour,
+            venue,
+            city,
+            date: `${date.getFullYear()}-${month}-${day}`,
+            userId: user.id,
+          },
+          selectedImage,
+        );
+      }
 
       setVisible(false);
     } catch (e) {
@@ -109,10 +129,11 @@ export default function CreateUpcomingShowModal({ visible, setVisible }: ModalPr
         contentContainerStyle={styles.modal}>
         <View style={styles.header}>
           <Text variant="headlineLarge">Show Details</Text>
-          {selectedImage ? (
+          {selectedImage || previousShowImage ? (
             <Image
+              onTouchStart={pickImageAsync}
               source={{
-                uri: selectedImage.uri,
+                uri: selectedImage ? selectedImage.uri : previousShowImage,
                 width: styles.image.width,
                 height: styles.image.height,
               }}

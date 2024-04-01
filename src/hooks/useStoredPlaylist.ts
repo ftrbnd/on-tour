@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "../providers/AuthProvider";
-import { addPlaylist, deletePlaylist, getPlaylists } from "../services/db";
+import { addPlaylist, deletePlaylist, getPlaylists } from "../services/savedPlaylists";
 
 interface AddPlaylistVars {
   playlistId: string;
