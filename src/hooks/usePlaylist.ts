@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import * as FileSystem from "expo-file-system";
 import { ImagePickerAsset } from "expo-image-picker";
 import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
@@ -29,6 +30,7 @@ export default function usePlaylist(setlistId: string) {
   const [name, setName] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [image, setImage] = useState<ImagePickerAsset | null>(null);
+  const [preSavedImageData, setPreSavedImageData] = useState<string | null>(null);
 
   const [addedTracks, setAddedTracks] = useState<boolean>(false);
   const [tracksFound, setTracksFound] = useState<number | null>(null);
@@ -77,21 +79,25 @@ export default function usePlaylist(setlistId: string) {
 
   useEffect(() => {
     if (setlist) {
-      setName(createPlaylistName(setlist));
-      setDescription(
-        `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}`,
-      );
+      setDefaults();
     }
   }, [setlist]);
 
-  const handleCreatePlaylist = async (image?: ImagePickerAsset | null) => {
+  const handleCreatePlaylist = async (image?: ImagePickerAsset | string | null) => {
     try {
       if (!user) throw new Error("User must be logged in");
-      if (image) setImage(image);
+      if (typeof image === "string") {
+        const base64 = await FileSystem.readAsStringAsync(image, { encoding: "base64" });
+        console.log({ base64 });
+
+        setPreSavedImageData(base64);
+      } else if (image) {
+        setImage(image);
+      }
       if (!spotifyTracks || spotifyTracks.length === 0) return;
 
       await createPlaylistMutation.mutateAsync({
-        name: createPlaylistName(setlist),
+        name: name ?? "",
         description: description ?? "",
         public: false,
       });
@@ -113,13 +119,13 @@ export default function usePlaylist(setlistId: string) {
 
       await addToDatabase({ playlistId: playlist.id, playlistName: playlist.name, setlistId });
 
-      if (image) {
+      if (image || preSavedImageData) {
         await updatePlaylistImageMutation.mutateAsync({
           playlistId: playlist.id,
-          base64: image.base64,
+          base64: image ? image.base64 : preSavedImageData,
         });
 
-        storage.set(`playlist-${playlist.id}-image`, image.uri);
+        storage.set(`playlist-${playlist.id}-image`, image ? image.uri : preSavedImageData ?? "");
       }
     } catch (error) {
       console.error(error);
@@ -132,6 +138,13 @@ export default function usePlaylist(setlistId: string) {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const setDefaults = () => {
+    setName(createPlaylistName(setlist));
+    setDescription(
+      `${setlist?.venue.name} / ${setlist?.venue.city.name} / ${moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM D, YYYY")}`,
+    );
   };
 
   const mutationsPending =
@@ -160,5 +173,6 @@ export default function usePlaylist(setlistId: string) {
     setName,
     description,
     setDescription,
+    setDefaults,
   };
 }

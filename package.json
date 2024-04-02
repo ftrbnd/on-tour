@@ -17,6 +17,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
     "@react-native-community/datetimepicker": "7.6.1",
+    "@react-native-picker/picker": "2.6.1",
     "@react-navigation/drawer": "^6.6.15",
     "@react-navigation/material-top-tabs": "^6.6.12",
     "@react-navigation/native": "^6.0.2",

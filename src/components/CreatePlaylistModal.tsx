@@ -1,10 +1,16 @@
 import { Ionicons, Entypo } from "@expo/vector-icons";
+import { Picker } from "@react-native-picker/picker";
 import { Image } from "expo-image";
+import moment from "moment";
+import { useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { useMMKVString } from "react-native-mmkv";
 import { Button, Modal, Portal, Text, TextInput } from "react-native-paper";
 
 import useImagePicker from "../hooks/useImagePicker";
 import usePlaylist from "../hooks/usePlaylist";
+import useUpcomingShows from "../hooks/useUpcomingShows";
+import { UpcomingShow } from "../services/upcomingShows";
 
 const styles = StyleSheet.create({
   modal: {
@@ -31,6 +37,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  pickerContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "stretch",
+  },
   bottom: {
     display: "flex",
     flexDirection: "row",
@@ -47,8 +58,25 @@ interface ModalProps {
 
 export default function CreatePlaylistModal({ visible, setVisible, setlistId }: ModalProps) {
   const playlist = usePlaylist(setlistId);
+  const { selectedImage, setSelectedImage, pickImageAsync, warning } = useImagePicker();
 
-  const { selectedImage, pickImageAsync, warning } = useImagePicker();
+  const { upcomingShows } = useUpcomingShows();
+  const [selectedShow, setSelectedShow] = useState<UpcomingShow | null>(null);
+  const [upcomingImage] = useMMKVString(`upcoming-show-${selectedShow?.id}-image`);
+
+  const handleSelection = async (show: UpcomingShow | null) => {
+    setSelectedShow(show);
+    playlist.setName(`${show?.artist} - ${show?.tour}`);
+    playlist.setDescription(
+      `${show?.venue} / ${show?.city} / ${moment(show?.date, "YYYY-MM-DD").format("MMMM D, YYYY")}`,
+    );
+  };
+
+  const resetModal = () => {
+    playlist.setDefaults();
+    setSelectedShow(null);
+    setSelectedImage(null);
+  };
 
   return (
     <Portal>
@@ -60,19 +88,22 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
           <Text variant="headlineLarge">
             {playlist.addedTracks ? "Playlist Created!" : "Playlist Details"}
           </Text>
-          {selectedImage ? (
+          {selectedImage || upcomingImage ? (
             <Image
               source={{
-                uri: selectedImage.uri,
+                uri: selectedImage ? selectedImage.uri : upcomingImage,
                 width: styles.image.width,
                 height: styles.image.height,
               }}
+              onTouchStart={() => (playlist.mutationsPending ? null : pickImageAsync())}
               contentFit="cover"
               style={styles.image}
               transition={1000}
             />
           ) : (
-            <View style={styles.image}>
+            <View
+              style={styles.image}
+              onTouchStart={() => (playlist.mutationsPending ? null : pickImageAsync())}>
               <Ionicons name="musical-notes" size={styles.image.height * 0.66} color="black" />
             </View>
           )}
@@ -99,6 +130,28 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
           />
         )}
 
+        {!playlist.addedTracks && (
+          <View>
+            {upcomingShows.length > 0 && (
+              <View style={styles.pickerContainer}>
+                <Text style={{ alignSelf: "center" }}>OR</Text>
+                <Picker
+                  selectedValue={selectedShow}
+                  onValueChange={(item) => handleSelection(item)}>
+                  <Picker.Item label="Import an upcoming show" enabled={false} />
+                  {upcomingShows.map((show) => (
+                    <Picker.Item
+                      key={show.id}
+                      label={`${show.artist} - ${show.tour}`}
+                      value={show}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            )}
+          </View>
+        )}
+
         <View style={styles.bottom}>
           {warning && <Text variant="labelMedium">{warning}</Text>}
 
@@ -111,11 +164,15 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
             </Button>
           ) : (
             <>
-              <Button onPress={pickImageAsync} mode="outlined" disabled={playlist.mutationsPending}>
-                {selectedImage ? "New image" : "Upload image"}
-              </Button>
+              {selectedShow && (
+                <Button
+                  onPress={resetModal}
+                  disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
+                  Reset
+                </Button>
+              )}
               <Button
-                onPress={() => playlist.startMutations(selectedImage)}
+                onPress={() => playlist.startMutations(selectedImage ?? upcomingImage)}
                 mode="outlined"
                 loading={playlist.mutationsPending}
                 disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
