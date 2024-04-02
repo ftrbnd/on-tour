@@ -62,7 +62,7 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
 
   const { upcomingShows } = useUpcomingShows();
   const [selectedShow, setSelectedShow] = useState<UpcomingShow | null>(null);
-  const [upcomingImage] = useMMKVString(`upcoming-show-${selectedShow?.id}-image`);
+  const [upcomingImageUri] = useMMKVString(`upcoming-show-${selectedShow?.id}-image`);
 
   const handleSelection = async (show: UpcomingShow | null) => {
     setSelectedShow(show);
@@ -88,10 +88,10 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
           <Text variant="headlineLarge">
             {playlist.addedTracks ? "Playlist Created!" : "Playlist Details"}
           </Text>
-          {selectedImage || upcomingImage ? (
+          {selectedImage || upcomingImageUri ? (
             <Image
               source={{
-                uri: selectedImage ? selectedImage.uri : upcomingImage,
+                uri: selectedImage ? selectedImage.uri : upcomingImageUri,
                 width: styles.image.width,
                 height: styles.image.height,
               }}
@@ -172,7 +172,7 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
                 </Button>
               )}
               <Button
-                onPress={() => playlist.startMutations(selectedImage ?? upcomingImage)}
+                onPress={() => playlist.startMutations(selectedImage, { uri: upcomingImageUri })}
                 mode="outlined"
                 loading={playlist.mutationsPending}
                 disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>

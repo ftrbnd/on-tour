@@ -20,6 +20,11 @@ import { createPlaylistName } from "../utils/helpers";
 import { storage } from "../utils/mmkv";
 import { Playlist, TrackItem } from "../utils/spotify-types";
 
+interface PreSavedImage {
+  base64?: string;
+  uri?: string;
+}
+
 export default function usePlaylist(setlistId: string) {
   const { data: setlist, songs, spotifyTracks } = useSetlist(setlistId);
   const { session, user } = useAuth();
@@ -30,7 +35,7 @@ export default function usePlaylist(setlistId: string) {
   const [name, setName] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);
   const [image, setImage] = useState<ImagePickerAsset | null>(null);
-  const [preSavedImageData, setPreSavedImageData] = useState<string | null>(null);
+  const [preSavedImage, setPreSavedImage] = useState<PreSavedImage | null>(null);
 
   const [addedTracks, setAddedTracks] = useState<boolean>(false);
   const [tracksFound, setTracksFound] = useState<number | null>(null);
@@ -83,14 +88,18 @@ export default function usePlaylist(setlistId: string) {
     }
   }, [setlist]);
 
-  const handleCreatePlaylist = async (image?: ImagePickerAsset | string | null) => {
+  const handleCreatePlaylist = async (
+    image?: ImagePickerAsset | null,
+    preSavedImage?: PreSavedImage | null,
+  ) => {
     try {
       if (!user) throw new Error("User must be logged in");
-      if (typeof image === "string") {
-        const base64 = await FileSystem.readAsStringAsync(image, { encoding: "base64" });
-        console.log({ base64 });
+      if (preSavedImage?.uri) {
+        const base64 = await FileSystem.readAsStringAsync(preSavedImage.uri, {
+          encoding: "base64",
+        });
 
-        setPreSavedImageData(base64);
+        setPreSavedImage({ uri: preSavedImage.uri, base64 });
       } else if (image) {
         setImage(image);
       }
@@ -119,13 +128,13 @@ export default function usePlaylist(setlistId: string) {
 
       await addToDatabase({ playlistId: playlist.id, playlistName: playlist.name, setlistId });
 
-      if (image || preSavedImageData) {
+      if (image || preSavedImage) {
         await updatePlaylistImageMutation.mutateAsync({
           playlistId: playlist.id,
-          base64: image ? image.base64 : preSavedImageData,
+          base64: image ? image.base64 : preSavedImage?.base64,
         });
 
-        storage.set(`playlist-${playlist.id}-image`, image ? image.uri : preSavedImageData ?? "");
+        storage.set(`playlist-${playlist.id}-image`, image ? image.uri : preSavedImage?.uri ?? "");
       }
     } catch (error) {
       console.error(error);
