@@ -8,8 +8,8 @@ import { Avatar, Card, Divider, FAB, List, Text } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/PlaylistExistsModal";
+import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useSetlist from "@/src/hooks/useSetlist";
-import useStoredPlaylist from "@/src/hooks/useStoredPlaylist";
 import { Song } from "@/src/utils/setlist-fm-types";
 import { Image } from "@/src/utils/spotify-types";
 
@@ -70,7 +70,7 @@ function SongItem({ item, image }: { item: Song; image: Image | null | undefined
 export default function SetlistPage() {
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
   const { data: setlist, songs, spotifyTracks, openWebpage } = useSetlist(setlistId);
-  const { playlistExists } = useStoredPlaylist({ setlistId });
+  const { playlistExists } = useCreatedPlaylist({ setlistId });
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 

@@ -2,17 +2,16 @@ import { env } from "../utils/env";
 
 const ENDPOINT = env.EXPO_PUBLIC_FASTIFY_SERVER_URL;
 
-// TODO: enforce consistent naming - "Stored/Created/Saved"???
-export interface StoredPlaylist {
+export interface CreatedPlaylist {
   id: string;
   userId: string;
   title: string;
   setlistId: string;
 }
 
-export async function addPlaylist(
+export async function addCreatedPlaylist(
   sessionToken: string | null | undefined,
-  body: StoredPlaylist | null | undefined,
+  body: CreatedPlaylist | null | undefined,
 ) {
   try {
     if (!sessionToken || !body) throw new Error("Session token and request body required");
@@ -27,14 +26,14 @@ export async function addPlaylist(
     });
     if (!res.ok) throw new Error("Failed to store playlist in database");
 
-    const { playlist }: { playlist: StoredPlaylist } = await res.json();
+    const { playlist }: { playlist: CreatedPlaylist } = await res.json();
     return playlist;
   } catch (error) {
     throw error;
   }
 }
 
-export async function getPlaylists(
+export async function getCreatedPlaylists(
   sessionToken: string | null | undefined,
   userId: string | null | undefined,
   setlistId?: string | null | undefined,
@@ -53,14 +52,14 @@ export async function getPlaylists(
     });
     if (!res.ok) throw new Error("Failed to get user playlists from database");
 
-    const { playlists }: { playlists: StoredPlaylist[] } = await res.json();
+    const { playlists }: { playlists: CreatedPlaylist[] } = await res.json();
     return playlists;
   } catch (error) {
     throw error;
   }
 }
 
-export async function deletePlaylist(
+export async function deleteCreatedPlaylist(
   sessionToken: string | null | undefined,
   userId: string | null | undefined,
   playlistId: string | null | undefined,

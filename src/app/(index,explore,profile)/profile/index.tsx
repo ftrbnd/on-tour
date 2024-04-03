@@ -11,10 +11,10 @@ import { Avatar, Button, Dialog, List, Portal, Snackbar, Text } from "react-nati
 
 import SwipeableItem from "@/src/components/SwipeableItem";
 import UpcomingShowModal from "@/src/components/UpcomingShowModal";
-import useStoredPlaylist from "@/src/hooks/useStoredPlaylist";
+import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { StoredPlaylist, getPlaylists } from "@/src/services/savedPlaylists";
+import { CreatedPlaylist, getCreatedPlaylists } from "@/src/services/createdPlaylists";
 import { UpcomingShow } from "@/src/services/upcomingShows";
 
 const styles = StyleSheet.create({
@@ -54,15 +54,15 @@ function InfoDialog({
   );
 }
 
-function PlaylistItem({
+function CreatedPlaylistItem({
   playlist,
   showSnackbar,
 }: {
-  playlist: StoredPlaylist;
+  playlist: CreatedPlaylist;
   showSnackbar: () => void;
 }) {
   const [playlistImage] = useMMKVString(`playlist-${playlist.id}-image`);
-  const { deleteFromDatabase } = useStoredPlaylist({ playlistId: playlist.id });
+  const { removeFromDatabase } = useCreatedPlaylist({ playlistId: playlist.id });
 
   const openWebPage = async () => {
     try {
@@ -74,7 +74,7 @@ function PlaylistItem({
 
   const handleDelete = async () => {
     try {
-      await deleteFromDatabase();
+      await removeFromDatabase();
       showSnackbar();
     } catch (e) {
       console.error(e);
@@ -122,7 +122,7 @@ export default function Profile() {
   const { user, session } = useAuth();
   const { data: playlists } = useQuery({
     queryKey: ["created-playlists"],
-    queryFn: () => getPlaylists(session?.token, user?.id),
+    queryFn: () => getCreatedPlaylists(session?.token, user?.id),
     enabled: user !== null,
   });
   const { upcomingShows } = useUpcomingShows();
@@ -162,7 +162,7 @@ export default function Profile() {
                 />
               ))}
             {playlists?.map((playlist) => (
-              <PlaylistItem
+              <CreatedPlaylistItem
                 key={playlist.id}
                 playlist={playlist}
                 showSnackbar={() => setSnackbarVisible(true)}
