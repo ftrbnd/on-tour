@@ -1,13 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAuth } from "../providers/AuthProvider";
-import { addPlaylist, deletePlaylist, getPlaylists } from "../services/savedPlaylists";
-
-interface AddPlaylistVars {
-  playlistId: string;
-  playlistName: string;
-  setlistId: string;
-}
+import {
+  StoredPlaylist,
+  addPlaylist,
+  deletePlaylist,
+  getPlaylists,
+} from "../services/savedPlaylists";
 
 interface UseStoredPlaylistProps {
   playlistId?: string;
@@ -25,8 +24,13 @@ export default function useStoredPlaylist({ playlistId, setlistId }: UseStoredPl
   });
 
   const addToDatabaseMutation = useMutation({
-    mutationFn: (vars: AddPlaylistVars) =>
-      addPlaylist(session?.token, user?.id, vars.playlistId, vars.playlistName, vars.setlistId),
+    mutationFn: (vars: Omit<StoredPlaylist, "userId">) =>
+      addPlaylist(session?.token, {
+        id: vars.id,
+        userId: user?.id ?? "",
+        setlistId: vars.setlistId,
+        title: vars.title,
+      }),
     onSuccess: async () => {
       console.log("Playlist added to database");
       await queryClient.invalidateQueries({ queryKey: ["created-playlists"] });

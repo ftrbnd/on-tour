@@ -126,7 +126,7 @@ export default function usePlaylist(setlistId: string) {
         found: spotifyTracks.length,
       });
 
-      await addToDatabase({ playlistId: playlist.id, playlistName: playlist.name, setlistId });
+      await addToDatabase({ id: playlist.id, title: playlist.name, setlistId });
 
       if (image || preSavedImage) {
         await updatePlaylistImageMutation.mutateAsync({

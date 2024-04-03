@@ -12,18 +12,14 @@ export interface StoredPlaylist {
 
 export async function addPlaylist(
   sessionToken: string | null | undefined,
-  userId: string | null | undefined,
-  playlistId: string | null | undefined,
-  title: string | null | undefined,
-  setlistId: string | null | undefined,
+  body: StoredPlaylist | null | undefined,
 ) {
   try {
-    if (!sessionToken || !userId || !playlistId || !setlistId)
-      throw new Error("Session token, user id, playlist id, and setlist id required");
+    if (!sessionToken || !body) throw new Error("Session token and request body required");
 
-    const res = await fetch(`${ENDPOINT}/users/${userId}/playlists`, {
+    const res = await fetch(`${ENDPOINT}/users/${body.userId}/playlists`, {
       method: "POST",
-      body: JSON.stringify({ playlistId, title, setlistId }),
+      body: JSON.stringify({ playlist: body }),
       headers: {
         Authorization: `Bearer ${sessionToken}`,
         "Content-Type": "application/json",
