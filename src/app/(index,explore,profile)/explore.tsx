@@ -2,7 +2,8 @@ import { useQuery } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { Stack } from "expo-router";
 import { useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import { Searchbar } from "react-native-paper";
 import { useDebouncedCallback } from "use-debounce";
 

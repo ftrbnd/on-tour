@@ -2,7 +2,8 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, FlatList, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import { Card, Text } from "react-native-paper";
 
 import SetlistPreview from "@/src/components/SetlistPreview";

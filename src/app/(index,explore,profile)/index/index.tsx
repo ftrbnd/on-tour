@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
-import { FlatList, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 
 import SetlistPreview from "@/src/components/SetlistPreview";
 import { useAuth } from "@/src/providers/AuthProvider";

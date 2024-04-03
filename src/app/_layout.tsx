@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Tabs } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { MD3LightTheme as DefaultTheme, PaperProvider } from "react-native-paper";
 
 import { AuthProvider } from "../providers/AuthProvider";
@@ -18,13 +19,15 @@ const theme = {
 
 export default function AppLayout() {
   return (
-    <AuthProvider>
-      <QueryClientProvider client={queryClient}>
-        <PaperProvider theme={theme}>
-          <TabsLayout />
-        </PaperProvider>
-      </QueryClientProvider>
-    </AuthProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AuthProvider>
+        <QueryClientProvider client={queryClient}>
+          <PaperProvider theme={theme}>
+            <TabsLayout />
+          </PaperProvider>
+        </QueryClientProvider>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }
 

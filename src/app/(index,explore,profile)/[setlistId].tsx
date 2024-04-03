@@ -3,7 +3,8 @@ import { randomUUID } from "expo-crypto";
 import { Stack, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { useState } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet } from "react-native";
+import { FlatList } from "react-native-gesture-handler";
 import { Avatar, Card, Divider, FAB, List, Text } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/CreatePlaylistModal";

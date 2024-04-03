@@ -2,20 +2,17 @@ import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { Drawer } from "expo-router/drawer";
-import { openBrowserAsync } from "expo-web-browser";
-import moment from "moment";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { useMMKVString } from "react-native-mmkv";
+import { FlatList } from "react-native-gesture-handler";
 import { Avatar, Button, Dialog, List, Portal, Snackbar, Text } from "react-native-paper";
 
-import SwipeableItem from "@/src/components/SwipeableItem";
+import CreatedPlaylistItem from "@/src/components/CreatedPlaylistItem";
+import UpcomingShowItem from "@/src/components/UpcomingShowItem";
 import UpcomingShowModal from "@/src/components/UpcomingShowModal";
-import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { CreatedPlaylist, getCreatedPlaylists } from "@/src/services/createdPlaylists";
-import { UpcomingShow } from "@/src/services/upcomingShows";
+import { getCreatedPlaylists } from "@/src/services/createdPlaylists";
 
 const styles = StyleSheet.create({
   container: {
@@ -51,70 +48,6 @@ function InfoDialog({
         </Dialog.Actions>
       </Dialog>
     </Portal>
-  );
-}
-
-function CreatedPlaylistItem({
-  playlist,
-  showSnackbar,
-}: {
-  playlist: CreatedPlaylist;
-  showSnackbar: () => void;
-}) {
-  const [playlistImage] = useMMKVString(`playlist-${playlist.id}-image`);
-  const { removeFromDatabase } = useCreatedPlaylist({ playlistId: playlist.id });
-
-  const openWebPage = async () => {
-    try {
-      if (playlist) await openBrowserAsync(`https://open.spotify.com/playlist/${playlist.id}`);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      await removeFromDatabase();
-      showSnackbar();
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  return (
-    <SwipeableItem onEdit={openWebPage} onDelete={handleDelete}>
-      <List.Item
-        title={playlist.title}
-        titleEllipsizeMode="tail"
-        left={() => <List.Icon icon={{ uri: playlistImage }} />}
-        style={styles.listItem}
-      />
-    </SwipeableItem>
-  );
-}
-
-function UpcomingShowItem({ show }: { show: UpcomingShow }) {
-  const [showImage] = useMMKVString(`upcoming-show-${show.id}-image`);
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-
-  const { deleteShow } = useUpcomingShows();
-
-  return (
-    <>
-      <SwipeableItem onEdit={() => setModalVisible(true)} onDelete={() => deleteShow(show)}>
-        <List.Item
-          title={`${show.artist} - ${show.tour}`}
-          description={`${show.venue} / ${show.city} / ${moment(show.date, "YYYY-MM-DD-MM").format("MMMM Do, YYYY")}`}
-          titleEllipsizeMode="tail"
-          left={() => <List.Icon icon={{ uri: showImage }} />}
-          style={styles.listItem}
-        />
-      </SwipeableItem>
-
-      {modalVisible && (
-        <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} editingShow={show} />
-      )}
-    </>
   );
 }
 
@@ -161,13 +94,16 @@ export default function Profile() {
                   right={() => <List.Icon icon={() => <Ionicons name="search" size={24} />} />}
                 />
               ))}
-            {playlists?.map((playlist) => (
-              <CreatedPlaylistItem
-                key={playlist.id}
-                playlist={playlist}
-                showSnackbar={() => setSnackbarVisible(true)}
-              />
-            ))}
+            <FlatList
+              data={playlists ?? []}
+              renderItem={({ item }) => (
+                <CreatedPlaylistItem
+                  playlist={item}
+                  showSnackbar={() => setSnackbarVisible(true)}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+            />
           </List.Accordion>
           <List.Accordion title={`Upcoming Shows (${upcomingShows.length})`} id="2">
             <List.Item
@@ -177,7 +113,11 @@ export default function Profile() {
               titleStyle={{ fontWeight: "bold" }}
               right={() => <List.Icon icon={() => <Ionicons name="add-circle" size={24} />} />}
             />
-            {upcomingShows?.map((show) => <UpcomingShowItem key={show.id} show={show} />)}
+            <FlatList
+              data={upcomingShows}
+              renderItem={({ item }) => <UpcomingShowItem show={item} />}
+              keyExtractor={(item) => item.id}
+            />
           </List.Accordion>
         </List.AccordionGroup>
 
