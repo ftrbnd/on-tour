@@ -1,46 +1,40 @@
 import { Ionicons } from "@expo/vector-icons";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { useFonts } from "expo-font";
 import { Tabs } from "expo-router";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { MD3LightTheme as DefaultTheme, PaperProvider } from "react-native-paper";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
 
-import { AuthProvider } from "../providers/AuthProvider";
-import { clientPersister } from "../utils/mmkv";
+import Providers from "../providers";
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      gcTime: 24 * 60 * 60 * 1000, // 24 hours
-    },
-  },
-});
+SplashScreen.preventAutoHideAsync();
 
-persistQueryClient({
-  queryClient,
-  persister: clientPersister,
-});
+export default function RootLayout() {
+  const [loaded, error] = useFonts({
+    InterVariable: require("../assets/fonts/InterVariable.ttf"),
+  });
 
-const theme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: "tomato",
-    secondary: "yellow",
-  },
-};
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
 
-export default function AppLayout() {
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
+
+  if (!loaded) {
+    return null;
+  }
+
+  return <RootLayoutNav />;
+}
+
+function RootLayoutNav() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <QueryClientProvider client={queryClient}>
-          <PaperProvider theme={theme}>
-            <TabsLayout />
-          </PaperProvider>
-        </QueryClientProvider>
-      </AuthProvider>
-    </GestureHandlerRootView>
+    <Providers>
+      <TabsLayout />
+    </Providers>
   );
 }
 

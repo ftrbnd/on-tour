@@ -34,7 +34,7 @@
       [
         "expo-font",
         {
-          "fonts": ["./assets/fonts/InterVariable.ttf"]
+          "fonts": ["./src/assets/fonts/InterVariable.ttf"]
         }
       ]
     ],
