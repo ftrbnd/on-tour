@@ -1,3 +1,7 @@
 export type Group<T extends string> = `(${T})`;
 
-export type SharedSegment = Group<"home"> | Group<"explore"> | Group<"profile">;
+export type Route = "home" | "explore" | "profile";
+
+export type SharedSegment = Group<Route>;
+
+export type NestedSegment = ["(drawer)", "(tabs)", SharedSegment, Route];

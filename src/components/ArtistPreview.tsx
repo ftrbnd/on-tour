@@ -3,7 +3,7 @@ import { useRouter, useSegments } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Avatar, Card, Text } from "react-native-paper";
 
-import { SharedSegment } from "../utils/segments";
+import { NestedSegment } from "../utils/segments";
 import { Artist } from "../utils/spotify-types";
 
 const styles = StyleSheet.create({
@@ -24,11 +24,11 @@ interface ArtistPreviewProps {
 }
 
 export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewProps) {
-  const [segment] = useSegments() as [SharedSegment];
+  const segments = useSegments<NestedSegment>();
   const router = useRouter();
 
   const openArtistPage = () => {
-    router.push(`/${segment}/artist/${artist.id}`);
+    router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/artist/${artist.id}`);
   };
 
   return (

@@ -5,7 +5,7 @@ export default function SharedLayout() {
   return (
     <Tabs>
       <Tabs.Screen
-        name="home"
+        name="(home)"
         options={{
           tabBarLabel: "Home",
           headerShown: false,
@@ -18,9 +18,10 @@ export default function SharedLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="(explore)"
         options={{
           tabBarLabel: "Explore",
+          headerShown: false,
           tabBarIcon: ({ focused, color }) =>
             focused ? (
               <Ionicons name="search" size={24} color={color} />
@@ -30,9 +31,10 @@ export default function SharedLayout() {
         }}
       />
       <Tabs.Screen
-        name="profile"
+        name="(profile)"
         options={{
           tabBarLabel: "Me",
+          headerShown: false,
           tabBarIcon: ({ focused, color }) =>
             focused ? (
               <Ionicons name="person" size={24} color={color} />
@@ -41,8 +43,6 @@ export default function SharedLayout() {
             ),
         }}
       />
-      <Tabs.Screen name="artist" options={{ href: null }} />
-      <Tabs.Screen name="[setlistId]" options={{ href: null }} />
     </Tabs>
   );
 }

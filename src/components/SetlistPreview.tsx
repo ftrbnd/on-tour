@@ -3,7 +3,7 @@ import moment from "moment";
 import { StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
 
-import { SharedSegment } from "../utils/segments";
+import { NestedSegment } from "../utils/segments";
 import { Setlist } from "../utils/setlist-fm-types";
 
 const styles = StyleSheet.create({
@@ -12,18 +12,17 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function SetlistPreview({
-  setlist,
-  displayArtist,
-}: {
+interface SetlistProps {
   setlist: Setlist;
   displayArtist?: boolean;
-}) {
+}
+
+export default function SetlistPreview({ setlist, displayArtist }: SetlistProps) {
   const router = useRouter();
-  const [segment] = useSegments() as [SharedSegment];
+  const segments = useSegments<NestedSegment>();
 
   const openSetlistPage = () => {
-    router.push(`/${segment}/${setlist.id}`);
+    router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}`);
   };
 
   return (
