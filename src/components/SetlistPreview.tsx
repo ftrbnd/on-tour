@@ -3,8 +3,8 @@ import moment from "moment";
 import { StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
 
+import { SharedSegment } from "../utils/segments";
 import { Setlist } from "../utils/setlist-fm-types";
-import { SharedSegment } from "../utils/types";
 
 const styles = StyleSheet.create({
   card: {
