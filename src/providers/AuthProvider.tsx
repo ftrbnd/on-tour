@@ -52,7 +52,7 @@ export function AuthProvider(props: PropsWithChildren) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
 
-  const redirectURL = Linking.createURL("profile");
+  const redirectURL = Linking.createURL("(drawer)/settings");
 
   useEffect(() => {
     updateContext();

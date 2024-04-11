@@ -1,6 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useFonts } from "expo-font";
-import { Tabs } from "expo-router";
+import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
@@ -33,54 +32,16 @@ export default function RootLayout() {
 function RootLayoutNav() {
   return (
     <Providers>
-      <TabsLayout />
+      <StackLayout />
     </Providers>
   );
 }
 
-function TabsLayout() {
+function StackLayout() {
   return (
-    <Tabs>
-      <Tabs.Screen
-        name="(home)"
-        options={{
-          tabBarLabel: "Home",
-          headerShown: false,
-          tabBarIcon: ({ focused, color }) =>
-            focused ? (
-              <Ionicons name="home" size={24} color={color} />
-            ) : (
-              <Ionicons name="home-outline" size={24} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="(explore)"
-        options={{
-          tabBarLabel: "Explore",
-          headerShown: false,
-          tabBarIcon: ({ focused, color }) =>
-            focused ? (
-              <Ionicons name="search" size={24} color={color} />
-            ) : (
-              <Ionicons name="search-outline" size={24} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen
-        name="(profile)"
-        options={{
-          tabBarLabel: "Me",
-          headerShown: false,
-          tabBarIcon: ({ focused, color }) =>
-            focused ? (
-              <Ionicons name="person" size={24} color={color} />
-            ) : (
-              <Ionicons name="person-outline" size={24} color={color} />
-            ),
-        }}
-      />
-      <Tabs.Screen name="index" options={{ href: null }} />
-    </Tabs>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+    </Stack>
   );
 }
