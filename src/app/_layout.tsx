@@ -42,7 +42,7 @@ function TabsLayout() {
   return (
     <Tabs>
       <Tabs.Screen
-        name="(index)"
+        name="(home)"
         options={{
           tabBarLabel: "Home",
           headerShown: false,
@@ -80,6 +80,7 @@ function TabsLayout() {
             ),
         }}
       />
+      <Tabs.Screen name="index" options={{ href: null }} />
     </Tabs>
   );
 }
