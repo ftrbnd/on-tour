@@ -1,7 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
-import { useRouter } from "expo-router";
-import { Drawer } from "expo-router/drawer";
+import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
@@ -67,9 +66,9 @@ export default function Profile() {
 
   return (
     <>
-      <Drawer.Screen
+      <Stack.Screen
         options={{
-          drawerLabel: "My Library",
+          headerTitle: "My Library",
           title: user ? user.displayName ?? user.providerId : "My Library",
           headerRight: () =>
             user ? (
@@ -77,7 +76,6 @@ export default function Profile() {
             ) : (
               <Avatar.Icon size={36} icon="account" />
             ),
-          headerRightContainerStyle: styles.headerRight,
         }}
       />
 
