@@ -6,9 +6,9 @@ import { View, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import { Button, Dialog, List, Portal, Snackbar, Text } from "react-native-paper";
 
-import CreatedPlaylistItem from "@/src/components/CreatedPlaylistItem";
-import UpcomingShowItem from "@/src/components/UpcomingShowItem";
-import UpcomingShowModal from "@/src/components/UpcomingShowModal";
+import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
+import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
+import UpcomingShowModal from "@/src/components/UpcomingShow/UpcomingShowModal";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getCreatedPlaylists } from "@/src/services/createdPlaylists";

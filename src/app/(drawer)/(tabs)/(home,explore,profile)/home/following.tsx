@@ -3,7 +3,7 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 
-import ArtistPreview from "@/src/components/ArtistPreview";
+import ArtistPreview from "@/src/components/Artist/ArtistPreview";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getTopArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";

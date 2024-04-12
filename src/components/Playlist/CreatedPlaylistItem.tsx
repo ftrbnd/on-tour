@@ -3,9 +3,9 @@ import { StyleSheet } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 import { List } from "react-native-paper";
 
-import SwipeableItem from "./SwipeableItem";
-import useCreatedPlaylist from "../hooks/useCreatedPlaylist";
-import { CreatedPlaylist } from "../services/createdPlaylists";
+import useCreatedPlaylist from "../../hooks/useCreatedPlaylist";
+import { CreatedPlaylist } from "../../services/createdPlaylists";
+import SwipeableItem from "../ui/SwipeableItem";
 
 const styles = StyleSheet.create({
   listItem: {

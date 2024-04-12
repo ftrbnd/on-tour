@@ -3,8 +3,8 @@ import { useRouter, useSegments } from "expo-router";
 import { StyleSheet } from "react-native";
 import { Avatar, Card, Text } from "react-native-paper";
 
-import { NestedSegment } from "../utils/segments";
-import { Artist } from "../utils/spotify-types";
+import { NestedSegment } from "../../utils/segments";
+import { Artist } from "../../utils/spotify-types";
 
 const styles = StyleSheet.create({
   card: {

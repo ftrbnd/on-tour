@@ -6,8 +6,8 @@ import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Avatar, Card, Divider, FAB, List, Text } from "react-native-paper";
 
-import CreatePlaylistModal from "@/src/components/CreatePlaylistModal";
-import PlaylistExistsModal from "@/src/components/PlaylistExistsModal";
+import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
+import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
 import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useSetlist from "@/src/hooks/useSetlist";
 import { Song } from "@/src/utils/setlist-fm-types";

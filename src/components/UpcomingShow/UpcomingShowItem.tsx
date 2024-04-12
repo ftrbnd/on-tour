@@ -4,10 +4,10 @@ import { StyleSheet } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 import { List } from "react-native-paper";
 
-import SwipeableItem from "./SwipeableItem";
 import UpcomingShowModal from "./UpcomingShowModal";
-import useUpcomingShows from "../hooks/useUpcomingShows";
-import { UpcomingShow } from "../services/upcomingShows";
+import useUpcomingShows from "../../hooks/useUpcomingShows";
+import { UpcomingShow } from "../../services/upcomingShows";
+import SwipeableItem from "../ui/SwipeableItem";
 
 const styles = StyleSheet.create({
   listItem: {

@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
 
-import SetlistPreview from "@/src/components/SetlistPreview";
+import SetlistPreview from "@/src/components/Setlist/SetlistPreview";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { searchArtistSetlist } from "@/src/services/setlist-fm";
 import { getOneArtist } from "@/src/services/spotify";

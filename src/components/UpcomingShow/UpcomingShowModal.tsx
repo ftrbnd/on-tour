@@ -6,10 +6,10 @@ import { StyleSheet, View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 import { Button, Card, Modal, Portal, Text, TextInput } from "react-native-paper";
 
-import useImagePicker from "../hooks/useImagePicker";
-import useUpcomingShows from "../hooks/useUpcomingShows";
-import { useAuth } from "../providers/AuthProvider";
-import { UpcomingShow } from "../services/upcomingShows";
+import useImagePicker from "../../hooks/useImagePicker";
+import useUpcomingShows from "../../hooks/useUpcomingShows";
+import { useAuth } from "../../providers/AuthProvider";
+import { UpcomingShow } from "../../services/upcomingShows";
 
 const styles = StyleSheet.create({
   modal: {

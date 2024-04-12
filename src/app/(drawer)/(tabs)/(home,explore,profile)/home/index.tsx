@@ -2,7 +2,7 @@ import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
 import { StyleSheet, View } from "react-native";
 
-import SetlistPreview from "@/src/components/SetlistPreview";
+import SetlistPreview from "@/src/components/Setlist/SetlistPreview";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getRecentShows } from "@/src/services/setlist-fm";
 import { getTopArtists } from "@/src/services/spotify";

@@ -75,11 +75,11 @@ export function AuthProvider(props: PropsWithChildren) {
   }, []);
 
   const updateContext = async () => {
-    setIsLoading(true);
-    const now = new Date();
-    console.log(`Updating context at ${now.toLocaleTimeString()}`);
-
     try {
+      setIsLoading(true);
+      const now = new Date();
+      console.log(`Updating context at ${now.toLocaleTimeString()}`);
+
       const sessionToken = await SecureStore.getItemAsync("session_token");
 
       if (sessionToken) {

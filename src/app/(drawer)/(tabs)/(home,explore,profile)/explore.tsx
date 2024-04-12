@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native";
 import { Searchbar } from "react-native-paper";
 import { useDebouncedCallback } from "use-debounce";
 
-import ArtistPreview from "@/src/components/ArtistPreview";
+import ArtistPreview from "@/src/components/Artist/ArtistPreview";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getRelatedArtists, getTopArtists, searchForArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";
