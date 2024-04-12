@@ -1,11 +1,10 @@
-import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Searchbar } from "react-native-paper";
 import { useDebouncedCallback } from "use-debounce";
 
-import ArtistPreview from "@/src/components/Artist/ArtistPreview";
+import ArtistList from "@/src/components/Artist/ArtistList";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getRelatedArtists, getTopArtists, searchForArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";
@@ -55,22 +54,10 @@ export default function Explore() {
         value={searchQuery}
       />
 
-      {searchResults.length > 0 ? (
-        <FlashList
-          estimatedItemSize={75}
-          contentContainerStyle={styles.list}
-          data={searchResults}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult />}
-        />
-      ) : (
-        <FlashList
-          estimatedItemSize={75}
-          contentContainerStyle={styles.list}
-          data={relatedArtists ?? []}
-          renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={false} />}
-        />
-      )}
+      <ArtistList
+        artists={searchResults.length > 0 ? searchResults : relatedArtists ?? []}
+        showsVerticalScrollIndicator={searchResults.length > 0}
+      />
     </View>
   );
 }

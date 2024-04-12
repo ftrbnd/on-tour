@@ -1,9 +1,8 @@
-import { FlashList } from "@shopify/flash-list";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 
-import ArtistPreview from "@/src/components/Artist/ArtistPreview";
+import ArtistList from "@/src/components/Artist/ArtistList";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getTopArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";
@@ -11,9 +10,6 @@ import { Artist } from "@/src/utils/spotify-types";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  list: {
-    padding: 8,
   },
 });
 
@@ -38,17 +34,11 @@ export default function Following() {
 
   return (
     <View style={styles.container}>
-      <FlashList
-        estimatedItemSize={75}
-        contentContainerStyle={styles.list}
-        data={topArtists}
-        renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={false} />}
-        onEndReached={() => {
-          if (!isPlaceholderData && data?.next) {
-            setNext(data.next);
-          }
-        }}
-        onEndReachedThreshold={0.5}
+      <ArtistList
+        artists={topArtists}
+        isPlaceholderData={isPlaceholderData}
+        next={data?.next}
+        setNext={setNext}
       />
     </View>
   );
