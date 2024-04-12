@@ -1,7 +1,6 @@
+import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
-import { randomUUID } from "expo-crypto";
 import { StyleSheet, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 
 import SetlistPreview from "@/src/components/SetlistPreview";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -9,6 +8,9 @@ import { getRecentShows } from "@/src/services/setlist-fm";
 import { getTopArtists } from "@/src/services/spotify";
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   list: {
     padding: 8,
   },
@@ -26,16 +28,16 @@ export default function Recent() {
   const { data: recentShows } = useQuery({
     queryKey: ["recent-shows"],
     queryFn: () => getRecentShows(data?.topArtists),
-    enabled: data?.topArtists !== undefined,
+    enabled: data !== undefined && data.topArtists.length > 0,
   });
 
   return (
-    <View>
-      <FlatList
-        style={styles.list}
-        data={recentShows}
+    <View style={styles.container}>
+      <FlashList
+        estimatedItemSize={150}
+        contentContainerStyle={styles.list}
+        data={recentShows ?? []}
         renderItem={({ item }) => <SetlistPreview setlist={item} displayArtist />}
-        keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
       />
     </View>
   );

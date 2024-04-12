@@ -78,6 +78,7 @@ export default function Profile() {
                 right={() => <List.Icon icon={() => <Ionicons name="search" size={24} />} />}
               />
             ))}
+          {/* TODO: convert to FlashList */}
           <FlatList
             data={playlists ?? []}
             renderItem={({ item }) => (

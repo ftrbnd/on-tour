@@ -1,8 +1,7 @@
+import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
-import { randomUUID } from "expo-crypto";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import { Searchbar } from "react-native-paper";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -13,7 +12,7 @@ import { Artist } from "@/src/utils/spotify-types";
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
+    flex: 1,
   },
   list: {
     padding: 8,
@@ -47,6 +46,7 @@ export default function Explore() {
   return (
     <View style={styles.container}>
       <Searchbar
+        style={{ marginTop: 16, marginHorizontal: 16 }}
         placeholder="Search for an artist"
         onChangeText={(text) => {
           setSearchQuery(text);
@@ -56,19 +56,19 @@ export default function Explore() {
       />
 
       {searchResults.length > 0 ? (
-        <FlatList
-          style={styles.list}
+        <FlashList
+          estimatedItemSize={75}
+          contentContainerStyle={styles.list}
+          data={searchResults}
           showsVerticalScrollIndicator={false}
-          data={searchResults ?? []}
           renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult />}
-          keyExtractor={(artist) => artist.id}
         />
       ) : (
-        <FlatList
-          style={styles.list}
+        <FlashList
+          estimatedItemSize={75}
+          contentContainerStyle={styles.list}
           data={relatedArtists ?? []}
           renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={false} />}
-          keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
         />
       )}
     </View>

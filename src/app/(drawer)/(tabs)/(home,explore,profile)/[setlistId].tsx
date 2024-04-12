@@ -1,10 +1,9 @@
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
-import { randomUUID } from "expo-crypto";
+import { FlashList } from "@shopify/flash-list";
 import { Stack, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import { Avatar, Card, Divider, FAB, List, Text } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/CreatePlaylistModal";
@@ -111,9 +110,9 @@ export default function SetlistPage() {
           </Card.Content>
         </Card>
 
-        <FlatList
-          data={songs}
-          ItemSeparatorComponent={() => <Divider />}
+        <FlashList
+          estimatedItemSize={75}
+          data={songs ?? []}
           renderItem={({ item, index }) => (
             <SongItem
               item={item}
@@ -122,7 +121,7 @@ export default function SetlistPage() {
                 .at(index)}
             />
           )}
-          keyExtractor={(song) => `${song.name}-${randomUUID()}`}
+          ItemSeparatorComponent={() => <Divider />}
         />
 
         {/* TODO: doesn't update when deleted from database */}

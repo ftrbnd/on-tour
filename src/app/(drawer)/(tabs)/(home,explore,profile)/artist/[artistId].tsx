@@ -1,9 +1,8 @@
+import { FlashList } from "@shopify/flash-list";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { randomUUID } from "expo-crypto";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
 import { Card, Text } from "react-native-paper";
 
 import SetlistPreview from "@/src/components/SetlistPreview";
@@ -14,10 +13,11 @@ import { Setlist } from "@/src/utils/setlist-fm-types";
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
+    flex: 1,
   },
   list: {
-    padding: 8,
+    // padding: 8,
+    // TODO: use margin instead, within the SetlistPreview component
   },
   cover: {
     borderRadius: 0,
@@ -51,7 +51,7 @@ export default function ArtistPage() {
   }, [data?.setlists]);
 
   return (
-    <View>
+    <>
       <Stack.Screen
         options={{
           headerTitle: artist?.name,
@@ -60,29 +60,25 @@ export default function ArtistPage() {
         }}
       />
 
-      {artist && <Card.Cover source={{ uri: artist.images[1].url }} style={styles.cover} />}
       <View style={styles.container}>
-        <FlatList
-          style={styles.list}
+        <FlashList
+          estimatedItemSize={150}
+          contentContainerStyle={styles.list}
           data={setlists}
           renderItem={({ item }) => <SetlistPreview setlist={item} />}
-          keyExtractor={(setlist) => `${setlist.id}-${randomUUID()}`}
-          onStartReachedThreshold={1}
-          onStartReached={() => {
-            if (setlists.length <= 5 && !isPlaceholderData && data?.nextPage) {
-              setNextPage(data.nextPage);
-            }
-          }}
           onEndReachedThreshold={0.5}
           onEndReached={() => {
             if (!isPlaceholderData && data?.nextPage) {
               setNextPage(data.nextPage);
             }
           }}
+          ListHeaderComponent={
+            artist && <Card.Cover source={{ uri: artist.images[1].url }} style={styles.cover} />
+          }
           ListEmptyComponent={<Text>No setlists were found for this artist.</Text>}
           ListFooterComponent={<Text>Looks like there are no more setlists for this artist.</Text>}
         />
       </View>
-    </View>
+    </>
   );
 }

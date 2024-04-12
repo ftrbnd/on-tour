@@ -36,6 +36,12 @@
         {
           "fonts": ["./src/assets/fonts/InterVariable.ttf"]
         }
+      ],
+      [
+        "expo-dev-launcher",
+        {
+          "launchModeExperimental": "most-recent"
+        }
       ]
     ],
     "experiments": {
