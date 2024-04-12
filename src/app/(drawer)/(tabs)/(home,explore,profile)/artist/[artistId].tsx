@@ -52,7 +52,13 @@ export default function ArtistPage() {
 
   return (
     <View>
-      <Stack.Screen options={{ headerTitle: artist?.name }} />
+      <Stack.Screen
+        options={{
+          headerTitle: artist?.name,
+          headerBackVisible: true,
+          headerLeft: () => null,
+        }}
+      />
 
       {artist && <Card.Cover source={{ uri: artist.images[1].url }} style={styles.cover} />}
       <View style={styles.container}>

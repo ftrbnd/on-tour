@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
-import { Stack } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
@@ -46,35 +45,32 @@ export default function Explore() {
   });
 
   return (
-    <>
-      <Stack.Screen options={{ headerTitle: "Explore" }} />
-      <View style={styles.container}>
-        <Searchbar
-          placeholder="Search for an artist"
-          onChangeText={(text) => {
-            setSearchQuery(text);
-            debounced(text);
-          }}
-          value={searchQuery}
-        />
+    <View style={styles.container}>
+      <Searchbar
+        placeholder="Search for an artist"
+        onChangeText={(text) => {
+          setSearchQuery(text);
+          debounced(text);
+        }}
+        value={searchQuery}
+      />
 
-        {searchResults.length > 0 ? (
-          <FlatList
-            style={styles.list}
-            showsVerticalScrollIndicator={false}
-            data={searchResults ?? []}
-            renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult />}
-            keyExtractor={(artist) => artist.id}
-          />
-        ) : (
-          <FlatList
-            style={styles.list}
-            data={relatedArtists ?? []}
-            renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={false} />}
-            keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
-          />
-        )}
-      </View>
-    </>
+      {searchResults.length > 0 ? (
+        <FlatList
+          style={styles.list}
+          showsVerticalScrollIndicator={false}
+          data={searchResults ?? []}
+          renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult />}
+          keyExtractor={(artist) => artist.id}
+        />
+      ) : (
+        <FlatList
+          style={styles.list}
+          data={relatedArtists ?? []}
+          renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={false} />}
+          keyExtractor={(artist) => `${artist.id}-${randomUUID()}`}
+        />
+      )}
+    </View>
   );
 }

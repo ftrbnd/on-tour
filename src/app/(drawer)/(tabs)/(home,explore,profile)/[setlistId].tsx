@@ -77,11 +77,24 @@ export default function SetlistPage() {
 
   return (
     <>
-      <Stack.Screen options={{ headerTitle: `${setlist?.artist.name} Setlist` }} />
+      <Stack.Screen
+        options={{
+          headerTitle: `Setlist`,
+          headerBackVisible: true,
+          headerLeft: () => null,
+        }}
+      />
 
       <View style={styles.container}>
         <Card onPress={() => openWebpage()}>
-          {setlist?.tour && <Card.Title title={setlist.tour.name} titleStyle={styles.cardTitle} />}
+          {setlist?.tour && (
+            <Card.Title
+              title={setlist.artist.name}
+              titleStyle={styles.cardTitle}
+              subtitle={setlist.tour.name}
+              subtitleStyle={styles.cardTitle}
+            />
+          )}
           <Card.Content style={[styles.cardContent, !setlist?.tour && { padding: 16 }]}>
             <View style={styles.detail}>
               <FontAwesome5 name="building" size={24} color="black" />
