@@ -38,7 +38,10 @@ export default function SetlistList({
       onEndReached={handleEndReached}
       ListHeaderComponent={
         artist ? (
-          <Card.Cover source={{ uri: artist.images[1].url }} style={{ borderRadius: 8 }} />
+          <Card.Cover
+            source={{ uri: artist.images[1].url }}
+            style={{ borderRadius: 0, marginHorizontal: -8, marginTop: -8, marginBottom: 8 }}
+          />
         ) : null
       }
       ListEmptyComponent={artist ? <Text>No setlists were found for this artist.</Text> : null}

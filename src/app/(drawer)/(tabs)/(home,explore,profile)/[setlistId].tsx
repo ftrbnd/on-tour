@@ -16,10 +16,11 @@ import { Image } from "@/src/utils/spotify-types";
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 8,
-    display: "flex",
     gap: 8,
     justifyContent: "flex-start",
+  },
+  card: {
+    margin: 8,
   },
   cardTitle: { fontWeight: "bold", textAlign: "center" },
   cardContent: {
@@ -31,18 +32,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-  },
-  list: {
-    flex: 1,
-    display: "flex",
-  },
-  bottom: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-  },
-  image: {
-    objectFit: "cover",
   },
   fab: {
     position: "absolute",
@@ -85,13 +74,13 @@ export default function SetlistPage() {
       />
 
       <View style={styles.container}>
-        <Card onPress={() => openWebpage()}>
-          {setlist?.tour && (
+        <Card style={styles.card} onPress={() => openWebpage()}>
+          {setlist?.artist && (
             <Card.Title
               title={setlist.artist.name}
               titleStyle={styles.cardTitle}
-              subtitle={setlist.tour.name}
-              subtitleStyle={styles.cardTitle}
+              subtitle={setlist.tour?.name}
+              subtitleStyle={setlist.tour ? styles.cardTitle : null}
             />
           )}
           <Card.Content style={[styles.cardContent, !setlist?.tour && { padding: 16 }]}>
@@ -112,6 +101,7 @@ export default function SetlistPage() {
 
         <FlashList
           estimatedItemSize={75}
+          contentContainerStyle={{ padding: 8 }}
           data={songs ?? []}
           renderItem={({ item, index }) => (
             <SongItem

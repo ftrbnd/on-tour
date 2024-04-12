@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Searchbar } from "react-native-paper";
 import { useDebouncedCallback } from "use-debounce";
@@ -49,7 +49,10 @@ export default function Explore() {
     enabled: session !== null && data?.topArtists !== undefined,
   });
 
-  const shuffledArtists = relatedArtists?.sort(() => Math.random() - 0.5);
+  const shuffledArtists = useMemo(
+    () => relatedArtists?.sort(() => Math.random() - 0.5),
+    [relatedArtists],
+  );
 
   return (
     <View style={styles.container}>
@@ -66,7 +69,7 @@ export default function Explore() {
       <ArtistList
         artists={searchResults.length > 0 ? searchResults : shuffledArtists ?? []}
         showsVerticalScrollIndicator={searchResults.length > 0}
-        onRefresh={refetch}
+        onRefresh={() => (searchResults.length > 0 ? null : refetch())}
         refreshing={isRefetching}
       />
     </View>
