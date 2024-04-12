@@ -1,28 +1,13 @@
-import { FlashList } from "@shopify/flash-list";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { Card, Text } from "react-native-paper";
+import { View } from "react-native";
 
-import SetlistPreview from "@/src/components/Setlist/SetlistPreview";
+import SetlistList from "@/src/components/Setlist/SetlistList";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { searchArtistSetlist } from "@/src/services/setlist-fm";
 import { getOneArtist } from "@/src/services/spotify";
 import { Setlist } from "@/src/utils/setlist-fm-types";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
-    // padding: 8,
-    // TODO: use margin instead, within the SetlistPreview component
-  },
-  cover: {
-    borderRadius: 0,
-  },
-});
 
 export default function ArtistPage() {
   const [nextPage, setNextPage] = useState<number>(1);
@@ -60,23 +45,13 @@ export default function ArtistPage() {
         }}
       />
 
-      <View style={styles.container}>
-        <FlashList
-          estimatedItemSize={150}
-          contentContainerStyle={styles.list}
-          data={setlists}
-          renderItem={({ item }) => <SetlistPreview setlist={item} />}
-          onEndReachedThreshold={0.5}
-          onEndReached={() => {
-            if (!isPlaceholderData && data?.nextPage) {
-              setNextPage(data.nextPage);
-            }
-          }}
-          ListHeaderComponent={
-            artist && <Card.Cover source={{ uri: artist.images[1].url }} style={styles.cover} />
-          }
-          ListEmptyComponent={<Text>No setlists were found for this artist.</Text>}
-          ListFooterComponent={<Text>Looks like there are no more setlists for this artist.</Text>}
+      <View style={{ flex: 1 }}>
+        <SetlistList
+          setlists={setlists}
+          isPlaceholderData={isPlaceholderData}
+          nextPage={data?.nextPage}
+          setNextPage={setNextPage}
+          artist={artist}
         />
       </View>
     </>

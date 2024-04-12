@@ -1,17 +1,11 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
 import ArtistList from "@/src/components/Artist/ArtistList";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getTopArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
 
 export default function Following() {
   const [next, setNext] = useState<string | null>(null);
@@ -33,7 +27,7 @@ export default function Following() {
   }, [data?.topArtists]);
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       <ArtistList
         artists={topArtists}
         isPlaceholderData={isPlaceholderData}

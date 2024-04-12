@@ -1,20 +1,10 @@
-import { FlashList } from "@shopify/flash-list";
 import { useQuery } from "@tanstack/react-query";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 
-import SetlistPreview from "@/src/components/Setlist/SetlistPreview";
+import SetlistList from "@/src/components/Setlist/SetlistList";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getRecentShows } from "@/src/services/setlist-fm";
 import { getTopArtists } from "@/src/services/spotify";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
-    padding: 8,
-  },
-});
 
 export default function Recent() {
   const { session } = useAuth();
@@ -32,13 +22,8 @@ export default function Recent() {
   });
 
   return (
-    <View style={styles.container}>
-      <FlashList
-        estimatedItemSize={150}
-        contentContainerStyle={styles.list}
-        data={recentShows ?? []}
-        renderItem={({ item }) => <SetlistPreview setlist={item} displayArtist />}
-      />
+    <View style={{ flex: 1 }}>
+      <SetlistList setlists={recentShows ?? []} />
     </View>
   );
 }
