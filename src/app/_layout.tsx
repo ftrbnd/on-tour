@@ -42,8 +42,6 @@ function RoutingSetup() {
   const { session, isLoaded } = useAuth();
 
   useEffect(() => {
-    console.log(isLoaded && !session);
-
     if (isLoaded && !session) {
       router.replace("/(auth)/sign-in");
     } else {

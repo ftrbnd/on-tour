@@ -5,7 +5,7 @@ import { Avatar, Button } from "react-native-paper";
 import { useAuth } from "@/src/providers/AuthProvider";
 
 export default function Settings() {
-  const { session, user, signIn, signOut } = useAuth();
+  const { session, user, signIn, signOut, isLoading } = useAuth();
 
   return (
     <View style={styles.container}>
@@ -14,8 +14,8 @@ export default function Settings() {
       ) : (
         <Avatar.Icon icon={() => <Ionicons name="person" size={24} />} />
       )}
-      <Button onPress={session ? signOut : signIn}>
-        {session ? `${user?.displayName ?? user?.providerId} - Sign Out` : "Sign in with Spotify"}
+      <Button loading={isLoading} disabled={isLoading} onPress={session ? signOut : signIn}>
+        {isLoading ? "Signing out..." : `${user?.displayName ?? user?.providerId} - Sign Out`}
       </Button>
     </View>
   );
