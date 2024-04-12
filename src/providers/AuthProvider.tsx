@@ -35,6 +35,8 @@ interface AuthUser {
 interface AuthContextProps {
   session: AuthSession | null;
   user: AuthUser | null;
+  isLoading: boolean;
+  isLoaded: boolean;
   signIn: () => void;
   signOut: () => void;
 }
@@ -42,6 +44,8 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps>({
   session: null,
   user: null,
+  isLoading: false,
+  isLoaded: false,
   signIn: () => {},
   signOut: () => {},
 });
@@ -52,7 +56,10 @@ export function AuthProvider(props: PropsWithChildren) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
 
-  const redirectURL = Linking.createURL("(drawer)/settings");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
+
+  const redirectURL = Linking.createURL("(auth)/sign-in");
 
   useEffect(() => {
     updateContext();
@@ -68,6 +75,7 @@ export function AuthProvider(props: PropsWithChildren) {
   }, []);
 
   const updateContext = async () => {
+    setIsLoading(true);
     const now = new Date();
     console.log(`Updating context at ${now.toLocaleTimeString()}`);
 
@@ -100,6 +108,9 @@ export function AuthProvider(props: PropsWithChildren) {
       }
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsLoading(false);
+      setIsLoaded(true);
     }
   };
 
@@ -150,6 +161,8 @@ export function AuthProvider(props: PropsWithChildren) {
       value={{
         session,
         user,
+        isLoading,
+        isLoaded,
         signIn,
         signOut,
       }}>
