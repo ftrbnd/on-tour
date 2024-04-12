@@ -9,6 +9,8 @@ interface Props {
   next?: string | null;
   setNext?: (next: string) => void;
   showsVerticalScrollIndicator?: boolean;
+  onRefresh?: () => void;
+  refreshing?: boolean;
 }
 
 export default function ArtistList({
@@ -17,6 +19,8 @@ export default function ArtistList({
   next,
   setNext,
   showsVerticalScrollIndicator,
+  onRefresh,
+  refreshing,
 }: Props) {
   const handleEndReached = () => (!isPlaceholderData && next && setNext ? setNext(next) : null);
 
@@ -29,6 +33,8 @@ export default function ArtistList({
       onEndReached={handleEndReached}
       onEndReachedThreshold={next ? 0.5 : null}
       showsVerticalScrollIndicator={showsVerticalScrollIndicator}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
     />
   );
 }

@@ -15,7 +15,11 @@ export default function Recent() {
     enabled: session !== null,
   });
 
-  const { data: recentShows } = useQuery({
+  const {
+    data: recentShows,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ["recent-shows"],
     queryFn: () => getRecentShows(data?.topArtists),
     enabled: data !== undefined && data.topArtists.length > 0,
@@ -23,7 +27,7 @@ export default function Recent() {
 
   return (
     <View style={{ flex: 1 }}>
-      <SetlistList setlists={recentShows ?? []} />
+      <SetlistList setlists={recentShows ?? []} onRefresh={refetch} refreshing={isRefetching} />
     </View>
   );
 }

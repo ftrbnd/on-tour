@@ -35,12 +35,21 @@ export default function Explore() {
     enabled: session !== null,
   });
 
-  const { data: relatedArtists } = useQuery({
+  const {
+    data: relatedArtists,
+    refetch,
+    isRefetching,
+  } = useQuery({
     queryKey: ["related-artists"],
     queryFn: () =>
-      getRelatedArtists(session?.accessToken, data?.topArtists ? data?.topArtists[0].id : null),
+      getRelatedArtists(
+        session?.accessToken,
+        data?.topArtists ? data?.topArtists[Math.floor(Math.random() * 10)].id : null,
+      ),
     enabled: session !== null && data?.topArtists !== undefined,
   });
+
+  const shuffledArtists = relatedArtists?.sort(() => Math.random() - 0.5);
 
   return (
     <View style={styles.container}>
@@ -55,8 +64,10 @@ export default function Explore() {
       />
 
       <ArtistList
-        artists={searchResults.length > 0 ? searchResults : relatedArtists ?? []}
+        artists={searchResults.length > 0 ? searchResults : shuffledArtists ?? []}
         showsVerticalScrollIndicator={searchResults.length > 0}
+        onRefresh={refetch}
+        refreshing={isRefetching}
       />
     </View>
   );

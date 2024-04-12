@@ -13,7 +13,7 @@ export default function Following() {
 
   const { session } = useAuth();
 
-  const { data, isPlaceholderData } = useQuery({
+  const { data, isPlaceholderData, refetch, isRefetching } = useQuery({
     queryKey: ["top-artists", next],
     queryFn: () => getTopArtists(session?.accessToken, next),
     enabled: session !== null,
@@ -33,6 +33,8 @@ export default function Following() {
         isPlaceholderData={isPlaceholderData}
         next={data?.next}
         setNext={setNext}
+        onRefresh={refetch}
+        refreshing={isRefetching}
       />
     </View>
   );

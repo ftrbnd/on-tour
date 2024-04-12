@@ -12,6 +12,8 @@ interface Props {
   nextPage?: number;
   setNextPage?: (num: number) => void;
   artist?: Artist;
+  refreshing?: boolean;
+  onRefresh?: () => void;
 }
 
 export default function SetlistList({
@@ -20,6 +22,8 @@ export default function SetlistList({
   nextPage,
   setNextPage,
   artist,
+  refreshing,
+  onRefresh,
 }: Props) {
   const handleEndReached = () =>
     !isPlaceholderData && nextPage && setNextPage ? setNextPage(nextPage) : null;
@@ -41,6 +45,8 @@ export default function SetlistList({
       ListFooterComponent={
         artist ? <Text>Looks like there are no more setlists for this artist.</Text> : null
       }
+      refreshing={refreshing}
+      onRefresh={onRefresh}
     />
   );
 }
