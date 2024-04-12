@@ -9,9 +9,6 @@ import { getRecentShows } from "@/src/services/setlist-fm";
 import { getTopArtists } from "@/src/services/spotify";
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 8,
-  },
   list: {
     padding: 8,
   },
@@ -33,7 +30,7 @@ export default function Recent() {
   });
 
   return (
-    <View style={styles.container}>
+    <View>
       <FlatList
         style={styles.list}
         data={recentShows}

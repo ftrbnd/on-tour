@@ -10,9 +10,6 @@ import { getTopArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 8,
-  },
   list: {
     padding: 8,
   },
