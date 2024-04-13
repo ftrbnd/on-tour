@@ -15,7 +15,11 @@ export default function Settings() {
         <Avatar.Icon icon={() => <Ionicons name="person" size={24} />} />
       )}
       <Button loading={isLoading} disabled={isLoading} onPress={session ? signOut : signIn}>
-        {isLoading ? "Signing out..." : `${user?.displayName ?? user?.providerId} - Sign Out`}
+        {isLoading
+          ? "Signing out..."
+          : session
+            ? `${user?.displayName ?? user?.providerId} - Sign Out`
+            : "Sign In"}
       </Button>
     </View>
   );
