@@ -46,6 +46,7 @@ export default function Layout({ segment }: { segment: Group<Segment> }) {
               <Ionicons
                 name="menu"
                 size={24}
+                // TODO: sync with theme
                 onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
               />
             )}
