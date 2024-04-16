@@ -1,13 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useRef, useState } from "react";
-import {
-  Appearance,
-  ColorSchemeName,
-  Platform,
-  StyleSheet,
-  View,
-  useColorScheme,
-} from "react-native";
+import { useRef } from "react";
+import { ColorSchemeName, Platform, StyleSheet, View, useColorScheme } from "react-native";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import {
@@ -22,6 +15,7 @@ import {
 } from "react-native-paper";
 
 import { useAuth } from "@/src/providers/AuthProvider";
+import { usePreferredTheme } from "@/src/providers/ThemeProvider";
 
 export default function Settings() {
   return (
@@ -70,28 +64,25 @@ function ProfileCard() {
 
 function ThemeSettings() {
   const colorScheme = useColorScheme();
-  const actionSheetRef = useRef<ActionSheetRef>(null);
+  const { toggleTheme, usingSystemTheme } = usePreferredTheme();
   const theme = useTheme();
 
-  const [checked, setChecked] = useState<ColorSchemeName>("light");
-  const [isDeviceTheme, setIsDeviceTheme] = useState<boolean>(false);
+  const actionSheetRef = useRef<ActionSheetRef>(null);
 
   const handleRadioCheck = (value: ColorSchemeName) => {
-    setChecked(value);
-    Appearance.setColorScheme(value);
-
-    console.log("TODO: implement persisting theme");
+    toggleTheme(value);
   };
 
-  const handleSwitchToggle = (deviceTheme: boolean) => {
-    setIsDeviceTheme(deviceTheme);
-    console.log("TODO: implement persisting theme");
+  const handleSwitchToggle = (switchChecked: boolean) => {
+    if (switchChecked) toggleTheme(null);
   };
+
+  const capitalizedThemeName = colorScheme?.replace(colorScheme[0], colorScheme[0].toUpperCase());
 
   return (
     <TouchableOpacity onPress={() => actionSheetRef.current?.show()}>
       <Card.Title
-        title="Theme"
+        title={`Theme: ${usingSystemTheme ? "System" : capitalizedThemeName}`}
         subtitle="Change app appearance"
         subtitleStyle={{ color: "gray" }}
         left={() => (
@@ -113,29 +104,17 @@ function ThemeSettings() {
         <View style={{ flexDirection: "row", justifyContent: "space-evenly", padding: 16 }}>
           <TouchableOpacity style={styles.radioButton} onPress={() => handleRadioCheck("light")}>
             <Ionicons
-              name={checked === "light" ? "sunny" : "sunny-outline"}
+              name={colorScheme === "light" ? "sunny" : "sunny-outline"}
               size={36}
-              color={
-                checked === "light"
-                  ? theme.colors.primary
-                  : colorScheme === "light"
-                    ? "black"
-                    : "white"
-              }
+              color={colorScheme === "light" ? theme.colors.primary : "white"}
             />
             <RadioButton status={colorScheme === "light" ? "checked" : "unchecked"} value="light" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.radioButton} onPress={() => handleRadioCheck("dark")}>
             <Ionicons
-              name={checked === "dark" ? "moon" : "moon-outline"}
+              name={colorScheme === "dark" ? "moon" : "moon-outline"}
               size={36}
-              color={
-                checked === "dark"
-                  ? theme.colors.primary
-                  : colorScheme === "dark"
-                    ? "white"
-                    : "black"
-              }
+              color={colorScheme === "dark" ? theme.colors.primary : "black"}
             />
             <RadioButton status={colorScheme === "dark" ? "checked" : "unchecked"} value="dark" />
           </TouchableOpacity>
@@ -158,7 +137,7 @@ function ThemeSettings() {
             />
             <Text variant="labelLarge">Device settings</Text>
           </View>
-          <Switch value={isDeviceTheme} onValueChange={(val) => handleSwitchToggle(val)} />
+          <Switch value={usingSystemTheme} onValueChange={(val) => handleSwitchToggle(val)} />
         </View>
       </ActionSheet>
     </TouchableOpacity>
