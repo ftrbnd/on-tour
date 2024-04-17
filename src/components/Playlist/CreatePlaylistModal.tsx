@@ -2,8 +2,9 @@ import { Ionicons, Entypo } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { Image } from "expo-image";
 import moment from "moment";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
 import { Button, Modal, Portal, Text, TextInput } from "react-native-paper";
 
@@ -63,6 +64,8 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
   const { upcomingShows } = useUpcomingShows();
   const [selectedShow, setSelectedShow] = useState<UpcomingShow | null>(null);
   const [upcomingImageUri] = useMMKVString(`upcoming-show-${selectedShow?.id}-image`);
+
+  const pickerRef = useRef<Picker<UpcomingShow | null>>(null);
 
   const handleSelection = async (show: UpcomingShow | null) => {
     setSelectedShow(show);
@@ -130,25 +133,20 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
           />
         )}
 
-        {!playlist.addedTracks && (
-          <View>
-            {upcomingShows.length > 0 && (
-              <View style={styles.pickerContainer}>
-                <Text style={{ alignSelf: "center" }}>OR</Text>
-                <Picker
-                  selectedValue={selectedShow}
-                  onValueChange={(item) => handleSelection(item)}>
-                  <Picker.Item label="Import an upcoming show" enabled={false} />
-                  {upcomingShows.map((show) => (
-                    <Picker.Item
-                      key={show.id}
-                      label={`${show.artist} - ${show.tour}`}
-                      value={show}
-                    />
-                  ))}
-                </Picker>
-              </View>
-            )}
+        {!playlist.addedTracks && upcomingShows.length > 0 && (
+          <View style={styles.pickerContainer}>
+            <Text style={{ alignSelf: "center" }}>OR</Text>
+            <TouchableOpacity onPress={() => pickerRef.current?.focus()}>
+              <Picker
+                ref={pickerRef}
+                selectedValue={selectedShow}
+                onValueChange={(item) => handleSelection(item)}>
+                <Picker.Item label="Import an upcoming show" enabled={false} />
+                {upcomingShows.map((show) => (
+                  <Picker.Item key={show.id} label={`${show.artist} - ${show.tour}`} value={show} />
+                ))}
+              </Picker>
+            </TouchableOpacity>
           </View>
         )}
 
@@ -173,7 +171,7 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
               )}
               <Button
                 onPress={() => playlist.startMutations(selectedImage, { uri: upcomingImageUri })}
-                mode="outlined"
+                mode="contained"
                 loading={playlist.mutationsPending}
                 disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
                 {playlist.mutationsPending ? playlist.currentOperation : "Create"}

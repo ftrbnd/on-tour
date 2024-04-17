@@ -152,6 +152,8 @@ export function AuthProvider(props: PropsWithChildren) {
 
       await updateContext();
     } catch (e) {
+      setSession(null);
+      setUser(null);
       console.error(e);
     }
   };

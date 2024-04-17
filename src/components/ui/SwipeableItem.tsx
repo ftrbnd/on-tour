@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Animated, StyleSheet, View } from "react-native";
-import { RectButton, Swipeable } from "react-native-gesture-handler";
+import { RectButton, Swipeable, TouchableOpacity } from "react-native-gesture-handler";
 import { Text } from "react-native-paper";
 
 const styles = StyleSheet.create({
@@ -57,8 +57,9 @@ export default function SwipeableItem({
       )}
       friction={2}
       leftThreshold={30}
-      rightThreshold={40}>
-      {children}
+      rightThreshold={40}
+      overshootRight={false}>
+      <TouchableOpacity>{children}</TouchableOpacity>
     </Swipeable>
   );
 }
