@@ -17,7 +17,7 @@ export default function DrawerHeaderIcon({ marginLeft }: { marginLeft?: number }
   const theme = useTheme();
   return (
     <TouchableOpacity>
-      {user?.avatar ? (
+      {user?.avatar && !marginLeft ? (
         <Image
           source={{
             uri: user.avatar,
