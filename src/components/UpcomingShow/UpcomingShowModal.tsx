@@ -1,8 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
-import DateTimePicker, { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import DateTimePicker, {
+  DateTimePickerAndroid,
+  DateTimePickerEvent,
+} from "@react-native-community/datetimepicker";
 import { Image } from "expo-image";
+import moment from "moment";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Platform, StyleSheet, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
 import { Button, Card, Modal, Portal, Text, TextInput } from "react-native-paper";
 
@@ -40,12 +45,6 @@ const styles = StyleSheet.create({
     display: "flex",
     gap: 8,
   },
-  buttons: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-  },
   bottom: {
     display: "flex",
     flexDirection: "row",
@@ -65,9 +64,14 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
   const [tour, setTour] = useState<string>(editingShow?.tour ?? "");
   const [venue, setVenue] = useState<string>(editingShow?.venue ?? "");
   const [city, setCity] = useState<string>(editingShow?.city ?? "");
-  const [date, setDate] = useState<Date>(editingShow ? new Date(editingShow.date) : new Date());
-  const disabled = !artist || !tour || !venue || !city || !date;
+  const [date, setDate] = useState<Date>(
+    editingShow?.date ? new Date(editingShow.date) : new Date(),
+  );
   const [showDateTimePicker, setShowDateTimePicker] = useState(false);
+
+  const dateWithoutTimezone = date.toISOString().substring(0, 10);
+  const formattedDate = moment(dateWithoutTimezone).format("MMMM Do, YYYY");
+  const disabled = !artist || !tour || !venue || !city || !date;
 
   const { selectedImage, pickImageAsync, warning } = useImagePicker();
   const { addShow, updateShow } = useUpcomingShows();
@@ -76,19 +80,42 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
 
   const onDateChange = (event: DateTimePickerEvent, selectedDate?: Date | undefined) => {
     setShowDateTimePicker(false);
+    if (event.type !== "set") return;
+
     if (selectedDate) setDate(selectedDate);
+  };
+
+  const handleDatePickerPress = () => {
+    if (Platform.OS === "android") {
+      DateTimePickerAndroid.open({
+        value: date ? new Date(date) : new Date(),
+        onChange: onDateChange,
+        mode: "date",
+        display: "spinner",
+        timeZoneName: "UTC",
+        minimumDate: new Date(),
+      });
+    } else {
+      setShowDateTimePicker(true);
+    }
   };
 
   const handleSave = async () => {
     // TODO: use react-hook-form or Formik?
     if (!artist || !tour || !venue || !city || !date || !user?.id) return;
 
-    // TODO: fix dates being set to previous day
-    const month = `${date.getMonth() + 1}`.padStart(2, "0");
-    const day = `${date.getDate()}`.padStart(2, "0");
-
     try {
       if (editingShow) {
+        if (
+          artist === editingShow?.artist &&
+          tour === editingShow?.tour &&
+          venue === editingShow?.venue &&
+          city === editingShow?.city &&
+          dateWithoutTimezone === editingShow?.date
+        ) {
+          return setVisible(false);
+        }
+
         await updateShow(
           {
             id: editingShow.id,
@@ -97,7 +124,7 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
             tour,
             venue,
             city,
-            date: `${date.getFullYear()}-${month}-${day}`,
+            date: dateWithoutTimezone,
           },
           selectedImage,
         );
@@ -108,7 +135,7 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
             tour,
             venue,
             city,
-            date: `${date.getFullYear()}-${month}-${day}`,
+            date: dateWithoutTimezone,
             userId: user.id,
           },
           selectedImage,
@@ -170,23 +197,25 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
           <TextInput label="City" value={city} onChangeText={(text) => setCity(text)} multiline />
 
           <Card>
-            <Card.Title
-              title={date.toDateString()}
-              right={() => (
-                <Ionicons size={24} name="calendar" onPress={() => setShowDateTimePicker(true)} />
-              )}
-              rightStyle={{ marginRight: 16 }}
-            />
-          </Card>
+            <TouchableOpacity onPress={handleDatePickerPress}>
+              <Card.Title
+                title={formattedDate}
+                right={() => <Ionicons size={24} name="calendar" />}
+                rightStyle={{ marginRight: 16 }}
+              />
+            </TouchableOpacity>
 
-          {showDateTimePicker && (
-            <DateTimePicker
-              testID="dateTimePicker"
-              value={date}
-              mode="date"
-              onChange={onDateChange}
-            />
-          )}
+            {Platform.OS === "ios" && showDateTimePicker && (
+              <DateTimePicker
+                testID="dateTimePicker"
+                value={new Date(date)}
+                mode="date"
+                display="spinner"
+                onChange={onDateChange}
+                minimumDate={new Date()}
+              />
+            )}
+          </Card>
         </View>
 
         <View style={styles.bottom}>

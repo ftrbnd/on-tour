@@ -26,7 +26,7 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
       <SwipeableItem onEdit={() => setModalVisible(true)} onDelete={() => deleteShow(show)}>
         <List.Item
           title={`${show.artist} - ${show.tour}`}
-          description={`${show.venue} / ${show.city} / ${moment(show.date, "YYYY-MM-DD-MM").format("MMMM Do, YYYY")}`}
+          description={`${show.venue} / ${show.city} / ${moment(show.date).format("MMMM Do, YYYY")}`}
           titleEllipsizeMode="tail"
           left={() => <List.Icon icon={{ uri: showImage }} />}
           style={styles.listItem}
