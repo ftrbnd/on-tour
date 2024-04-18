@@ -4,7 +4,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { Avatar, Card, Divider, FAB, List, Text } from "react-native-paper";
+import { Avatar, Card, Divider, FAB, IconButton, List, Text, useTheme } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
@@ -41,12 +41,22 @@ const styles = StyleSheet.create({
   },
 });
 
-function SongItem({ item, image }: { item: Song; image: Image | null | undefined }) {
+function SongItem({
+  item,
+  loading,
+  image,
+}: {
+  item: Song;
+  loading: boolean;
+  image: Image | null | undefined;
+}) {
   return (
     <List.Item
       title={() => <Text variant="titleMedium">{item.name}</Text>}
       left={() =>
-        image ? (
+        loading ? (
+          <IconButton size={24} loading={loading} icon="loading" disabled />
+        ) : image ? (
           <Avatar.Image size={48} source={{ uri: image.url }} />
         ) : (
           <List.Icon icon={() => <Ionicons name="musical-note" size={48} color="black" />} />
@@ -58,8 +68,9 @@ function SongItem({ item, image }: { item: Song; image: Image | null | undefined
 
 export default function SetlistPage() {
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
-  const { data: setlist, songs, spotifyTracks, openWebpage } = useSetlist(setlistId);
+  const setlist = useSetlist(setlistId);
   const { playlistExists } = useCreatedPlaylist({ setlistId });
+  const theme = useTheme();
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
@@ -74,27 +85,29 @@ export default function SetlistPage() {
       />
 
       <View style={styles.container}>
-        <Card style={styles.card} onPress={() => openWebpage()}>
-          {setlist?.artist && (
+        <Card
+          style={{ ...styles.card, backgroundColor: theme.colors.secondaryContainer }}
+          onPress={() => setlist.openWebpage()}>
+          {setlist.data?.artist && (
             <Card.Title
-              title={setlist.artist.name}
+              title={setlist.data.artist.name}
               titleStyle={styles.cardTitle}
-              subtitle={setlist.tour?.name}
-              subtitleStyle={setlist.tour ? styles.cardTitle : null}
+              subtitle={setlist.data.tour?.name}
+              subtitleStyle={setlist.data.tour ? styles.cardTitle : null}
             />
           )}
-          <Card.Content style={[styles.cardContent, !setlist?.tour && { padding: 16 }]}>
+          <Card.Content style={[styles.cardContent, !setlist.data?.tour && { padding: 16 }]}>
             <View style={styles.detail}>
               <FontAwesome5 name="building" size={24} color="black" />
-              <Text>{`${setlist?.venue.name}`}</Text>
+              <Text>{`${setlist.data?.venue.name}`}</Text>
             </View>
             <View style={styles.detail}>
               <FontAwesome5 name="city" size={24} color="black" />
-              <Text>{`${setlist?.venue.city.name}, ${setlist?.venue.city.state}, ${setlist?.venue.city.country.code}`}</Text>
+              <Text>{`${setlist.data?.venue.city.name}, ${setlist.data?.venue.city.state}, ${setlist.data?.venue.city.country.code}`}</Text>
             </View>
             <View style={styles.detail}>
               <FontAwesome5 name="calendar-day" size={24} color="black" />
-              <Text>{moment(setlist?.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}</Text>
+              <Text>{moment(setlist.data?.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}</Text>
             </View>
           </Card.Content>
         </Card>
@@ -102,11 +115,12 @@ export default function SetlistPage() {
         <FlashList
           estimatedItemSize={75}
           contentContainerStyle={{ padding: 8 }}
-          data={songs ?? []}
+          data={setlist.songs}
           renderItem={({ item, index }) => (
             <SongItem
               item={item}
-              image={spotifyTracks
+              loading={setlist.spotifyTracksLoading}
+              image={setlist.spotifyTracks
                 ?.map((track) => (track ? track.album.images[0] : null))
                 .at(index)}
             />

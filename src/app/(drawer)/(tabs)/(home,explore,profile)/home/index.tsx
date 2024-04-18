@@ -17,6 +17,7 @@ export default function Recent() {
 
   const {
     data: recentShows,
+    isLoading,
     refetch,
     isRefetching,
   } = useQuery({
@@ -27,7 +28,12 @@ export default function Recent() {
 
   return (
     <View style={{ flex: 1 }}>
-      <SetlistList setlists={recentShows ?? []} onRefresh={refetch} refreshing={isRefetching} />
+      <SetlistList
+        setlists={recentShows ?? []}
+        loading={isLoading}
+        onRefresh={refetch}
+        refreshing={isRefetching}
+      />
     </View>
   );
 }

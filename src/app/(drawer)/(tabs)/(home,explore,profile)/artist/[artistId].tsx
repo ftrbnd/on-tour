@@ -22,7 +22,7 @@ export default function ArtistPage() {
     enabled: session != null,
   });
 
-  const { data, isPlaceholderData, refetch, isRefetching } = useQuery({
+  const { data, isPlaceholderData, refetch, isRefetching, isLoading } = useQuery({
     queryKey: ["setlists", artist?.name, nextPage],
     queryFn: () => searchArtistSetlist(artist?.name, nextPage),
     enabled: artist !== undefined,
@@ -52,6 +52,7 @@ export default function ArtistPage() {
           nextPage={data?.nextPage}
           setNextPage={setNextPage}
           artist={artist}
+          loading={isLoading}
           onRefresh={refetch}
           refreshing={isRefetching}
         />

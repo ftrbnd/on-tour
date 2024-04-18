@@ -1,5 +1,5 @@
 import { FlashList } from "@shopify/flash-list";
-import { Card, Text } from "react-native-paper";
+import { Button, Card, Text } from "react-native-paper";
 
 import SetlistPreview from "./SetlistPreview";
 
@@ -12,6 +12,7 @@ interface Props {
   nextPage?: number;
   setNextPage?: (num: number) => void;
   artist?: Artist;
+  loading?: boolean;
   refreshing?: boolean;
   onRefresh?: () => void;
 }
@@ -22,6 +23,7 @@ export default function SetlistList({
   nextPage,
   setNextPage,
   artist,
+  loading,
   refreshing,
   onRefresh,
 }: Props) {
@@ -33,7 +35,7 @@ export default function SetlistList({
       estimatedItemSize={150}
       contentContainerStyle={{ padding: 8 }}
       data={setlists}
-      renderItem={({ item }) => <SetlistPreview setlist={item} displayArtist />}
+      renderItem={({ item }) => <SetlistPreview setlist={item} displayArtist={!artist} />}
       onEndReachedThreshold={nextPage ? 0.5 : null}
       onEndReached={handleEndReached}
       ListHeaderComponent={
@@ -44,9 +46,24 @@ export default function SetlistList({
           />
         ) : null
       }
-      ListEmptyComponent={artist ? <Text>No setlists were found for this artist.</Text> : null}
-      ListFooterComponent={
-        artist ? <Text>Looks like there are no more setlists for this artist.</Text> : null
+      ListEmptyComponent={
+        loading ? (
+          <Card>
+            <Card.Content>
+              <Button loading={loading} disabled>
+                Loading...
+              </Button>
+            </Card.Content>
+          </Card>
+        ) : artist ? (
+          <Card>
+            <Card.Content>
+              <Text variant="titleSmall" style={{ textAlign: "center" }}>
+                {artist && !loading ? "No setlists were found for this artist." : "Loading..."}
+              </Text>
+            </Card.Content>
+          </Card>
+        ) : null
       }
       refreshing={refreshing}
       onRefresh={onRefresh}
