@@ -43,9 +43,15 @@ interface ModalProps {
   visible: boolean;
   setVisible: (vis: boolean) => void;
   playlistId: string | null;
+  playlistTitle: string;
 }
 
-export default function PlaylistExistsModal({ visible, setVisible, playlistId }: ModalProps) {
+export default function PlaylistExistsModal({
+  visible,
+  setVisible,
+  playlistId,
+  playlistTitle,
+}: ModalProps) {
   const [playlistImage] = useMMKVString(`playlist-${playlistId}-image`);
 
   const openWebPage = async () => {
@@ -81,13 +87,15 @@ export default function PlaylistExistsModal({ visible, setVisible, playlistId }:
           )}
         </View>
 
-        <Text variant="labelLarge">Looks like you're already created this playlist</Text>
+        <Text variant="labelLarge" style={{ fontWeight: "bold" }}>
+          {playlistTitle}
+        </Text>
 
         <View style={styles.info}>
           <Button
             mode="contained"
             onPress={openWebPage}
-            icon={() => <Entypo name="spotify" size={24} color="black" />}>
+            icon={({ color }) => <Entypo name="spotify" size={24} color={color} />}>
             View your playlist
           </Button>
         </View>

@@ -37,11 +37,6 @@ const CombinedDarkTheme = {
     ...MD3DarkTheme.colors,
     ...DarkTheme.colors,
   },
-  fonts: configureFonts({
-    config: {
-      fontFamily: "InterVariable",
-    },
-  }),
 };
 
 interface PreferredThemeContextProps {

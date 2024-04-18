@@ -1,4 +1,4 @@
-import { Ionicons, Entypo } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { Image } from "expo-image";
 import moment from "moment";
@@ -88,9 +88,7 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
         onDismiss={() => setVisible(false)}
         contentContainerStyle={styles.modal}>
         <View style={styles.header}>
-          <Text variant="headlineLarge">
-            {playlist.addedTracks ? "Playlist Created!" : "Playlist Details"}
-          </Text>
+          <Text variant="headlineLarge">Playlist Details</Text>
           {selectedImage || upcomingImageUri ? (
             <Image
               source={{
@@ -112,28 +110,20 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
           )}
         </View>
 
-        {playlist.addedTracks ? (
-          <Text variant="labelLarge">{playlist.name}</Text>
-        ) : (
-          <TextInput
-            label="Name"
-            value={playlist.name ?? ""}
-            onChangeText={(text) => playlist.setName(text)}
-            multiline
-          />
-        )}
-        {playlist.addedTracks ? (
-          <Text variant="labelMedium">{playlist.description}</Text>
-        ) : (
-          <TextInput
-            label="Description"
-            value={playlist.description ?? ""}
-            onChangeText={(text) => playlist.setDescription(text)}
-            multiline
-          />
-        )}
+        <TextInput
+          label="Name"
+          value={playlist.name ?? ""}
+          onChangeText={(text) => playlist.setName(text)}
+          multiline
+        />
+        <TextInput
+          label="Description"
+          value={playlist.description ?? ""}
+          onChangeText={(text) => playlist.setDescription(text)}
+          multiline
+        />
 
-        {!playlist.addedTracks && upcomingShows.length > 0 && (
+        {upcomingShows.length > 0 && (
           <View style={styles.pickerContainer}>
             <Text style={{ alignSelf: "center" }}>OR</Text>
             <TouchableOpacity onPress={() => pickerRef.current?.focus()}>
@@ -153,31 +143,20 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
         <View style={styles.bottom}>
           {warning && <Text variant="labelMedium">{warning}</Text>}
 
-          {playlist.addedTracks ? (
+          {selectedShow && (
             <Button
-              mode="contained"
-              onPress={() => playlist.openWebPage()}
-              icon={() => <Entypo name="spotify" size={24} color="black" />}>
-              View your playlist
+              onPress={resetModal}
+              disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
+              Reset
             </Button>
-          ) : (
-            <>
-              {selectedShow && (
-                <Button
-                  onPress={resetModal}
-                  disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
-                  Reset
-                </Button>
-              )}
-              <Button
-                onPress={() => playlist.startMutations(selectedImage, { uri: upcomingImageUri })}
-                mode="contained"
-                loading={playlist.mutationsPending}
-                disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
-                {playlist.mutationsPending ? playlist.currentOperation : "Create"}
-              </Button>
-            </>
           )}
+          <Button
+            onPress={() => playlist.startMutations(selectedImage, { uri: upcomingImageUri })}
+            mode="contained"
+            loading={playlist.mutationsPending}
+            disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
+            {playlist.mutationsPending ? playlist.currentOperation : "Create"}
+          </Button>
         </View>
       </Modal>
     </Portal>

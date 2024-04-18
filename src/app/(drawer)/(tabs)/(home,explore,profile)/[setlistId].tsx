@@ -128,12 +128,12 @@ export default function SetlistPage() {
           ItemSeparatorComponent={() => <Divider />}
         />
 
-        {/* TODO: doesn't update when deleted from database */}
-        {setlist && playlistExists && playlistExists?.length > 0 ? (
+        {setlist && playlistExists && playlistExists.length > 0 ? (
           <PlaylistExistsModal
             visible={modalVisible}
             setVisible={setModalVisible}
             playlistId={playlistExists[0].id}
+            playlistTitle={playlistExists[0].title}
           />
         ) : (
           <CreatePlaylistModal

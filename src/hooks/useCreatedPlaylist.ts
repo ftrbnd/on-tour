@@ -18,7 +18,7 @@ export default function useCreatedPlaylist({ playlistId, setlistId }: UseCreated
   const queryClient = useQueryClient();
 
   const { data: playlistExists } = useQuery({
-    queryKey: ["playlist-exists", setlistId],
+    queryKey: ["created-playlists", setlistId],
     queryFn: () => getCreatedPlaylists(session?.token, user?.id, setlistId),
     enabled: session !== null && user !== null && setlistId !== undefined,
   });
