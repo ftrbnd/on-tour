@@ -6,7 +6,7 @@ import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
-import { Button, Modal, Portal, Text, TextInput } from "react-native-paper";
+import { Button, Modal, Portal, Text, TextInput, useTheme } from "react-native-paper";
 
 import useImagePicker from "../../hooks/useImagePicker";
 import usePlaylist from "../../hooks/usePlaylist";
@@ -15,7 +15,6 @@ import { UpcomingShow } from "../../services/upcomingShows";
 
 const styles = StyleSheet.create({
   modal: {
-    backgroundColor: "white",
     padding: 20,
     margin: 20,
     display: "flex",
@@ -60,6 +59,7 @@ interface ModalProps {
 export default function CreatePlaylistModal({ visible, setVisible, setlistId }: ModalProps) {
   const playlist = usePlaylist(setlistId);
   const { selectedImage, setSelectedImage, pickImageAsync, warning } = useImagePicker();
+  const theme = useTheme();
 
   const { upcomingShows } = useUpcomingShows();
   const [selectedShow, setSelectedShow] = useState<UpcomingShow | null>(null);
@@ -86,7 +86,7 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
       <Modal
         visible={visible}
         onDismiss={() => setVisible(false)}
-        contentContainerStyle={styles.modal}>
+        contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.background }]}>
         <View style={styles.header}>
           <Text variant="headlineLarge">Playlist Details</Text>
           {selectedImage || upcomingImageUri ? (
@@ -102,11 +102,15 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
               transition={1000}
             />
           ) : (
-            <View
-              style={styles.image}
-              onTouchStart={() => (playlist.mutationsPending ? null : pickImageAsync())}>
-              <Ionicons name="musical-notes" size={styles.image.height * 0.66} color="black" />
-            </View>
+            <TouchableOpacity
+              onPress={() => (playlist.mutationsPending ? null : pickImageAsync())}
+              style={[styles.image, { backgroundColor: theme.colors.surfaceVariant }]}>
+              <Ionicons
+                name="musical-notes"
+                size={styles.image.height * 0.66}
+                color={theme.colors.secondary}
+              />
+            </TouchableOpacity>
           )}
         </View>
 
@@ -125,13 +129,21 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
 
         {upcomingShows.length > 0 && (
           <View style={styles.pickerContainer}>
-            <Text style={{ alignSelf: "center" }}>OR</Text>
+            <Text style={{ alignSelf: "center", marginBottom: 8 }}>OR</Text>
             <TouchableOpacity onPress={() => pickerRef.current?.focus()}>
               <Picker
                 ref={pickerRef}
                 selectedValue={selectedShow}
-                onValueChange={(item) => handleSelection(item)}>
-                <Picker.Item label="Import an upcoming show" enabled={false} />
+                onValueChange={(item) => handleSelection(item)}
+                style={{
+                  color: theme.colors.onBackground,
+                  backgroundColor: theme.colors.background,
+                }}>
+                <Picker.Item
+                  label="Import an upcoming show"
+                  enabled={false}
+                  style={{ color: "gray" }}
+                />
                 {upcomingShows.map((show) => (
                   <Picker.Item key={show.id} label={`${show.artist} - ${show.tour}`} value={show} />
                 ))}

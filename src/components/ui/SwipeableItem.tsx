@@ -59,7 +59,7 @@ export default function SwipeableItem({
       leftThreshold={30}
       rightThreshold={40}
       overshootRight={false}>
-      <TouchableOpacity>{children}</TouchableOpacity>
+      <TouchableOpacity onPress={onEdit}>{children}</TouchableOpacity>
     </Swipeable>
   );
 }

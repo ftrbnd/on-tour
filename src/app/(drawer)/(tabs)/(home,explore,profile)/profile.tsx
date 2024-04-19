@@ -66,42 +66,47 @@ export default function Profile() {
 
   return (
     <View style={styles.container}>
-      <List.AccordionGroup>
-        <List.Accordion title={`My Playlists (${playlists?.length ?? 0})`} id="1">
-          {!playlists ||
-            (playlists?.length === 0 && (
-              <List.Item
-                onPress={() => router.replace("/explore")}
-                style={styles.listItem}
-                title="Check out some setlists to get started"
-                titleStyle={{ fontWeight: "bold" }}
-                right={() => <List.Icon icon={() => <Ionicons name="search" size={24} />} />}
-              />
-            ))}
-          {/* TODO: convert to FlashList */}
-          <FlatList
-            data={playlists ?? []}
-            renderItem={({ item }) => (
-              <CreatedPlaylistItem playlist={item} showSnackbar={() => setSnackbarVisible(true)} />
-            )}
-            keyExtractor={(item) => item.id}
-          />
-        </List.Accordion>
-        <List.Accordion title={`Upcoming Shows (${upcomingShows.length})`} id="2">
-          <List.Item
-            onPress={() => setModalVisible(true)}
-            style={styles.listItem}
-            title="Add New"
-            titleStyle={{ fontWeight: "bold" }}
-            right={() => <List.Icon icon={() => <Ionicons name="add-circle" size={24} />} />}
-          />
-          <FlatList
-            data={upcomingShows}
-            renderItem={({ item }) => <UpcomingShowItem show={item} />}
-            keyExtractor={(item) => item.id}
-          />
-        </List.Accordion>
-      </List.AccordionGroup>
+      <List.Accordion title={`My Playlists (${playlists?.length ?? 0})`} id="1">
+        {!playlists ||
+          (playlists?.length === 0 && (
+            <List.Item
+              onPress={() => router.replace("/explore")}
+              style={styles.listItem}
+              title="Check out some setlists to get started"
+              titleStyle={{ fontWeight: "bold" }}
+              right={() => (
+                <List.Icon
+                  icon={({ color }) => <Ionicons name="search" size={24} color={color} />}
+                />
+              )}
+            />
+          ))}
+        <FlatList
+          data={playlists ?? []}
+          renderItem={({ item }) => (
+            <CreatedPlaylistItem playlist={item} showSnackbar={() => setSnackbarVisible(true)} />
+          )}
+          keyExtractor={(item) => item.id}
+        />
+      </List.Accordion>
+      <List.Accordion title={`Upcoming Shows (${upcomingShows.length})`} id="2">
+        <List.Item
+          onPress={() => setModalVisible(true)}
+          style={styles.listItem}
+          title="Add New"
+          titleStyle={{ fontWeight: "bold" }}
+          right={() => (
+            <List.Icon
+              icon={({ color }) => <Ionicons name="add-circle" size={24} color={color} />}
+            />
+          )}
+        />
+        <FlatList
+          data={upcomingShows}
+          renderItem={({ item }) => <UpcomingShowItem show={item} />}
+          keyExtractor={(item) => item.id}
+        />
+      </List.Accordion>
 
       {modalVisible && <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />}
       {infoDialogVisible && (

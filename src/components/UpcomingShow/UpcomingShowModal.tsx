@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
-import { Button, Card, Modal, Portal, Text, TextInput } from "react-native-paper";
+import { Button, Card, Modal, Portal, Text, TextInput, useTheme } from "react-native-paper";
 
 import useImagePicker from "../../hooks/useImagePicker";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
@@ -18,7 +18,6 @@ import { UpcomingShow } from "../../services/upcomingShows";
 
 const styles = StyleSheet.create({
   modal: {
-    backgroundColor: "white",
     padding: 20,
     margin: 20,
     display: "flex",
@@ -36,7 +35,6 @@ const styles = StyleSheet.create({
     width: 75,
     height: 75,
     borderRadius: 10,
-    backgroundColor: "lightgray",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
@@ -73,6 +71,7 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
   const formattedDate = moment(dateWithoutTimezone).format("MMMM Do, YYYY");
   const disabled = !artist || !tour || !venue || !city || !date;
 
+  const theme = useTheme();
   const { selectedImage, pickImageAsync, warning } = useImagePicker();
   const { addShow, updateShow } = useUpcomingShows();
   const [previousShowImage] = useMMKVString(`upcoming-show-${editingShow?.id}-image`);
@@ -153,7 +152,7 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
       <Modal
         visible={visible}
         onDismiss={() => setVisible(false)}
-        contentContainerStyle={styles.modal}>
+        contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.background }]}>
         <View style={styles.header}>
           <Text variant="headlineLarge">Show Details</Text>
           {selectedImage || previousShowImage ? (
@@ -169,14 +168,15 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
               transition={1000}
             />
           ) : (
-            <View style={styles.image}>
+            <TouchableOpacity
+              onPress={pickImageAsync}
+              style={[styles.image, { backgroundColor: theme.colors.surfaceVariant }]}>
               <Ionicons
-                onPress={pickImageAsync}
                 name="musical-notes"
                 size={styles.image.height * 0.66}
-                color="black"
+                color={theme.colors.secondary}
               />
-            </View>
+            </TouchableOpacity>
           )}
         </View>
 
@@ -200,8 +200,11 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
             <TouchableOpacity onPress={handleDatePickerPress}>
               <Card.Title
                 title={formattedDate}
-                right={() => <Ionicons size={24} name="calendar" />}
+                right={() => (
+                  <Ionicons size={24} name="calendar" color={theme.colors.onSurfaceVariant} />
+                )}
                 rightStyle={{ marginRight: 16 }}
+                style={{ backgroundColor: theme.colors.surfaceVariant }}
               />
             </TouchableOpacity>
 

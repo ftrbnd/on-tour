@@ -4,7 +4,18 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { Avatar, Card, Divider, FAB, IconButton, List, Text, useTheme } from "react-native-paper";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  Avatar,
+  Card,
+  Divider,
+  FAB,
+  IconButton,
+  List,
+  Text,
+  Tooltip,
+  useTheme,
+} from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
@@ -59,7 +70,13 @@ function SongItem({
         ) : image ? (
           <Avatar.Image size={48} source={{ uri: image.url }} />
         ) : (
-          <List.Icon icon={() => <Ionicons name="musical-note" size={48} color="black" />} />
+          <TouchableOpacity>
+            <Tooltip title="Song was not found">
+              <List.Icon
+                icon={({ color }) => <Ionicons name="musical-note" size={48} color={color} />}
+              />
+            </Tooltip>
+          </TouchableOpacity>
         )
       }
     />
@@ -98,15 +115,15 @@ export default function SetlistPage() {
           )}
           <Card.Content style={[styles.cardContent, !setlist.data?.tour && { padding: 16 }]}>
             <View style={styles.detail}>
-              <FontAwesome5 name="building" size={24} color="black" />
+              <FontAwesome5 name="building" size={24} color={theme.colors.onPrimaryContainer} />
               <Text>{`${setlist.data?.venue.name}`}</Text>
             </View>
             <View style={styles.detail}>
-              <FontAwesome5 name="city" size={24} color="black" />
+              <FontAwesome5 name="city" size={24} color={theme.colors.onPrimaryContainer} />
               <Text>{`${setlist.data?.venue.city.name}, ${setlist.data?.venue.city.state}, ${setlist.data?.venue.city.country.code}`}</Text>
             </View>
             <View style={styles.detail}>
-              <FontAwesome5 name="calendar-day" size={24} color="black" />
+              <FontAwesome5 name="calendar-day" size={24} color={theme.colors.onPrimaryContainer} />
               <Text>{moment(setlist.data?.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}</Text>
             </View>
           </Card.Content>
@@ -144,7 +161,8 @@ export default function SetlistPage() {
         )}
 
         <FAB
-          icon={() => <Ionicons name="cloud-upload" size={24} color="black" />}
+          variant="secondary"
+          icon={({ color }) => <Ionicons name="cloud-upload" size={24} color={color} />}
           style={styles.fab}
           onPress={() => setModalVisible(true)}
         />

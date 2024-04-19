@@ -59,9 +59,6 @@ export default function usePlaylist(setlistId: string) {
     onSuccess: async (_updatedPlaylist, body) => {
       setTracksFound(body.found ?? null);
       setAddedTracks(true);
-      // TODO: show this message as an alert?
-      // TODO: link setlist ids to playlist ids in mmkv or neondb
-      // if a user has already created a playlist for this setlist, show a button that can take them to the playlist
     },
     onError: (error) => {
       console.error("Tracks mutation failed", error);
