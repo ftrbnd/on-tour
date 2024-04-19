@@ -14,7 +14,7 @@ export default function useSetlist(id: string) {
     enabled: id !== null,
   });
 
-  const songs = setlist?.sets.set.flatMap((s) => s.song) ?? [];
+  const songs = setlist?.sets.set.flatMap((s) => s.song).filter((s) => !s.tape) ?? [];
 
   const { data: spotifyTracks, isLoading: spotifyTracksLoading } = useQuery({
     queryKey: ["spotify-tracks", id],
