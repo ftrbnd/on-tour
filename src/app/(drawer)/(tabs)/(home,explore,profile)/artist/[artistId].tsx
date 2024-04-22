@@ -3,7 +3,7 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import { View } from "react-native";
 
-import SetlistList from "@/src/components/Setlist/SetlistList";
+import ParallaxSetlistList from "@/src/components/Setlist/ParallaxSetlistList";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { searchArtistSetlist } from "@/src/services/setlist-fm";
 import { getOneArtist } from "@/src/services/spotify";
@@ -39,14 +39,12 @@ export default function ArtistPage() {
     <>
       <Stack.Screen
         options={{
-          headerTitle: artist?.name,
-          headerBackVisible: true,
-          headerLeft: () => null,
+          headerShown: false,
         }}
       />
 
       <View style={{ flex: 1 }}>
-        <SetlistList
+        <ParallaxSetlistList
           setlists={setlists}
           isPlaceholderData={isPlaceholderData}
           nextPage={data?.nextPage}

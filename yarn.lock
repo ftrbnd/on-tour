@@ -8310,6 +8310,11 @@ react-native-screens@~3.29.0:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
+react-native-sticky-parallax-header@^1.0.0-rc.9:
+  version "1.0.0-rc.9"
+  resolved "https://registry.yarnpkg.com/react-native-sticky-parallax-header/-/react-native-sticky-parallax-header-1.0.0-rc.9.tgz#86005f2c3ec4e71b6549c2ef0812d9f9b42bd3f6"
+  integrity sha512-dT58HeJxnxUumplgOciegPRSFuFl8c2/pgNR+GEY179CcKnwsyJFmT2T9FcN4Klv11EHzKY21RGHJkLw27Tlyw==
+
 react-native-tab-view@^3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/react-native-tab-view/-/react-native-tab-view-3.5.2.tgz#2789b8af6148b16835869566bf13dc3b0e6c1b46"
