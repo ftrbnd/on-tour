@@ -1,23 +1,20 @@
 import { Ionicons } from "@expo/vector-icons";
-import { FlashList } from "@shopify/flash-list";
 import { openBrowserAsync } from "expo-web-browser";
 import { useState } from "react";
-import { TouchableOpacity } from "react-native";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { Divider, List, Menu, IconButton, Avatar, Text } from "react-native-paper";
+import { Gesture, GestureDetector, TouchableOpacity } from "react-native-gesture-handler";
+import { List, Menu, IconButton, Avatar, Text } from "react-native-paper";
 
-import useSetlist from "@/src/hooks/useSetlist";
 import { Song } from "@/src/utils/setlist-fm-types";
 import { Image } from "@/src/utils/spotify-types";
 
-interface SongItemProps {
+interface Props {
   item: Song;
   loading: boolean;
   image: Image | null | undefined;
   link: string | null | undefined;
 }
 
-function SongItem({ item, loading, image, link }: SongItemProps) {
+export default function SongItem({ item, loading, image, link }: Props) {
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
   const [menuMessage, setMenuMessage] = useState<string>("");
 
@@ -73,30 +70,5 @@ function SongItem({ item, loading, image, link }: SongItemProps) {
         />
       </TouchableOpacity>
     </GestureDetector>
-  );
-}
-
-export default function SongsList({ setlistId }: { setlistId: string }) {
-  const setlist = useSetlist(setlistId);
-
-  return (
-    <FlashList
-      estimatedItemSize={75}
-      contentContainerStyle={{ padding: 8 }}
-      data={setlist.songs}
-      renderItem={({ item, index }) => (
-        <SongItem
-          item={item}
-          loading={setlist.spotifyTracksLoading}
-          image={setlist.spotifyTracks
-            ?.map((track) => (track ? track.album.images[0] : null))
-            .at(index)}
-          link={setlist.spotifyTracks
-            .map((track) => (track ? track.external_urls.spotify : null))
-            .at(index)}
-        />
-      )}
-      ItemSeparatorComponent={() => <Divider />}
-    />
   );
 }

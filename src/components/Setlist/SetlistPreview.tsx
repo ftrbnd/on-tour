@@ -15,14 +15,19 @@ const styles = StyleSheet.create({
 interface SetlistProps {
   setlist: Setlist;
   displayArtist?: boolean;
+  artistImage?: string;
 }
 
-export default function SetlistPreview({ setlist, displayArtist }: SetlistProps) {
+export default function SetlistPreview({ setlist, displayArtist, artistImage }: SetlistProps) {
   const router = useRouter();
   const segments = useSegments<NestedSegment>();
 
   const openSetlistPage = () => {
-    router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}`);
+    router.push(
+      !displayArtist
+        ? `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?artistImage=${artistImage}`
+        : `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}`,
+    );
   };
 
   return (

@@ -1,14 +1,12 @@
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams } from "expo-router";
-import moment from "moment";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { Card, FAB, Text, useTheme } from "react-native-paper";
+import { FAB } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
-import SongsList from "@/src/components/Setlist/SongsList";
+import ParallaxSongsList from "@/src/components/Setlist/ParallaxSongsList";
 import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useSetlist from "@/src/hooks/useSetlist";
 
@@ -44,7 +42,6 @@ export default function SetlistPage() {
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
   const setlist = useSetlist(setlistId);
   const { playlistExists } = useCreatedPlaylist({ setlistId });
-  const theme = useTheme();
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
@@ -52,50 +49,12 @@ export default function SetlistPage() {
     <>
       <Stack.Screen
         options={{
-          headerTitle: "Setlist",
-          headerBackVisible: true,
-          headerLeft: () => null,
-          headerRight: () => (
-            <TouchableOpacity onPress={() => setlist.openWebpage()}>
-              <Ionicons name="open-outline" size={24} color={theme.colors.onPrimaryContainer} />
-            </TouchableOpacity>
-          ),
+          headerShown: false,
         }}
       />
 
       <View style={styles.container}>
-        <Card style={{ ...styles.card, backgroundColor: theme.colors.secondaryContainer }}>
-          <TouchableOpacity style={{ paddingBottom: 16 }}>
-            {setlist.data?.artist && (
-              <Card.Title
-                title={setlist.data.artist.name}
-                titleStyle={styles.cardTitle}
-                subtitle={setlist.data.tour?.name}
-                subtitleStyle={setlist.data.tour ? styles.cardTitle : null}
-              />
-            )}
-            <Card.Content style={styles.cardContent}>
-              <View style={styles.detail}>
-                <FontAwesome5 name="building" size={24} color={theme.colors.onSecondaryContainer} />
-                <Text>{`${setlist.data?.venue.name}`}</Text>
-              </View>
-              <View style={styles.detail}>
-                <FontAwesome5 name="city" size={24} color={theme.colors.onSecondaryContainer} />
-                <Text>{`${setlist.data?.venue.city.name}, ${setlist.data?.venue.city.state}, ${setlist.data?.venue.city.country.code}`}</Text>
-              </View>
-              <View style={styles.detail}>
-                <FontAwesome5
-                  name="calendar-day"
-                  size={24}
-                  color={theme.colors.onSecondaryContainer}
-                />
-                <Text>{moment(setlist.data?.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}</Text>
-              </View>
-            </Card.Content>
-          </TouchableOpacity>
-        </Card>
-
-        <SongsList setlistId={setlistId} />
+        <ParallaxSongsList setlistId={setlistId} />
 
         {setlist && playlistExists && playlistExists.length > 0 ? (
           <PlaylistExistsModal

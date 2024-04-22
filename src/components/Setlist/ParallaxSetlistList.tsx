@@ -41,7 +41,7 @@ export default function ParallaxSetlistList({
 
   return (
     <AvatarHeaderFlashList
-      parallaxHeight={220}
+      parallaxHeight={300}
       hasBorderRadius
       leftTopIcon={() => (
         <TouchableOpacity>
@@ -57,15 +57,21 @@ export default function ParallaxSetlistList({
       rightTopIconOnPress={() => (artist ? openBrowserAsync(artist?.external_urls.spotify) : null)}
       backgroundColor={theme.colors.secondaryContainer}
       containerStyle={{ backgroundColor: theme.colors.surface }}
-      image={{ uri: artist?.images[1].url }}
-      title={artist?.name}
+      image={artist && { uri: artist.images[1].url }}
+      title={artist?.name ?? "Artist"}
       titleStyle={{
         color: theme.colors.onSecondaryContainer,
       }}
       estimatedItemSize={150}
       contentContainerStyle={{ padding: 8 }}
       data={setlists}
-      renderItem={({ item }) => <SetlistPreview setlist={item} displayArtist={!artist} />}
+      renderItem={({ item }) => (
+        <SetlistPreview
+          setlist={item}
+          displayArtist={!artist}
+          artistImage={artist?.images[1].url}
+        />
+      )}
       onEndReachedThreshold={nextPage ? 0.5 : null}
       onEndReached={handleEndReached}
       ListEmptyComponent={

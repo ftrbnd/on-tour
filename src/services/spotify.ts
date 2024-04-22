@@ -67,7 +67,7 @@ export async function getRelatedArtists(
 
 export async function searchForArtists(
   token: string | null | undefined,
-  query: string,
+  query: string | undefined,
 ): Promise<Artist[]> {
   try {
     if (!token) throw new Error("Access token required");
