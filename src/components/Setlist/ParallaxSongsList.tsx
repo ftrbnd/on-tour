@@ -1,7 +1,8 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
 import { router, useLocalSearchParams } from "expo-router";
 import moment from "moment";
+import { View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Divider, useTheme } from "react-native-paper";
 import { withDetailsHeaderFlashList } from "react-native-sticky-parallax-header";
@@ -14,7 +15,13 @@ import { Song } from "@/src/utils/setlist-fm-types";
 
 const DetailsHeaderFlashList = withDetailsHeaderFlashList<Song>(FlashList);
 
-export default function ParallaxSongsList({ setlistId }: { setlistId: string }) {
+export default function ParallaxSongsList({
+  setlistId,
+  setDialogVisible,
+}: {
+  setlistId: string;
+  setDialogVisible: (vis: boolean) => void;
+}) {
   const setlist = useSetlist(setlistId);
   const theme = useTheme();
   const { artistImage } = useLocalSearchParams<{ artistImage?: string }>();
@@ -39,11 +46,15 @@ export default function ParallaxSongsList({ setlistId }: { setlistId: string }) 
       )}
       leftTopIconOnPress={router.back}
       rightTopIcon={() => (
-        <TouchableOpacity>
-          <Ionicons name="open-outline" size={24} color={theme.colors.onPrimaryContainer} />
-        </TouchableOpacity>
+        <View style={{ flexDirection: "row", gap: 16 }}>
+          <TouchableOpacity onPress={() => setDialogVisible(true)}>
+            <SimpleLineIcons name="question" size={24} color={theme.colors.onPrimaryContainer} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={setlist.openWebpage}>
+            <Ionicons name="open-outline" size={24} color={theme.colors.onPrimaryContainer} />
+          </TouchableOpacity>
+        </View>
       )}
-      rightTopIconOnPress={setlist.openWebpage}
       backgroundColor={theme.colors.secondaryContainer}
       containerStyle={{ backgroundColor: theme.colors.surface }}
       title={setlist.data?.tour?.name ?? cityAndCountry}

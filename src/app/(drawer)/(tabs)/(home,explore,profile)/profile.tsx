@@ -4,11 +4,12 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
-import { Button, Dialog, List, Portal, Snackbar, Text } from "react-native-paper";
+import { List, Snackbar } from "react-native-paper";
 
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
 import UpcomingShowModal from "@/src/components/UpcomingShow/UpcomingShowModal";
+import InfoDialog from "@/src/components/ui/InfoDialog";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getCreatedPlaylists } from "@/src/services/createdPlaylists";
@@ -24,31 +25,6 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 });
-
-function InfoDialog({
-  visible,
-  setVisible,
-}: {
-  visible: boolean;
-  setVisible: (vis: boolean) => void;
-}) {
-  return (
-    <Portal>
-      <Dialog visible={visible} onDismiss={() => setVisible(false)}>
-        <Dialog.Title>About Spotify's Web API</Dialog.Title>
-        <Dialog.Content>
-          <Text variant="bodyMedium">
-            Spotify's API doesn't allow us to remotely delete playlists - you are only deleting them
-            from our own database. To fully delete the playlist, please go to the Spotify app.
-          </Text>
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={() => setVisible(false)}>OK</Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
-  );
-}
 
 export default function Profile() {
   const { user, session } = useAuth();
@@ -110,7 +86,13 @@ export default function Profile() {
 
       {modalVisible && <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />}
       {infoDialogVisible && (
-        <InfoDialog visible={infoDialogVisible} setVisible={setInfoDialogVisible} />
+        <InfoDialog
+          visible={infoDialogVisible}
+          setVisible={setInfoDialogVisible}
+          title="About Spotify's Web API">
+          Spotify's API doesn't allow us to remotely delete playlists - you are only deleting them
+          from our own database. To fully delete the playlist, please go to the Spotify app.
+        </InfoDialog>
       )}
 
       <Snackbar

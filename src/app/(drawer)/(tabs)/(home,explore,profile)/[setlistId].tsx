@@ -7,6 +7,7 @@ import { FAB } from "react-native-paper";
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
 import ParallaxSongsList from "@/src/components/Setlist/ParallaxSongsList";
+import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useSetlist from "@/src/hooks/useSetlist";
 
@@ -44,6 +45,7 @@ export default function SetlistPage() {
   const { playlistExists } = useCreatedPlaylist({ setlistId });
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
   return (
     <>
@@ -54,7 +56,7 @@ export default function SetlistPage() {
       />
 
       <View style={styles.container}>
-        <ParallaxSongsList setlistId={setlistId} />
+        <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />
 
         {setlist && playlistExists && playlistExists.length > 0 ? (
           <PlaylistExistsModal
@@ -69,6 +71,16 @@ export default function SetlistPage() {
             setVisible={setModalVisible}
             setlistId={setlistId}
           />
+        )}
+
+        {dialogVisible && (
+          <InfoDialog
+            visible={dialogVisible}
+            setVisible={setDialogVisible}
+            title="Not the artist you were expecting?">
+            On Tour searches for setlists through setlist.fm, and will match with any artists whose
+            names are similar.
+          </InfoDialog>
         )}
 
         <FAB
