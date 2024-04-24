@@ -21,7 +21,7 @@ export default function Recent() {
     refetch,
     isRefetching,
   } = useQuery({
-    queryKey: ["recent-shows"],
+    queryKey: ["setlists"],
     queryFn: () => getRecentShows(data?.topArtists),
     enabled: data !== undefined && data.topArtists.length > 0,
   });

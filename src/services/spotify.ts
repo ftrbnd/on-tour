@@ -15,6 +15,7 @@ export async function getTopArtists(
         Authorization: `Bearer ${token}`,
       },
     });
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok) throw new Error(`Failed to fetch your top artists`);
 
     const data: Page<Artist> = await res.json();
@@ -34,6 +35,7 @@ export async function getOneArtist(token: string | null | undefined, id: string)
         Authorization: `Bearer ${token}`,
       },
     });
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok) throw new Error(`Failed to fetch artist with id "${id}"`);
 
     const artist: Artist = await res.json();
@@ -56,6 +58,7 @@ export async function getRelatedArtists(
         Authorization: `Bearer ${token}`,
       },
     });
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok) throw new Error(`Failed to fetch related artists`);
 
     const { artists }: { artists: Artist[] } = await res.json();
@@ -78,6 +81,7 @@ export async function searchForArtists(
         Authorization: `Bearer ${token}`,
       },
     });
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok) throw new Error(`Failed to search for "${query}"`);
 
     const { artists }: { artists: Page<Artist> } = await res.json();
@@ -109,6 +113,7 @@ export async function createPlaylist(
         Authorization: `Bearer ${token}`,
       },
     });
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok) throw new Error(`Failed to create playlist`);
 
     const playlist: Playlist = await res.json();
@@ -139,6 +144,7 @@ export async function getTrackFromSetlistFmSong(
         },
       },
     );
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok) throw new Error(`Failed to search for "${artistToSearch} - ${sanitizedSongName}"`);
 
     const { tracks }: { tracks: Page<Track> } = await res.json();
@@ -173,6 +179,7 @@ export async function addSongsToPlaylist(
         Authorization: `Bearer ${token}`,
       },
     });
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok) throw new Error(`Failed to add tracks to playlist`);
 
     const snapshot: SnapshotReference = await res.json();
@@ -194,6 +201,7 @@ export async function getOnePlaylist(
         Authorization: `Bearer ${token}`,
       },
     });
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok) throw new Error(`Failed to fetch playlist with id "${id}"`);
 
     const playlist: Playlist = await res.json();
@@ -224,6 +232,7 @@ export async function addPlaylistCoverImage(
         Authorization: `Bearer ${token}`,
       },
     });
+    if (res.status === 401) throw new Error("Unauthorized");
     if (!res.ok)
       throw new Error(`Failed to add cover image to playlist with id "${body.playlistId}"`);
 

@@ -62,23 +62,14 @@ export function AuthProvider(props: PropsWithChildren) {
   const redirectURL = Linking.createURL("(auth)/sign-in");
 
   useEffect(() => {
-    updateContext();
-
-    const interval = setInterval(
-      () => {
-        updateContext();
-      },
-      30 * 60 * 1000,
-    ); // 30 minutes
-
-    return () => clearInterval(interval);
+    refreshSession();
   }, []);
 
-  const updateContext = async () => {
+  const refreshSession = async () => {
     try {
       setIsLoading(true);
       const now = new Date();
-      console.log(`Updating context at ${now.toLocaleTimeString()}`);
+      console.log(`Refreshing session at ${now.toLocaleTimeString()}`);
 
       const sessionToken = await SecureStore.getItemAsync("session_token");
 
@@ -129,7 +120,7 @@ export function AuthProvider(props: PropsWithChildren) {
 
       await SecureStore.setItemAsync("session_token", sessionToken);
 
-      await updateContext();
+      await refreshSession();
     } catch (e) {
       console.error(e);
     }
@@ -150,7 +141,7 @@ export function AuthProvider(props: PropsWithChildren) {
 
       await SecureStore.deleteItemAsync("session_token");
 
-      await updateContext();
+      await refreshSession();
     } catch (e) {
       setSession(null);
       setUser(null);
