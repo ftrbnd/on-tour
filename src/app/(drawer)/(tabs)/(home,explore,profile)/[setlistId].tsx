@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
 export default function SetlistPage() {
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
   const setlist = useSetlist(setlistId);
-  const { playlistExists } = useCreatedPlaylist({ setlistId });
+  const { playlists } = useCreatedPlaylist({ setlistId });
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -58,12 +58,12 @@ export default function SetlistPage() {
       <View style={styles.container}>
         <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />
 
-        {setlist && playlistExists && playlistExists.length > 0 ? (
+        {setlist && playlists.length > 0 ? (
           <PlaylistExistsModal
             visible={modalVisible}
             setVisible={setModalVisible}
-            playlistId={playlistExists[0].id}
-            playlistTitle={playlistExists[0].title}
+            playlistId={playlists[0].id}
+            playlistTitle={playlists[0].title}
           />
         ) : (
           <CreatePlaylistModal

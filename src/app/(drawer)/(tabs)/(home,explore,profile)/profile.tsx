@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { View, StyleSheet } from "react-native";
@@ -10,29 +9,17 @@ import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
 import UpcomingShowModal from "@/src/components/UpcomingShow/UpcomingShowModal";
 import InfoDialog from "@/src/components/ui/InfoDialog";
+import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
-import { useAuth } from "@/src/providers/AuthProvider";
-import { getCreatedPlaylists } from "@/src/services/createdPlaylists";
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  headerRight: {
-    marginRight: 16,
-  },
   listItem: {
     padding: 8,
   },
 });
 
 export default function Profile() {
-  const { user, session } = useAuth();
-  const { data: playlists } = useQuery({
-    queryKey: ["created-playlists"],
-    queryFn: () => getCreatedPlaylists(session?.token, user?.id),
-    enabled: user !== null,
-  });
+  const { playlists } = useCreatedPlaylist({});
   const { upcomingShows } = useUpcomingShows();
   const router = useRouter();
 
@@ -41,24 +28,22 @@ export default function Profile() {
   const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
+      {/* TODO: improve page ui */}
       <List.Accordion title={`My Playlists (${playlists?.length ?? 0})`} id="1">
-        {!playlists ||
-          (playlists?.length === 0 && (
-            <List.Item
-              onPress={() => router.replace("/explore")}
-              style={styles.listItem}
-              title="Check out some setlists to get started"
-              titleStyle={{ fontWeight: "bold" }}
-              right={() => (
-                <List.Icon
-                  icon={({ color }) => <Ionicons name="search" size={24} color={color} />}
-                />
-              )}
-            />
-          ))}
+        {playlists.length === 0 && (
+          <List.Item
+            onPress={() => router.replace("/explore")}
+            style={styles.listItem}
+            title="Check out some setlists to get started"
+            titleStyle={{ fontWeight: "bold" }}
+            right={() => (
+              <List.Icon icon={({ color }) => <Ionicons name="search" size={24} color={color} />} />
+            )}
+          />
+        )}
         <FlatList
-          data={playlists ?? []}
+          data={playlists}
           renderItem={({ item }) => (
             <CreatedPlaylistItem playlist={item} showSnackbar={() => setSnackbarVisible(true)} />
           )}

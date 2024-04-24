@@ -8,19 +8,21 @@ import {
   getCreatedPlaylists,
 } from "../services/createdPlaylists";
 
-interface UseCreatedPlaylistProps {
+interface Props {
   playlistId?: string;
   setlistId?: string;
 }
 
-export default function useCreatedPlaylist({ playlistId, setlistId }: UseCreatedPlaylistProps) {
+const QUERY_KEY = "created-playlists";
+
+export default function useCreatedPlaylist({ playlistId, setlistId }: Props) {
   const { session, user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: playlistExists } = useQuery({
-    queryKey: ["created-playlists", setlistId],
+  const { data } = useQuery({
+    queryKey: [QUERY_KEY, setlistId],
     queryFn: () => getCreatedPlaylists(session?.token, user?.id, setlistId),
-    enabled: session !== null && user !== null && setlistId !== undefined,
+    enabled: session !== null && user !== null,
   });
 
   const addToDatabaseMutation = useMutation({
@@ -33,7 +35,7 @@ export default function useCreatedPlaylist({ playlistId, setlistId }: UseCreated
       }),
     onSuccess: async () => {
       console.log("Playlist added to database");
-      await queryClient.invalidateQueries({ queryKey: ["created-playlists"] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
   });
 
@@ -41,8 +43,7 @@ export default function useCreatedPlaylist({ playlistId, setlistId }: UseCreated
     mutationFn: () => deleteCreatedPlaylist(session?.token, user?.id, playlistId),
     onSuccess: async () => {
       console.log("Playlist deleted from database!");
-      await queryClient.invalidateQueries({ queryKey: ["created-playlists"] });
-      await queryClient.invalidateQueries({ queryKey: ["playlist-exists", setlistId] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
     onError: () => {
       console.error("Failed to delete playlist from database");
@@ -52,6 +53,6 @@ export default function useCreatedPlaylist({ playlistId, setlistId }: UseCreated
   return {
     addToDatabase: addToDatabaseMutation.mutateAsync,
     removeFromDatabase: removeFromDatabaseMutation.mutateAsync,
-    playlistExists,
+    playlists: data ?? [],
   };
 }
