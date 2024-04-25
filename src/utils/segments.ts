@@ -1,6 +1,6 @@
 export type Group<T extends string> = `(${T})`;
 
-export type Segment = "home" | "explore" | "profile";
+export type Segment = "home" | "explore" | "library";
 
 export type SharedSegment = Group<Segment>;
 

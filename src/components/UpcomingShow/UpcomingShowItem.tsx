@@ -1,6 +1,5 @@
 import moment from "moment";
 import { useState } from "react";
-import { StyleSheet } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 import { List } from "react-native-paper";
 
@@ -8,12 +7,6 @@ import UpcomingShowModal from "./UpcomingShowModal";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { UpcomingShow } from "../../services/upcomingShows";
 import SwipeableItem from "../ui/SwipeableItem";
-
-const styles = StyleSheet.create({
-  listItem: {
-    padding: 8,
-  },
-});
 
 export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
   const [showImage] = useMMKVString(`upcoming-show-${show.id}-image`);
@@ -29,7 +22,7 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
           description={`${show.venue} / ${show.city} / ${moment(show.date).format("MMMM Do, YYYY")}`}
           titleEllipsizeMode="tail"
           left={() => <List.Icon icon={{ uri: showImage }} />}
-          style={styles.listItem}
+          style={{ padding: 8 }}
         />
       </SwipeableItem>
 

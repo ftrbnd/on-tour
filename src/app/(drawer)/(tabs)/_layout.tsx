@@ -31,15 +31,15 @@ export default function SharedLayout() {
         }}
       />
       <Tabs.Screen
-        name="(profile)"
+        name="(library)"
         options={{
           headerShown: false,
           tabBarShowLabel: false,
           tabBarIcon: ({ focused, color }) =>
             focused ? (
-              <Ionicons name="person" size={24} color={color} />
+              <Ionicons name="library" size={24} color={color} />
             ) : (
-              <Ionicons name="person-outline" size={24} color={color} />
+              <Ionicons name="library-outline" size={24} color={color} />
             ),
         }}
       />

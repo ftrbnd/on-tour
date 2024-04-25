@@ -13,7 +13,7 @@ import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 
-export default function Profile() {
+export default function Library() {
   const { playlists } = useCreatedPlaylist({});
   const { upcomingShows } = useUpcomingShows();
   const router = useRouter();
