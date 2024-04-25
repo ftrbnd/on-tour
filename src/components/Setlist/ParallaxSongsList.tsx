@@ -26,7 +26,7 @@ export default function ParallaxSongsList({
   const theme = useTheme();
   const { artistImage } = useLocalSearchParams<{ artistImage?: string }>();
 
-  const image = { uri: artistImage ?? setlist.spotifyArtist?.images[1].url } ?? ArtistIcon;
+  const image = { uri: artistImage ?? setlist.spotifyArtist?.images[1].url };
 
   const cityAndCountry = setlist.data
     ? `${setlist.data.venue.city.name}, ${setlist.data.venue.city.country.name}`
@@ -60,7 +60,7 @@ export default function ParallaxSongsList({
       title={setlist.data?.tour?.name ?? cityAndCountry}
       titleStyle={{ color: theme.colors.onSecondaryContainer }}
       subtitle={setlist.data?.artist.name ?? "Artist"}
-      image={image}
+      image={image.uri ? image : ArtistIcon}
       tag={setlist.data?.tour ? `${cityAndCountry}\n${venue}` : `${date}\n${venue}`}
       tagStyle={{
         backgroundColor: theme.colors.surface,

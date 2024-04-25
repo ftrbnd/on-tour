@@ -8,6 +8,7 @@ import { withAvatarHeaderFlashList } from "react-native-sticky-parallax-header";
 
 import SetlistPreview from "./SetlistPreview";
 
+import { ArtistIcon } from "@/src/assets/icons";
 import { Setlist } from "@/src/utils/setlist-fm-types";
 import { Artist } from "@/src/utils/spotify-types";
 
@@ -57,7 +58,7 @@ export default function ParallaxSetlistList({
       rightTopIconOnPress={() => (artist ? openBrowserAsync(artist?.external_urls.spotify) : null)}
       backgroundColor={theme.colors.secondaryContainer}
       containerStyle={{ backgroundColor: theme.colors.surface }}
-      image={artist && { uri: artist.images[1].url }}
+      image={artist ? { uri: artist.images[1].url } : ArtistIcon}
       title={artist?.name ?? "Artist"}
       titleStyle={{
         color: theme.colors.onSecondaryContainer,
