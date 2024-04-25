@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
+import { FlashList } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { FlatList } from "react-native-gesture-handler";
-import { List, Snackbar } from "react-native-paper";
+import { View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { Button, Card, IconButton, Snackbar, Text } from "react-native-paper";
 
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
@@ -11,12 +12,6 @@ import UpcomingShowModal from "@/src/components/UpcomingShow/UpcomingShowModal";
 import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
-
-const styles = StyleSheet.create({
-  listItem: {
-    padding: 8,
-  },
-});
 
 export default function Profile() {
   const { playlists } = useCreatedPlaylist({});
@@ -29,45 +24,59 @@ export default function Profile() {
 
   return (
     <View style={{ flex: 1 }}>
-      {/* TODO: improve page ui */}
-      <List.Accordion title={`My Playlists (${playlists?.length ?? 0})`} id="1">
-        {playlists.length === 0 && (
-          <List.Item
-            onPress={() => router.replace("/explore")}
-            style={styles.listItem}
-            title="Check out some setlists to get started"
-            titleStyle={{ fontWeight: "bold" }}
-            right={() => (
-              <List.Icon icon={({ color }) => <Ionicons name="search" size={24} color={color} />} />
-            )}
-          />
-        )}
-        <FlatList
+      <Text variant="headlineSmall" style={{ textAlign: "left", paddingTop: 16, paddingLeft: 16 }}>
+        My Playlists
+      </Text>
+      {playlists.length === 0 ? (
+        <Card style={{ margin: 8 }}>
+          <Card.Actions>
+            <Text>Check out some setlists to get started!</Text>
+            <Button mode="outlined" onPress={() => router.replace("/explore")}>
+              Explore
+            </Button>
+          </Card.Actions>
+        </Card>
+      ) : (
+        <FlashList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          estimatedItemSize={200}
+          contentContainerStyle={{ padding: 8 }}
           data={playlists}
           renderItem={({ item }) => (
             <CreatedPlaylistItem playlist={item} showSnackbar={() => setSnackbarVisible(true)} />
           )}
-          keyExtractor={(item) => item.id}
         />
-      </List.Accordion>
-      <List.Accordion title={`Upcoming Shows (${upcomingShows.length})`} id="2">
-        <List.Item
+      )}
+      <TouchableOpacity>
+        <Button
+          icon={({ color, size }) => <Ionicons name="arrow-forward" color={color} size={size} />}
+          // TODO: create created-playlists page
+          style={{ alignSelf: "flex-end" }}
+          contentStyle={{ flexDirection: "row-reverse" }}>
+          View All
+        </Button>
+      </TouchableOpacity>
+
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+        <Text
+          variant="headlineSmall"
+          style={{
+            textAlign: "left",
+            paddingLeft: 16,
+          }}>
+          My Upcoming Shows
+        </Text>
+        <IconButton
+          icon={({ color, size }) => <Ionicons name="add-circle" color={color} size={size} />}
           onPress={() => setModalVisible(true)}
-          style={styles.listItem}
-          title="Add New"
-          titleStyle={{ fontWeight: "bold" }}
-          right={() => (
-            <List.Icon
-              icon={({ color }) => <Ionicons name="add-circle" size={24} color={color} />}
-            />
-          )}
         />
-        <FlatList
-          data={upcomingShows}
-          renderItem={({ item }) => <UpcomingShowItem show={item} />}
-          keyExtractor={(item) => item.id}
-        />
-      </List.Accordion>
+      </View>
+      <FlashList
+        estimatedItemSize={100}
+        data={upcomingShows}
+        renderItem={({ item }) => <UpcomingShowItem show={item} />}
+      />
 
       {modalVisible && <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />}
       {infoDialogVisible && (
