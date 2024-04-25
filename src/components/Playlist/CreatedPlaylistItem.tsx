@@ -46,7 +46,6 @@ export default function CreatedPlaylistItem({ playlist, showSnackbar }: Props) {
   };
 
   return (
-    // <SwipeableItem onEdit={openWebPage} onDelete={handleDelete}>
     <Menu
       visible={menuVisible}
       onDismiss={() => setMenuVisible(false)}

@@ -10,6 +10,7 @@ import { Platform, StyleSheet, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
 import { Button, Card, Modal, Portal, Text, TextInput, useTheme } from "react-native-paper";
+import Animated, { SlideInDown, SlideOutUp } from "react-native-reanimated";
 
 import useImagePicker from "../../hooks/useImagePicker";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
@@ -69,7 +70,13 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
 
   const dateWithoutTimezone = date.toISOString().substring(0, 10);
   const formattedDate = moment(dateWithoutTimezone).format("MMMM Do, YYYY");
-  const disabled = !artist || !tour || !venue || !city || !date;
+  const noChanges =
+    artist === editingShow?.artist &&
+    tour === editingShow?.tour &&
+    venue === editingShow?.venue &&
+    city === editingShow?.city &&
+    dateWithoutTimezone === editingShow?.date;
+  const disabled = !artist || !tour || !venue || !city || !date || noChanges;
 
   const theme = useTheme();
   const { selectedImage, pickImageAsync, warning } = useImagePicker();
@@ -104,17 +111,7 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
     if (!artist || !tour || !venue || !city || !date || !user?.id) return;
 
     try {
-      if (editingShow) {
-        if (
-          artist === editingShow?.artist &&
-          tour === editingShow?.tour &&
-          venue === editingShow?.venue &&
-          city === editingShow?.city &&
-          dateWithoutTimezone === editingShow?.date
-        ) {
-          return setVisible(false);
-        }
-
+      if (editingShow && !noChanges) {
         await updateShow(
           {
             id: editingShow.id,
@@ -149,85 +146,91 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
 
   return (
     <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={() => setVisible(false)}
-        contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.header}>
-          <Text variant="headlineLarge">Show Details</Text>
-          {selectedImage || previousShowImage ? (
-            <Image
-              onTouchStart={pickImageAsync}
-              source={{
-                uri: selectedImage ? selectedImage.uri : previousShowImage,
-                width: styles.image.width,
-                height: styles.image.height,
-              }}
-              contentFit="cover"
-              style={styles.image}
-              transition={1000}
-            />
-          ) : (
-            <TouchableOpacity
-              onPress={pickImageAsync}
-              style={[styles.image, { backgroundColor: theme.colors.surfaceVariant }]}>
-              <Ionicons
-                name="musical-notes"
-                size={styles.image.height * 0.66}
-                color={theme.colors.secondary}
+      <Animated.View style={{ flex: 1 }} entering={SlideInDown} exiting={SlideOutUp}>
+        <Modal
+          visible={visible}
+          dismissable={false}
+          onDismiss={() => setVisible(false)}
+          contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.background }]}>
+          <View style={styles.header}>
+            <Text variant="headlineLarge">Show Details</Text>
+            {selectedImage || previousShowImage ? (
+              <Image
+                onTouchStart={pickImageAsync}
+                source={{
+                  uri: selectedImage ? selectedImage.uri : previousShowImage,
+                  width: styles.image.width,
+                  height: styles.image.height,
+                }}
+                contentFit="cover"
+                style={styles.image}
+                transition={1000}
               />
-            </TouchableOpacity>
-          )}
-        </View>
-
-        <View style={styles.form}>
-          <TextInput
-            label="Artist"
-            value={artist}
-            onChangeText={(text) => setArtist(text)}
-            multiline
-          />
-          <TextInput label="Tour" value={tour} onChangeText={(text) => setTour(text)} multiline />
-          <TextInput
-            label="Venue"
-            value={venue}
-            onChangeText={(text) => setVenue(text)}
-            multiline
-          />
-          <TextInput label="City" value={city} onChangeText={(text) => setCity(text)} multiline />
-
-          <Card>
-            <TouchableOpacity onPress={handleDatePickerPress}>
-              <Card.Title
-                title={formattedDate}
-                right={() => (
-                  <Ionicons size={24} name="calendar" color={theme.colors.onSurfaceVariant} />
-                )}
-                rightStyle={{ marginRight: 16 }}
-                style={{ backgroundColor: theme.colors.surfaceVariant }}
-              />
-            </TouchableOpacity>
-
-            {Platform.OS === "ios" && showDateTimePicker && (
-              <DateTimePicker
-                testID="dateTimePicker"
-                value={new Date(date)}
-                mode="date"
-                display="spinner"
-                onChange={onDateChange}
-                minimumDate={new Date()}
-              />
+            ) : (
+              <TouchableOpacity
+                onPress={pickImageAsync}
+                style={[styles.image, { backgroundColor: theme.colors.surfaceVariant }]}>
+                <Ionicons
+                  name="musical-notes"
+                  size={styles.image.height * 0.66}
+                  color={theme.colors.secondary}
+                />
+              </TouchableOpacity>
             )}
-          </Card>
-        </View>
+          </View>
 
-        <View style={styles.bottom}>
-          {warning && <Text variant="labelMedium">{warning}</Text>}
-          <Button mode="contained" onPress={handleSave} disabled={disabled}>
-            Save
-          </Button>
-        </View>
-      </Modal>
+          <View style={styles.form}>
+            <TextInput
+              label="Artist"
+              value={artist}
+              onChangeText={(text) => setArtist(text)}
+              multiline
+            />
+            <TextInput label="Tour" value={tour} onChangeText={(text) => setTour(text)} multiline />
+            <TextInput
+              label="Venue"
+              value={venue}
+              onChangeText={(text) => setVenue(text)}
+              multiline
+            />
+            <TextInput label="City" value={city} onChangeText={(text) => setCity(text)} multiline />
+
+            <Card>
+              <TouchableOpacity onPress={handleDatePickerPress}>
+                <Card.Title
+                  title={formattedDate}
+                  right={() => (
+                    <Ionicons size={24} name="calendar" color={theme.colors.onSurfaceVariant} />
+                  )}
+                  rightStyle={{ marginRight: 16 }}
+                  style={{ backgroundColor: theme.colors.surfaceVariant }}
+                />
+              </TouchableOpacity>
+
+              {Platform.OS === "ios" && showDateTimePicker && (
+                <DateTimePicker
+                  testID="dateTimePicker"
+                  value={new Date(date)}
+                  mode="date"
+                  display="spinner"
+                  onChange={onDateChange}
+                  minimumDate={new Date()}
+                />
+              )}
+            </Card>
+          </View>
+
+          <View style={styles.bottom}>
+            {warning && <Text variant="labelMedium">{warning}</Text>}
+            <Button mode="outlined" onPress={() => setVisible(false)}>
+              Cancel
+            </Button>
+            <Button mode="contained" onPress={handleSave} disabled={disabled}>
+              Save
+            </Button>
+          </View>
+        </Modal>
+      </Animated.View>
     </Portal>
   );
 }

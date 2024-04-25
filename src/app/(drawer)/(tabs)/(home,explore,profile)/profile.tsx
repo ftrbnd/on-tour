@@ -22,60 +22,77 @@ export default function Profile() {
   const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
   const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
 
-  return (
-    <View style={{ flex: 1 }}>
-      <Text variant="headlineSmall" style={{ textAlign: "left", paddingTop: 16, paddingLeft: 16 }}>
-        My Playlists
-      </Text>
-      {playlists.length === 0 ? (
-        <Card style={{ margin: 8 }}>
-          <Card.Actions>
-            <Text>Check out some setlists to get started!</Text>
-            <Button mode="outlined" onPress={() => router.replace("/explore")}>
-              Explore
-            </Button>
-          </Card.Actions>
-        </Card>
-      ) : (
-        <FlashList
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          estimatedItemSize={200}
-          contentContainerStyle={{ padding: 8 }}
-          data={playlists}
-          renderItem={({ item }) => (
-            <CreatedPlaylistItem playlist={item} showSnackbar={() => setSnackbarVisible(true)} />
-          )}
-        />
-      )}
-      <TouchableOpacity>
-        <Button
-          icon={({ color, size }) => <Ionicons name="arrow-forward" color={color} size={size} />}
-          // TODO: create created-playlists page
-          style={{ alignSelf: "flex-end" }}
-          contentStyle={{ flexDirection: "row-reverse" }}>
-          View All
-        </Button>
-      </TouchableOpacity>
-
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+  const Header = () => {
+    return (
+      <View style={{ flex: 1 }}>
         <Text
           variant="headlineSmall"
-          style={{
-            textAlign: "left",
-            paddingLeft: 16,
-          }}>
-          My Upcoming Shows
+          style={{ textAlign: "left", paddingTop: 16, paddingLeft: 16 }}>
+          My Playlists
         </Text>
-        <IconButton
-          icon={({ color, size }) => <Ionicons name="add-circle" color={color} size={size} />}
-          onPress={() => setModalVisible(true)}
-        />
+        {playlists.length === 0 ? (
+          <Card style={{ margin: 8 }}>
+            <Card.Actions>
+              <Text>Check out some setlists to get started!</Text>
+              <Button mode="outlined" onPress={() => router.replace("/explore")}>
+                Explore
+              </Button>
+            </Card.Actions>
+          </Card>
+        ) : (
+          <FlashList
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            estimatedItemSize={200}
+            contentContainerStyle={{ padding: 8 }}
+            data={playlists}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <CreatedPlaylistItem playlist={item} showSnackbar={() => setSnackbarVisible(true)} />
+            )}
+          />
+        )}
+        <TouchableOpacity>
+          <Button
+            icon={({ color, size }) => <Ionicons name="arrow-forward" color={color} size={size} />}
+            // TODO: create created-playlists page
+            style={{ alignSelf: "flex-end" }}
+            contentStyle={{ flexDirection: "row-reverse" }}>
+            View All
+          </Button>
+        </TouchableOpacity>
+
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}>
+          <Text
+            variant="headlineSmall"
+            style={{
+              textAlign: "left",
+              paddingLeft: 16,
+            }}>
+            My Upcoming Shows
+          </Text>
+          <IconButton
+            icon={({ color, size }) => <Ionicons name="add-circle" color={color} size={size} />}
+            onPress={() => setModalVisible(true)}
+          />
+        </View>
       </View>
+    );
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
       <FlashList
+        ListHeaderComponent={<Header />}
         estimatedItemSize={100}
         data={upcomingShows}
         renderItem={({ item }) => <UpcomingShowItem show={item} />}
+        keyExtractor={(item) => item.id}
       />
 
       {modalVisible && <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />}
