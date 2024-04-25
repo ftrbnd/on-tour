@@ -70,7 +70,7 @@ export default function ParallaxSongsList({
       contentIcon={PlaylistIcon}
       contentIconNumber={setlist.songs.length}
       contentIconNumberStyle={{
-        color: theme.colors.onSurface,
+        color: "#000",
       }}
       estimatedItemSize={150}
       contentContainerStyle={{ padding: 8 }}

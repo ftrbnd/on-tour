@@ -8,14 +8,9 @@ import {
   getCreatedPlaylists,
 } from "../services/createdPlaylists";
 
-interface Props {
-  playlistId?: string;
-  setlistId?: string;
-}
-
 const QUERY_KEY = "created-playlists";
 
-export default function useCreatedPlaylist({ playlistId, setlistId }: Props) {
+export default function useCreatedPlaylists(playlistId?: string | null, setlistId?: string | null) {
   const { session, user } = useAuth();
   const queryClient = useQueryClient();
 

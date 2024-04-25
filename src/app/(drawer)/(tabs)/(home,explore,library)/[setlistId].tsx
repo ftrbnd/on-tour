@@ -8,7 +8,7 @@ import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
 import ParallaxSongsList from "@/src/components/Setlist/ParallaxSongsList";
 import InfoDialog from "@/src/components/ui/InfoDialog";
-import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
+import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useSetlist from "@/src/hooks/useSetlist";
 
 const styles = StyleSheet.create({
@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
 export default function SetlistPage() {
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
   const setlist = useSetlist(setlistId);
-  const { playlists } = useCreatedPlaylist({ setlistId });
+  const { playlists } = useCreatedPlaylists(null, setlistId);
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);

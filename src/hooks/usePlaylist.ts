@@ -5,7 +5,7 @@ import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
 import { useEffect, useState } from "react";
 
-import useCreatedPlaylist from "./useCreatedPlaylist";
+import useCreatedPlaylists from "./useCreatedPlaylists";
 import useSetlist from "./useSetlist";
 import { useAuth } from "../providers/AuthProvider";
 import {
@@ -30,7 +30,7 @@ export default function usePlaylist(setlistId: string) {
   const { session, user } = useAuth();
 
   const [playlist, setPlaylist] = useState<Playlist<TrackItem> | null>(null);
-  const { addToDatabase } = useCreatedPlaylist({ playlistId: playlist?.id });
+  const { addToDatabase } = useCreatedPlaylists(playlist?.id);
 
   const [name, setName] = useState<string | null>(null);
   const [description, setDescription] = useState<string | null>(null);

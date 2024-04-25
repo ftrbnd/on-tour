@@ -10,11 +10,11 @@ import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
 import UpcomingShowModal from "@/src/components/UpcomingShow/UpcomingShowModal";
 import InfoDialog from "@/src/components/ui/InfoDialog";
-import useCreatedPlaylist from "@/src/hooks/useCreatedPlaylist";
+import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 
 export default function Library() {
-  const { playlists } = useCreatedPlaylist({});
+  const { playlists } = useCreatedPlaylists();
   const { upcomingShows } = useUpcomingShows();
   const router = useRouter();
 

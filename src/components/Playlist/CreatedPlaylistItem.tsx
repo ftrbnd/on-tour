@@ -4,7 +4,7 @@ import { openBrowserAsync } from "expo-web-browser";
 import { useState } from "react";
 import { Card, Menu } from "react-native-paper";
 
-import useCreatedPlaylist from "../../hooks/useCreatedPlaylist";
+import useCreatedPlaylists from "../../hooks/useCreatedPlaylists";
 import { CreatedPlaylist } from "../../services/createdPlaylists";
 
 import { PlaylistIcon } from "@/src/assets/icons";
@@ -19,7 +19,7 @@ interface Props {
 export default function CreatedPlaylistItem({ playlist, showSnackbar }: Props) {
   const [menuVisible, setMenuVisible] = useState<boolean>(false);
 
-  const { removeFromDatabase } = useCreatedPlaylist({ playlistId: playlist.id });
+  const { removeFromDatabase } = useCreatedPlaylists(playlist.id);
   const { session } = useAuth();
 
   const { data: spotifyPlaylist } = useQuery({
