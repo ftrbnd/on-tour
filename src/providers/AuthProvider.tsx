@@ -37,8 +37,9 @@ interface AuthContextProps {
   user: AuthUser | null;
   isLoading: boolean;
   isLoaded: boolean;
-  signIn: () => void;
-  signOut: () => void;
+  refreshSession: () => Promise<void>;
+  signIn: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -46,8 +47,9 @@ const AuthContext = createContext<AuthContextProps>({
   user: null,
   isLoading: false,
   isLoaded: false,
-  signIn: () => {},
-  signOut: () => {},
+  refreshSession: async () => {},
+  signIn: async () => {},
+  signOut: async () => {},
 });
 
 const API_URL = env.EXPO_PUBLIC_FASTIFY_SERVER_URL;
@@ -156,6 +158,7 @@ export function AuthProvider(props: PropsWithChildren) {
         user,
         isLoading,
         isLoaded,
+        refreshSession,
         signIn,
         signOut,
       }}>

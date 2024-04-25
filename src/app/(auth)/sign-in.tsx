@@ -6,9 +6,13 @@ import { Button, Text } from "react-native-paper";
 import { useAuth } from "@/src/providers/AuthProvider";
 
 export default function Login() {
-  const { isLoading, session, signIn } = useAuth();
+  const { isLoading, session, signIn, refreshSession } = useAuth();
 
-  if (session) return <Redirect href="/home" />;
+  if (session) {
+    refreshSession();
+    console.log("refreshed session");
+    return <Redirect href="/home" />;
+  }
 
   return (
     <View style={styles.container}>
