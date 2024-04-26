@@ -6,7 +6,7 @@ import { FAB } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
-import ParallaxSongsList from "@/src/components/Setlist/ParallaxSongsList";
+import ParallaxSongsList from "@/src/components/Song/ParallaxSongsList";
 import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useSetlist from "@/src/hooks/useSetlist";
