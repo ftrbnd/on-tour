@@ -54,6 +54,9 @@ const AuthContext = createContext<AuthContextProps>({
 
 const API_URL = env.EXPO_PUBLIC_FASTIFY_SERVER_URL;
 
+// TODO: Fix
+//  ERROR  Warning: Cannot update a component (`AuthProvider`) while rendering a different component (`Login`). To locate the bad setState() call inside `Login`, follow the stack trace as described in https://react.dev/link/setstate-in-render
+
 export function AuthProvider(props: PropsWithChildren) {
   const [session, setSession] = useState<AuthSession | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);

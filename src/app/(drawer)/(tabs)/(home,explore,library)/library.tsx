@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
-import { useRouter } from "expo-router";
+import { useRouter, useSegments } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -12,11 +12,14 @@ import UpcomingShowModal from "@/src/components/UpcomingShow/UpcomingShowModal";
 import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
+import { NestedSegment } from "@/src/utils/segments";
 
 export default function Library() {
   const { playlists } = useCreatedPlaylists();
   const { upcomingShows } = useUpcomingShows();
   const router = useRouter();
+
+  const segments = useSegments<NestedSegment>();
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
@@ -34,7 +37,7 @@ export default function Library() {
           <Card style={{ margin: 8 }}>
             <Card.Actions>
               <Text>Check out some setlists to get started!</Text>
-              <Button mode="outlined" onPress={() => router.replace("/explore")}>
+              <Button mode="text" onPress={() => router.replace("/explore")}>
                 Explore
               </Button>
             </Card.Actions>
@@ -52,15 +55,21 @@ export default function Library() {
             )}
           />
         )}
-        <TouchableOpacity>
-          <Button
-            icon={({ color, size }) => <Ionicons name="arrow-forward" color={color} size={size} />}
-            // TODO: create created-playlists page
-            style={{ alignSelf: "flex-end" }}
-            contentStyle={{ flexDirection: "row-reverse" }}>
-            View All
-          </Button>
-        </TouchableOpacity>
+        {playlists.length > 0 && (
+          <TouchableOpacity
+            onPress={() =>
+              router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/createdPlaylists`)
+            }>
+            <Button
+              icon={({ color, size }) => (
+                <Ionicons name="arrow-forward" color={color} size={size} />
+              )}
+              style={{ alignSelf: "flex-end" }}
+              contentStyle={{ flexDirection: "row-reverse" }}>
+              View All
+            </Button>
+          </TouchableOpacity>
+        )}
 
         <View
           style={{
