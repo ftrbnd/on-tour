@@ -1,31 +1,37 @@
 import { Entypo } from "@expo/vector-icons";
-import { Redirect } from "expo-router";
-import { StyleSheet, View } from "react-native";
-import { Button, Text } from "react-native-paper";
+import { LinearGradient } from "expo-linear-gradient";
+import { Redirect, useLocalSearchParams } from "expo-router";
+import { StyleSheet } from "react-native";
+import { Button, Text, useTheme } from "react-native-paper";
 
 import { useAuth } from "@/src/providers/AuthProvider";
 
 export default function Login() {
   const { isLoading, session, signIn, refreshSession } = useAuth();
+  const theme = useTheme();
+  const { status }: { status: string } = useLocalSearchParams();
 
-  if (session) {
-    refreshSession();
-    console.log("refreshed session");
-    return <Redirect href="/home" />;
-  }
+  if (status === "401") refreshSession();
+
+  if (session) return <Redirect href="/home" />;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.display}>On Tour</Text>
-      <Text style={styles.paragraph}>Create playlists from your favorite shows</Text>
+    <LinearGradient
+      colors={[theme.colors.secondary, theme.colors.secondaryContainer]}
+      style={styles.container}>
+      <Text style={[styles.display, { color: theme.colors.onSecondary }]}>On Tour</Text>
+      <Text style={[styles.paragraph, { color: theme.colors.onSecondaryContainer }]}>
+        Create playlists from your favorite shows
+      </Text>
       <Button
         loading={isLoading}
         disabled={isLoading}
-        icon={({ color }) => <Entypo name="spotify" size={24} color={color} />}
+        icon={() => <Entypo name="spotify" size={24} color={theme.colors.onSecondaryContainer} />}
+        labelStyle={{ color: theme.colors.onSecondaryContainer }}
         onPress={signIn}>
         {isLoading ? "Authenticating..." : "Sign in with Spotify"}
       </Button>
-    </View>
+    </LinearGradient>
   );
 }
 

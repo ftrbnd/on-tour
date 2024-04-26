@@ -14,8 +14,7 @@ const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: async (error) => {
       if (error.message === "Unauthorized") {
-        console.log("UNAUTHORIZED");
-        router.replace("/(auth)/sign-in");
+        router.replace("/sign-in?status=401");
       }
     },
   }),
