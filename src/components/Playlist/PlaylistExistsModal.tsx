@@ -5,40 +5,6 @@ import { StyleSheet, View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 import { Button, Modal, Portal, Text } from "react-native-paper";
 
-const styles = StyleSheet.create({
-  modal: {
-    backgroundColor: "white",
-    padding: 20,
-    margin: 20,
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    borderRadius: 20,
-  },
-  header: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 100,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    backgroundColor: "lightgray",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  info: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-  },
-});
-
 interface ModalProps {
   visible: boolean;
   setVisible: (vis: boolean) => void;
@@ -103,3 +69,37 @@ export default function PlaylistExistsModal({
     </Portal>
   );
 }
+
+const styles = StyleSheet.create({
+  modal: {
+    backgroundColor: "white",
+    padding: 20,
+    margin: 20,
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 20,
+  },
+  header: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    height: 100,
+  },
+  image: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    backgroundColor: "lightgray",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  info: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
+});

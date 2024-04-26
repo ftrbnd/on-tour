@@ -17,41 +17,6 @@ import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { useAuth } from "../../providers/AuthProvider";
 import { UpcomingShow } from "../../services/upcomingShows";
 
-const styles = StyleSheet.create({
-  modal: {
-    padding: 20,
-    margin: 20,
-    display: "flex",
-    gap: 12,
-    borderRadius: 20,
-  },
-  header: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    height: 75,
-  },
-  image: {
-    width: 75,
-    height: 75,
-    borderRadius: 10,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  form: {
-    display: "flex",
-    gap: 8,
-  },
-  bottom: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-  },
-});
-
 interface ModalProps {
   visible: boolean;
   setVisible: (vis: boolean) => void;
@@ -234,3 +199,38 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
     </Portal>
   );
 }
+
+const styles = StyleSheet.create({
+  modal: {
+    padding: 20,
+    margin: 20,
+    display: "flex",
+    gap: 12,
+    borderRadius: 20,
+  },
+  header: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: 75,
+  },
+  image: {
+    width: 75,
+    height: 75,
+    borderRadius: 10,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  form: {
+    display: "flex",
+    gap: 8,
+  },
+  bottom: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-evenly",
+  },
+});

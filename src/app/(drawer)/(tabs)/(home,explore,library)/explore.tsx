@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { Searchbar } from "react-native-paper";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -8,15 +8,6 @@ import ArtistList from "@/src/components/Artist/ArtistList";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { getRelatedArtists, getTopArtists, searchForArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  list: {
-    padding: 8,
-  },
-});
 
 export default function Explore() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,7 +46,7 @@ export default function Explore() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={{ flex: 1 }}>
       <Searchbar
         style={{ marginTop: 16, marginHorizontal: 16 }}
         placeholder="Search for an artist"

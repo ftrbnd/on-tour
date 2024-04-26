@@ -11,34 +11,6 @@ import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useSetlist from "@/src/hooks/useSetlist";
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    gap: 8,
-    justifyContent: "flex-start",
-  },
-  card: {
-    margin: 8,
-  },
-  cardTitle: { fontWeight: "bold", textAlign: "center" },
-  cardContent: {
-    display: "flex",
-    gap: 8,
-  },
-  detail: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  fab: {
-    position: "absolute",
-    margin: 16,
-    right: 0,
-    bottom: 0,
-  },
-});
-
 export default function SetlistPage() {
   const { setlistId }: { setlistId: string } = useLocalSearchParams();
   const setlist = useSetlist(setlistId);
@@ -93,3 +65,17 @@ export default function SetlistPage() {
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    gap: 8,
+    justifyContent: "flex-start",
+  },
+  fab: {
+    position: "absolute",
+    margin: 16,
+    right: 0,
+    bottom: 0,
+  },
+});

@@ -13,43 +13,6 @@ import usePlaylist from "../../hooks/usePlaylist";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { UpcomingShow } from "../../services/upcomingShows";
 
-const styles = StyleSheet.create({
-  modal: {
-    padding: 20,
-    margin: 20,
-    display: "flex",
-    gap: 12,
-    borderRadius: 20,
-  },
-  header: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    height: 75,
-  },
-  image: {
-    width: 75,
-    height: 75,
-    borderRadius: 10,
-    backgroundColor: "lightgray",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  pickerContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "stretch",
-  },
-  bottom: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-  },
-});
-
 interface ModalProps {
   visible: boolean;
   setVisible: (vis: boolean) => void;
@@ -174,3 +137,40 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
     </Portal>
   );
 }
+
+const styles = StyleSheet.create({
+  modal: {
+    padding: 20,
+    margin: 20,
+    display: "flex",
+    gap: 12,
+    borderRadius: 20,
+  },
+  header: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    height: 75,
+  },
+  image: {
+    width: 75,
+    height: 75,
+    borderRadius: 10,
+    backgroundColor: "lightgray",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  pickerContainer: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "stretch",
+  },
+  bottom: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+  },
+});

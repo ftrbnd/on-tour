@@ -1,16 +1,9 @@
 import { useRouter, useSegments } from "expo-router";
 import moment from "moment";
-import { StyleSheet } from "react-native";
 import { Card, Text } from "react-native-paper";
 
 import { NestedSegment } from "../../utils/segments";
 import { Setlist } from "../../utils/setlist-fm-types";
-
-const styles = StyleSheet.create({
-  card: {
-    margin: 4,
-  },
-});
 
 interface SetlistProps {
   setlist: Setlist;
@@ -31,7 +24,7 @@ export default function SetlistPreview({ setlist, displayArtist, artistImage }: 
   };
 
   return (
-    <Card style={styles.card} onPress={openSetlistPage}>
+    <Card style={{ margin: 4 }} onPress={openSetlistPage}>
       <Card.Content>
         {displayArtist && <Text variant="titleLarge">{setlist.artist.name}</Text>}
         <Text variant="titleMedium">{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>

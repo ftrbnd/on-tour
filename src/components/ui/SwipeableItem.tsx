@@ -3,20 +3,6 @@ import { Animated, StyleSheet, View } from "react-native";
 import { RectButton, Swipeable, TouchableOpacity } from "react-native-gesture-handler";
 import { Text } from "react-native-paper";
 
-const styles = StyleSheet.create({
-  rightAction: {
-    alignItems: "center",
-    flex: 1,
-    justifyContent: "center",
-  },
-  actionText: {
-    color: "white",
-    fontSize: 16,
-    backgroundColor: "transparent",
-    padding: 10,
-  },
-});
-
 function renderRightAction(
   text: string,
   color: string,
@@ -63,3 +49,17 @@ export default function SwipeableItem({
     </Swipeable>
   );
 }
+
+const styles = StyleSheet.create({
+  rightAction: {
+    alignItems: "center",
+    flex: 1,
+    justifyContent: "center",
+  },
+  actionText: {
+    color: "white",
+    fontSize: 16,
+    backgroundColor: "transparent",
+    padding: 10,
+  },
+});

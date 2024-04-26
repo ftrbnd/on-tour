@@ -1,22 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, useSegments } from "expo-router";
-import { StyleSheet } from "react-native";
 import { Avatar, Card, Text } from "react-native-paper";
 
 import { NestedSegment } from "../../utils/segments";
 import { Artist } from "../../utils/spotify-types";
-
-const styles = StyleSheet.create({
-  card: {
-    margin: 8,
-  },
-  title: {
-    marginLeft: 8,
-  },
-  right: {
-    marginRight: 8,
-  },
-});
 
 interface ArtistPreviewProps {
   artist: Artist;
@@ -32,17 +19,17 @@ export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewP
   };
 
   return (
-    <Card style={styles.card} onPress={openArtistPage}>
+    <Card style={{ margin: 8 }} onPress={openArtistPage}>
       <Card.Title
         title={
           <Text variant="titleMedium" numberOfLines={1} ellipsizeMode="head">
             {artist.name}
           </Text>
         }
-        titleStyle={styles.title}
+        titleStyle={{ marginLeft: 8 }}
         left={() => <Avatar.Image size={50} source={{ uri: artist.images[0]?.url ?? "" }} />}
         right={() => (isSearchResult ? <Ionicons size={24} name="arrow-forward-outline" /> : null)}
-        rightStyle={styles.right}
+        rightStyle={{ marginRight: 8 }}
       />
     </Card>
   );
