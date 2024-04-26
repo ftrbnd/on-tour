@@ -82,6 +82,8 @@ function HorizontalPlaylistItem({
   handleDelete,
   spotifyPlaylist,
 }: ItemProps) {
+  const parsedDescription = spotifyPlaylist?.description.replaceAll("&#x2F;", "/") ?? "";
+
   return (
     <Surface style={{ margin: 8, borderRadius: 10 }}>
       <SwipeableItem onEdit={openWebPage} onDelete={handleDelete}>
@@ -98,9 +100,20 @@ function HorizontalPlaylistItem({
             }
             style={{ borderTopLeftRadius: 10, borderBottomLeftRadius: 10, height: 100, width: 100 }}
           />
-          <Text variant="labelMedium" numberOfLines={2} style={{ flex: 1, padding: 8 }}>
-            {playlist.title}
-          </Text>
+          <View style={{ flex: 1 }}>
+            <Text
+              variant="labelLarge"
+              numberOfLines={2}
+              style={{ flex: 1, paddingHorizontal: 8, paddingTop: 8 }}>
+              {playlist.title}
+            </Text>
+            <Text
+              variant="labelSmall"
+              numberOfLines={2}
+              style={{ flex: 1, paddingHorizontal: 8, paddingBottom: 8 }}>
+              {parsedDescription}
+            </Text>
+          </View>
         </View>
       </SwipeableItem>
     </Surface>

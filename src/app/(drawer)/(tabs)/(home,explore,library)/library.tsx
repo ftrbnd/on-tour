@@ -56,19 +56,20 @@ export default function Library() {
           />
         )}
         {playlists.length > 0 && (
-          <TouchableOpacity
-            onPress={() =>
-              router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/createdPlaylists`)
-            }>
-            <Button
-              icon={({ color, size }) => (
-                <Ionicons name="arrow-forward" color={color} size={size} />
-              )}
-              style={{ alignSelf: "flex-end" }}
-              contentStyle={{ flexDirection: "row-reverse" }}>
-              View All
-            </Button>
-          </TouchableOpacity>
+          <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
+            <TouchableOpacity
+              onPress={() =>
+                router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/createdPlaylists`)
+              }>
+              <Button
+                icon={({ color, size }) => (
+                  <Ionicons name="arrow-forward" color={color} size={size} />
+                )}
+                contentStyle={{ flexDirection: "row-reverse" }}>
+                View All
+              </Button>
+            </TouchableOpacity>
+          </View>
         )}
 
         <View
