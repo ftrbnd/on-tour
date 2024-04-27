@@ -26,7 +26,7 @@ export default function ParallaxSongsList({
   const theme = useTheme();
   const { artistImage } = useLocalSearchParams<{ artistImage?: string }>();
 
-  const image = { uri: artistImage ?? setlist.spotifyArtist?.images[1].url };
+  const image = { uri: setlist.spotifyArtist ? setlist.spotifyArtist.images[1].url : artistImage };
 
   const cityAndCountry = setlist.data
     ? `${setlist.data.venue.city.name}, ${setlist.data.venue.city.country.name}`

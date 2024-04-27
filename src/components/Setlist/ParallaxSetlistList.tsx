@@ -9,6 +9,8 @@ import { withAvatarHeaderFlashList } from "react-native-sticky-parallax-header";
 import SetlistPreview from "./SetlistPreview";
 
 import { ArtistIcon } from "@/src/assets/icons";
+import useUpcomingShows from "@/src/hooks/useUpcomingShows";
+import { isUpcomingShow } from "@/src/utils/helpers";
 import { Setlist } from "@/src/utils/setlist-fm-types";
 import { Artist } from "@/src/utils/spotify-types";
 
@@ -35,6 +37,7 @@ export default function ParallaxSetlistList({
   refreshing,
   onRefresh,
 }: Props) {
+  const { upcomingShows } = useUpcomingShows();
   const theme = useTheme();
 
   const handleEndReached = () =>
@@ -71,6 +74,7 @@ export default function ParallaxSetlistList({
           setlist={item}
           displayArtist={!artist}
           artistImage={artist?.images[1].url}
+          isUpcomingShow={isUpcomingShow(item, upcomingShows)}
         />
       )}
       onEndReachedThreshold={nextPage ? 0.5 : null}

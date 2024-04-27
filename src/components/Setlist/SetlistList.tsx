@@ -1,17 +1,17 @@
 import { FlashList } from "@shopify/flash-list";
-import { Button, Card, Text } from "react-native-paper";
+import { Button, Card } from "react-native-paper";
 
 import SetlistPreview from "./SetlistPreview";
 
+import useUpcomingShows from "@/src/hooks/useUpcomingShows";
+import { isUpcomingShow } from "@/src/utils/helpers";
 import { Setlist } from "@/src/utils/setlist-fm-types";
-import { Artist } from "@/src/utils/spotify-types";
 
 interface Props {
   setlists: Setlist[];
   isPlaceholderData?: boolean;
   nextPage?: number;
   setNextPage?: (num: number) => void;
-  artist?: Artist;
   loading?: boolean;
   refreshing?: boolean;
   onRefresh?: () => void;
@@ -22,11 +22,12 @@ export default function SetlistList({
   isPlaceholderData,
   nextPage,
   setNextPage,
-  artist,
   loading,
   refreshing,
   onRefresh,
 }: Props) {
+  const { upcomingShows } = useUpcomingShows();
+
   const handleEndReached = () =>
     !isPlaceholderData && nextPage && setNextPage ? setNextPage(nextPage) : null;
 
@@ -35,35 +36,23 @@ export default function SetlistList({
       estimatedItemSize={150}
       contentContainerStyle={{ padding: 8 }}
       data={setlists}
-      renderItem={({ item }) => <SetlistPreview setlist={item} displayArtist={!artist} />}
+      renderItem={({ item }) => (
+        <SetlistPreview
+          setlist={item}
+          displayArtist
+          isUpcomingShow={isUpcomingShow(item, upcomingShows)}
+        />
+      )}
       onEndReachedThreshold={nextPage ? 0.5 : null}
       onEndReached={handleEndReached}
-      ListHeaderComponent={
-        artist ? (
-          <Card.Cover
-            source={{ uri: artist.images[1].url }}
-            style={{ borderRadius: 0, marginHorizontal: -8, marginTop: -8, marginBottom: 8 }}
-          />
-        ) : null
-      }
       ListEmptyComponent={
-        loading ? (
-          <Card>
-            <Card.Content>
-              <Button loading={loading} disabled>
-                Loading...
-              </Button>
-            </Card.Content>
-          </Card>
-        ) : artist ? (
-          <Card>
-            <Card.Content>
-              <Text variant="titleSmall" style={{ textAlign: "center" }}>
-                {artist && !loading ? "No setlists were found for this artist." : "Loading..."}
-              </Text>
-            </Card.Content>
-          </Card>
-        ) : null
+        <Card>
+          <Card.Content>
+            <Button loading={loading} disabled>
+              {loading ? "Loading..." : "No setlists were found."}
+            </Button>
+          </Card.Content>
+        </Card>
       }
       refreshing={refreshing}
       onRefresh={onRefresh}

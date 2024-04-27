@@ -1,6 +1,7 @@
 import { Entypo } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { Redirect, useLocalSearchParams } from "expo-router";
+import { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { Button, Text, useTheme } from "react-native-paper";
 
@@ -11,7 +12,9 @@ export default function Login() {
   const theme = useTheme();
   const { status }: { status: string } = useLocalSearchParams();
 
-  if (status === "401") refreshSession();
+  useEffect(() => {
+    if (status === "401") refreshSession();
+  }, [status]);
 
   if (session) return <Redirect href="/home" />;
 
