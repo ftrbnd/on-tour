@@ -27,7 +27,7 @@ export default function SetlistPage() {
         }}
       />
 
-      <View style={styles.container}>
+      <View style={{ flex: 1 }}>
         <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />
 
         {setlist && playlists.length > 0 ? (

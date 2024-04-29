@@ -1,12 +1,13 @@
 import { Entypo } from "@expo/vector-icons";
 import { openBrowserAsync } from "expo-web-browser";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-import { Button, Modal, Portal, Text, useTheme } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 
 import PlaylistImage from "./PlaylistImage";
+import AnimatedModal from "../ui/AnimatedModal";
 
-interface ModalProps {
+interface Props {
   visible: boolean;
   setVisible: (vis: boolean) => void;
   playlistId: string | null;
@@ -18,9 +19,8 @@ export default function PlaylistExistsModal({
   setVisible,
   playlistId,
   playlistTitle,
-}: ModalProps) {
+}: Props) {
   const [playlistImage] = useMMKVString(`playlist-${playlistId}-image`);
-  const theme = useTheme();
 
   const openWebPage = async () => {
     try {
@@ -31,51 +31,29 @@ export default function PlaylistExistsModal({
   };
 
   return (
-    <Portal>
-      <Modal
-        visible={visible}
-        onDismiss={() => setVisible(false)}
-        contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.background }]}>
-        <View style={styles.header}>
+    <AnimatedModal
+      visible={visible}
+      setVisible={setVisible}
+      header={
+        <>
+          <View />
           <PlaylistImage showImage={playlistImage !== undefined} uri={playlistImage} />
-        </View>
-
+          <View />
+        </>
+      }
+      body={
         <Text variant="labelLarge" style={{ fontWeight: "bold", textAlign: "center" }}>
           {playlistTitle}
         </Text>
-
-        <View style={styles.info}>
-          <Button
-            mode="contained"
-            onPress={openWebPage}
-            icon={({ color }) => <Entypo name="spotify" size={24} color={color} />}>
-            View your playlist
-          </Button>
-        </View>
-      </Modal>
-    </Portal>
+      }
+      footer={
+        <Button
+          mode="contained"
+          onPress={openWebPage}
+          icon={({ color }) => <Entypo name="spotify" size={24} color={color} />}>
+          View your playlist
+        </Button>
+      }
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  modal: {
-    padding: 20,
-    margin: 20,
-    display: "flex",
-    gap: 12,
-    borderRadius: 20,
-  },
-  header: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 100,
-  },
-  info: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-evenly",
-  },
-});
