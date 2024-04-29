@@ -3,7 +3,6 @@ import DateTimePicker, {
   DateTimePickerAndroid,
   DateTimePickerEvent,
 } from "@react-native-community/datetimepicker";
-import { Image } from "expo-image";
 import moment from "moment";
 import { useState } from "react";
 import { Platform, StyleSheet, View } from "react-native";
@@ -16,6 +15,7 @@ import useImagePicker from "../../hooks/useImagePicker";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { useAuth } from "../../providers/AuthProvider";
 import { UpcomingShow } from "../../services/upcomingShows";
+import PlaylistImage from "../Playlist/PlaylistImage";
 
 interface ModalProps {
   visible: boolean;
@@ -119,29 +119,11 @@ export default function UpcomingShowModal({ visible, setVisible, editingShow }: 
           contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.background }]}>
           <View style={styles.header}>
             <Text variant="headlineLarge">Show Details</Text>
-            {selectedImage || previousShowImage ? (
-              <Image
-                onTouchStart={pickImageAsync}
-                source={{
-                  uri: selectedImage ? selectedImage.uri : previousShowImage,
-                  width: styles.image.width,
-                  height: styles.image.height,
-                }}
-                contentFit="cover"
-                style={styles.image}
-                transition={1000}
-              />
-            ) : (
-              <TouchableOpacity
-                onPress={pickImageAsync}
-                style={[styles.image, { backgroundColor: theme.colors.surfaceVariant }]}>
-                <Ionicons
-                  name="musical-notes"
-                  size={styles.image.height * 0.66}
-                  color={theme.colors.secondary}
-                />
-              </TouchableOpacity>
-            )}
+            <PlaylistImage
+              showImage={selectedImage !== null || previousShowImage !== undefined}
+              onPress={pickImageAsync}
+              uri={selectedImage ? selectedImage.uri : previousShowImage}
+            />
           </View>
 
           <View style={styles.form}>
@@ -214,14 +196,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     height: 75,
-  },
-  image: {
-    width: 75,
-    height: 75,
-    borderRadius: 10,
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
   },
   form: {
     display: "flex",

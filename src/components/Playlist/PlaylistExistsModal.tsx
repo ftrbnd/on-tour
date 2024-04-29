@@ -1,9 +1,10 @@
-import { Entypo, Ionicons } from "@expo/vector-icons";
-import { Image } from "expo-image";
+import { Entypo } from "@expo/vector-icons";
 import { openBrowserAsync } from "expo-web-browser";
 import { StyleSheet, View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-import { Button, Modal, Portal, Text } from "react-native-paper";
+import { Button, Modal, Portal, Text, useTheme } from "react-native-paper";
+
+import PlaylistImage from "./PlaylistImage";
 
 interface ModalProps {
   visible: boolean;
@@ -19,6 +20,7 @@ export default function PlaylistExistsModal({
   playlistTitle,
 }: ModalProps) {
   const [playlistImage] = useMMKVString(`playlist-${playlistId}-image`);
+  const theme = useTheme();
 
   const openWebPage = async () => {
     try {
@@ -33,27 +35,12 @@ export default function PlaylistExistsModal({
       <Modal
         visible={visible}
         onDismiss={() => setVisible(false)}
-        contentContainerStyle={styles.modal}>
+        contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.background }]}>
         <View style={styles.header}>
-          {playlistImage ? (
-            <Image
-              source={{
-                uri: playlistImage,
-                width: styles.image.width,
-                height: styles.image.height,
-              }}
-              contentFit="cover"
-              style={styles.image}
-              transition={1000}
-            />
-          ) : (
-            <View style={styles.image}>
-              <Ionicons name="musical-notes" size={styles.image.height * 0.66} color="black" />
-            </View>
-          )}
+          <PlaylistImage showImage={playlistImage !== undefined} uri={playlistImage} />
         </View>
 
-        <Text variant="labelLarge" style={{ fontWeight: "bold" }}>
+        <Text variant="labelLarge" style={{ fontWeight: "bold", textAlign: "center" }}>
           {playlistTitle}
         </Text>
 
@@ -72,11 +59,9 @@ export default function PlaylistExistsModal({
 
 const styles = StyleSheet.create({
   modal: {
-    backgroundColor: "white",
     padding: 20,
     margin: 20,
     display: "flex",
-    alignItems: "center",
     gap: 12,
     borderRadius: 20,
   },
@@ -86,15 +71,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     height: 100,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-    backgroundColor: "lightgray",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
   },
   info: {
     display: "flex",

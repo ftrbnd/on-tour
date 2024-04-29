@@ -1,6 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
-import { Image } from "expo-image";
 import moment from "moment";
 import { useRef, useState } from "react";
 import { StyleSheet, View } from "react-native";
@@ -8,6 +6,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
 import { Button, Modal, Portal, Text, TextInput, useTheme } from "react-native-paper";
 
+import PlaylistImage from "./PlaylistImage";
 import useImagePicker from "../../hooks/useImagePicker";
 import usePlaylist from "../../hooks/usePlaylist";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
@@ -52,29 +51,11 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
         contentContainerStyle={[styles.modal, { backgroundColor: theme.colors.background }]}>
         <View style={styles.header}>
           <Text variant="headlineLarge">Playlist Details</Text>
-          {selectedImage || upcomingImageUri ? (
-            <Image
-              source={{
-                uri: selectedImage ? selectedImage.uri : upcomingImageUri,
-                width: styles.image.width,
-                height: styles.image.height,
-              }}
-              onTouchStart={() => (playlist.mutationsPending ? null : pickImageAsync())}
-              contentFit="cover"
-              style={styles.image}
-              transition={1000}
-            />
-          ) : (
-            <TouchableOpacity
-              onPress={() => (playlist.mutationsPending ? null : pickImageAsync())}
-              style={[styles.image, { backgroundColor: theme.colors.surfaceVariant }]}>
-              <Ionicons
-                name="musical-notes"
-                size={styles.image.height * 0.66}
-                color={theme.colors.secondary}
-              />
-            </TouchableOpacity>
-          )}
+          <PlaylistImage
+            showImage={selectedImage !== null || upcomingImageUri !== undefined}
+            uri={selectedImage ? selectedImage.uri : upcomingImageUri}
+            onPress={() => (playlist.mutationsPending ? null : pickImageAsync())}
+          />
         </View>
 
         <TextInput
