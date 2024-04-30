@@ -27,7 +27,11 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
       </SwipeableItem>
 
       {modalVisible && (
-        <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} editingShow={show} />
+        <UpcomingShowModal
+          visible={modalVisible}
+          setVisible={setModalVisible}
+          existingShow={show}
+        />
       )}
     </>
   );

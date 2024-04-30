@@ -8,7 +8,7 @@ interface Props {
   setVisible: (v: boolean) => void;
   header: ReactNode;
   body?: ReactNode;
-  footer: ReactNode;
+  footer?: ReactNode;
 }
 
 export default function AnimatedModal({ visible, setVisible, header, body, footer }: Props) {
@@ -23,7 +23,7 @@ export default function AnimatedModal({ visible, setVisible, header, body, foote
           style={[styles.modal, { backgroundColor: theme.colors.background }]}>
           <View style={styles.header}>{header}</View>
           {body && <View style={styles.body}>{body}</View>}
-          <View style={styles.footer}>{footer}</View>
+          {footer && <View style={styles.footer}>{footer}</View>}
         </Animated.View>
       </Modal>
     </Portal>
