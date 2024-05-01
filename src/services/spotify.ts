@@ -10,7 +10,7 @@ export async function getTopArtists(
   try {
     if (!token) throw new Error("Access token required");
 
-    const res = await fetch(next ?? `${ENDPOINT}/me/top/artists?limit=10`, {
+    const res = await fetch(next ?? `${ENDPOINT}/me/top/artists?limit=20`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

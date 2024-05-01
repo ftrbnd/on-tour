@@ -9,16 +9,16 @@ import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
 import ParallaxSongsList from "@/src/components/Song/ParallaxSongsList";
 import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
-import useSetlist from "@/src/hooks/useSetlist";
 
 export default function SetlistPage() {
   const { setlistId, isUpcomingShow }: { setlistId: string; isUpcomingShow?: "true" | "false" } =
     useLocalSearchParams();
-  const setlist = useSetlist(setlistId);
   const { playlists } = useCreatedPlaylists(null, setlistId);
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+
+  const playlistExists = playlists.some((playlist) => playlist.setlistId === setlistId);
 
   return (
     <>
@@ -31,7 +31,7 @@ export default function SetlistPage() {
       <View style={{ flex: 1 }}>
         <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />
 
-        {setlist && playlists.length > 0 ? (
+        {playlistExists ? (
           <PlaylistExistsModal
             visible={modalVisible}
             setVisible={setModalVisible}
@@ -69,11 +69,6 @@ export default function SetlistPage() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    gap: 8,
-    justifyContent: "flex-start",
-  },
   fab: {
     position: "absolute",
     margin: 16,
