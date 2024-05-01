@@ -1,5 +1,5 @@
 import { useField } from "formik";
-import { useTheme, Text, TextInput, TextInputProps } from "react-native-paper";
+import { TextInput, TextInputProps, HelperText } from "react-native-paper";
 
 interface FormikTextInputProps extends TextInputProps {
   name: string;
@@ -7,7 +7,6 @@ interface FormikTextInputProps extends TextInputProps {
 }
 
 export default function FormikTextInput({ name, placeholder, ...props }: FormikTextInputProps) {
-  const theme = useTheme();
   const [field, meta, helpers] = useField<string>(name);
   const showError = meta.touched && meta.error !== undefined;
 
@@ -21,9 +20,10 @@ export default function FormikTextInput({ name, placeholder, ...props }: FormikT
         placeholder={placeholder}
         error={showError}
         multiline
+        style={{ marginBottom: showError ? -10 : undefined }}
         {...props}
       />
-      {showError && <Text style={{ color: theme.colors.error }}>{meta.error}</Text>}
+      {showError && <HelperText type="error">{meta.error}</HelperText>}
     </>
   );
 }

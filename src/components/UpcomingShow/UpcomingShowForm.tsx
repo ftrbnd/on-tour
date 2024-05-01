@@ -1,10 +1,13 @@
 import { ImagePickerAsset } from "expo-image-picker";
 import { Formik, useFormikContext } from "formik";
+import moment from "moment";
+import { useMemo } from "react";
 import { View } from "react-native";
 import { Button } from "react-native-paper";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
+import FormikDateInput from "./FormInput/FormikDateInput";
 import FormikTextInput from "./FormInput/FormikTextInput";
 
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
@@ -24,18 +27,10 @@ interface ContainerProps {
 
 type NewUpcomingShow = Omit<UpcomingShow, "id" | "userId">;
 
-const initialEmptyValues: NewUpcomingShow = {
-  artist: "",
-  city: "",
-  date: "",
-  tour: "",
-  venue: "",
-};
-
 const validationSchema = z.object({
   artist: z.string().trim().min(1, { message: "Required" }),
   city: z.string().trim().min(1, { message: "Required" }),
-  date: z.string().trim().min(1, { message: "Required" }),
+  date: z.string().trim().date(),
   tour: z
     .string()
     .trim()
@@ -47,14 +42,13 @@ function Form({ onSubmit, dismissModal }: FormProps) {
   const { dirty, errors, isSubmitting, isValidating } = useFormikContext<NewUpcomingShow>();
   const noErrors = JSON.stringify(errors) === "{}";
 
-  console.log(errors);
-
   return (
     <>
       <FormikTextInput name="artist" placeholder="Artist" autoCorrect={false} />
       <FormikTextInput name="tour" placeholder="Tour" autoCorrect={false} />
       <FormikTextInput name="venue" placeholder="Venue" autoCorrect={false} />
       <FormikTextInput name="city" placeholder="City" autoCorrect={false} />
+      <FormikDateInput name="date" />
 
       <View
         style={{
@@ -83,6 +77,17 @@ export default function UpcomingShowForm({
 }: ContainerProps) {
   const { addShow, updateShow } = useUpcomingShows();
   const { user } = useAuth();
+
+  const today = new Date();
+  const initialEmptyValues: NewUpcomingShow = useMemo(() => {
+    return {
+      artist: "",
+      city: "",
+      date: moment(today).format("YYYY-MM-DD"),
+      tour: "",
+      venue: "",
+    };
+  }, [today]);
 
   const handleSubmit = async (values: NewUpcomingShow) => {
     if (!user?.id) return;
