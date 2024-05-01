@@ -95,12 +95,8 @@ export default function UpcomingShowForm({
     try {
       const submission = {
         show: {
+          ...values,
           userId: user.id,
-          artist: values.artist,
-          tour: values.tour,
-          venue: values.venue,
-          city: values.city,
-          date: values.date,
         },
         selectedImage,
       };

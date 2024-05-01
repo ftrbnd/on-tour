@@ -27,8 +27,8 @@ export default function SetlistPreview({
   const openSetlistPage = () => {
     router.push(
       !displayArtist
-        ? `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?artistImage=${artistImage}`
-        : `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}`,
+        ? `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?artistImage=${artistImage}&isUpcomingShow=${isUpcomingShow}`
+        : `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?isUpcomingShow=${isUpcomingShow}`,
     );
   };
 

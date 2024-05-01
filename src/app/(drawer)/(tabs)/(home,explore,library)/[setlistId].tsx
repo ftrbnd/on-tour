@@ -12,7 +12,8 @@ import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useSetlist from "@/src/hooks/useSetlist";
 
 export default function SetlistPage() {
-  const { setlistId }: { setlistId: string } = useLocalSearchParams();
+  const { setlistId, isUpcomingShow }: { setlistId: string; isUpcomingShow?: "true" | "false" } =
+    useLocalSearchParams();
   const setlist = useSetlist(setlistId);
   const { playlists } = useCreatedPlaylists(null, setlistId);
 
@@ -42,6 +43,7 @@ export default function SetlistPage() {
             visible={modalVisible}
             setVisible={setModalVisible}
             setlistId={setlistId}
+            isUpcomingShow={isUpcomingShow}
           />
         )}
 
@@ -56,7 +58,7 @@ export default function SetlistPage() {
         )}
 
         <FAB
-          variant="secondary"
+          variant={isUpcomingShow === "true" ? "tertiary" : "secondary"}
           icon={({ color }) => <Ionicons name="cloud-upload" size={24} color={color} />}
           style={styles.fab}
           onPress={() => setModalVisible(true)}

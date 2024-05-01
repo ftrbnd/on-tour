@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import moment from "moment";
 import { useRef, useState } from "react";
@@ -17,9 +18,15 @@ interface ModalProps {
   visible: boolean;
   setVisible: (vis: boolean) => void;
   setlistId: string;
+  isUpcomingShow?: "true" | "false";
 }
 
-export default function CreatePlaylistModal({ visible, setVisible, setlistId }: ModalProps) {
+export default function CreatePlaylistModal({
+  visible,
+  setVisible,
+  setlistId,
+  isUpcomingShow,
+}: ModalProps) {
   const playlist = usePlaylist(setlistId);
   const { selectedImage, setSelectedImage, pickImageAsync, warning } = useImagePicker();
   const theme = useTheme();
@@ -99,6 +106,22 @@ export default function CreatePlaylistModal({ visible, setVisible, setlistId }: 
                   ))}
                 </Picker>
               </TouchableOpacity>
+              {isUpcomingShow === "true" && (
+                <View
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-evenly",
+                    alignItems: "center",
+                    backgroundColor: theme.colors.tertiaryContainer,
+                    borderRadius: 5,
+                    padding: 8,
+                  }}>
+                  <Ionicons name="star" color={theme.colors.onTertiaryContainer} size={18} />
+                  <Text variant="labelMedium" style={{ color: theme.colors.onTertiaryContainer }}>
+                    This was one of your upcoming shows!
+                  </Text>
+                </View>
+              )}
             </View>
           )}
         </>
