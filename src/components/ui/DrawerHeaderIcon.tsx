@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { DrawerActions } from "@react-navigation/native";
+import { useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useTheme } from "react-native-paper";
 
 import { useAuth } from "@/src/providers/AuthProvider";
 
@@ -15,6 +15,7 @@ export default function DrawerHeaderIcon({ marginLeft }: { marginLeft?: number }
   const navigation = useNavigation();
   const { user } = useAuth();
   const theme = useTheme();
+
   return (
     <TouchableOpacity>
       {user?.avatar && !marginLeft ? (
@@ -37,7 +38,7 @@ export default function DrawerHeaderIcon({ marginLeft }: { marginLeft?: number }
           name="menu"
           size={24}
           style={{ marginLeft }}
-          color={theme.colors.onBackground}
+          color={theme["color-primary-default"]}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
       )}

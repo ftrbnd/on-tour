@@ -1,5 +1,5 @@
-import { ReactNode } from "react";
-import { Dialog, Portal, Text, Button } from "react-native-paper";
+import { Button, Layout, Modal, Text } from "@ui-kitten/components";
+import { ReactElement } from "react";
 
 export default function InfoDialog({
   visible,
@@ -10,19 +10,27 @@ export default function InfoDialog({
   visible: boolean;
   setVisible: (vis: boolean) => void;
   title: string;
-  children: ReactNode;
+  children: ReactElement;
 }) {
   return (
-    <Portal>
-      <Dialog visible={visible} onDismiss={() => setVisible(false)}>
-        <Dialog.Title>{title}</Dialog.Title>
-        <Dialog.Content>
-          <Text variant="bodyMedium">{children}</Text>
-        </Dialog.Content>
-        <Dialog.Actions>
-          <Button onPress={() => setVisible(false)}>OK</Button>
-        </Dialog.Actions>
-      </Dialog>
-    </Portal>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      onBackdropPress={() => setVisible(false)}
+      backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+      <Layout style={{ padding: 16, gap: 32, borderRadius: 10 }}>
+        <Text category="h5">{title}</Text>
+        <Layout>
+          <Text category="p1">{children}</Text>
+        </Layout>
+        <Layout>
+          <Button
+            onPress={() => setVisible(false)}
+            style={{ alignSelf: "flex-end", paddingHorizontal: 16 }}>
+            OK
+          </Button>
+        </Layout>
+      </Layout>
+    </Modal>
   );
 }
