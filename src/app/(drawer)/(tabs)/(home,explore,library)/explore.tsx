@@ -62,6 +62,7 @@ export default function Explore() {
         showsVerticalScrollIndicator={searchResults.length > 0}
         onRefresh={() => (searchResults.length > 0 ? null : refetch())}
         refreshing={isRefetching}
+        isSearchResult={searchResults.length > 0}
       />
     </View>
   );
