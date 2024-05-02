@@ -31,8 +31,8 @@ export default function PlaylistImage({ showImage, uri, onPress }: Props) {
       style={[styles.image, { backgroundColor: theme["color-primary-200"] }]}>
       <Icon
         name="music"
+        fill={theme["text-basic-color"]}
         style={{
-          color: theme["color-primary-200"],
           height: styles.image.height * 0.66,
           width: styles.image.width * 0.66,
         }}
