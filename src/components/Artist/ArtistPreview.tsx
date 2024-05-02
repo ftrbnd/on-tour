@@ -1,4 +1,4 @@
-import { Avatar, Card, Icon, Layout, Text } from "@ui-kitten/components";
+import { Avatar, Card, Icon, Text } from "@ui-kitten/components";
 import { useRouter, useSegments } from "expo-router";
 import { View } from "react-native";
 
@@ -35,12 +35,7 @@ export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewP
           </Text>
         </View>
 
-        {/* TODO: fix icon visibility */}
-        {isSearchResult && (
-          <Layout style={{ padding: 8, borderWidth: 1, borderColor: "red" }}>
-            <Icon name="arrow-forward-outline" />
-          </Layout>
-        )}
+        {isSearchResult && <Icon name="chevron-right-outline" style={{ height: 24, width: 24 }} />}
       </View>
     </Card>
   );
