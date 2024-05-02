@@ -1,7 +1,8 @@
 import { FlashList } from "@shopify/flash-list";
-import { Button, Card } from "react-native-paper";
+import { Button, Card } from "@ui-kitten/components";
 
 import SetlistPreview from "./SetlistPreview";
+import LoadingIndicator from "../ui/LoadingIndicator";
 
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { isUpcomingShow } from "@/src/utils/helpers";
@@ -47,11 +48,9 @@ export default function SetlistList({
       onEndReached={handleEndReached}
       ListEmptyComponent={
         <Card>
-          <Card.Content>
-            <Button loading={loading} disabled>
-              {loading ? "Loading..." : "No setlists were found."}
-            </Button>
-          </Card.Content>
+          <Button disabled accessoryLeft={LoadingIndicator}>
+            {loading ? "Loading..." : "No setlists were found."}
+          </Button>
         </Card>
       }
       refreshing={refreshing}
