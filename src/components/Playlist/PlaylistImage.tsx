@@ -1,8 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Icon, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useTheme } from "react-native-paper";
 
 interface Props {
   showImage: boolean;
@@ -26,13 +25,17 @@ export default function PlaylistImage({ showImage, uri, onPress }: Props) {
       transition={1000}
     />
   ) : (
+    // TODO: onPress doesn't register
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.image, { backgroundColor: theme.colors.surfaceVariant }]}>
-      <Ionicons
-        name="musical-notes"
-        size={styles.image.height * 0.66}
-        color={theme.colors.secondary}
+      style={[styles.image, { backgroundColor: theme["color-primary-200"] }]}>
+      <Icon
+        name="music"
+        style={{
+          color: theme["color-primary-200"],
+          height: styles.image.height * 0.66,
+          width: styles.image.width * 0.66,
+        }}
       />
     </TouchableOpacity>
   );

@@ -1,11 +1,10 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { Button, Icon, Input, Text, useTheme } from "@ui-kitten/components";
 import moment from "moment";
 import { useRef, useState } from "react";
 import { View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
-import { Button, Text, TextInput, useTheme } from "react-native-paper";
 
 import PlaylistImage from "./PlaylistImage";
 import useImagePicker from "../../hooks/useImagePicker";
@@ -13,6 +12,7 @@ import usePlaylist from "../../hooks/usePlaylist";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { UpcomingShow } from "../../services/upcomingShows";
 import AnimatedModal from "../ui/AnimatedModal";
+import LoadingIndicator from "../ui/LoadingIndicator";
 
 interface ModalProps {
   visible: boolean;
@@ -57,7 +57,7 @@ export default function CreatePlaylistModal({
       setVisible={setVisible}
       header={
         <>
-          <Text variant="headlineLarge">Playlist Details</Text>
+          <Text category="h2">Playlist Details</Text>
           <PlaylistImage
             showImage={selectedImage !== null || upcomingImageUri !== undefined}
             uri={selectedImage ? selectedImage.uri : upcomingImageUri}
@@ -67,14 +67,16 @@ export default function CreatePlaylistModal({
       }
       body={
         <>
-          <TextInput
+          <Input
             label="Name"
+            placeholder="Name"
             value={playlist.name ?? ""}
             onChangeText={(text) => playlist.setName(text)}
             multiline
           />
-          <TextInput
+          <Input
             label="Description"
+            placeholder="Description"
             value={playlist.description ?? ""}
             onChangeText={(text) => playlist.setDescription(text)}
             multiline
@@ -87,11 +89,7 @@ export default function CreatePlaylistModal({
                 <Picker
                   ref={pickerRef}
                   selectedValue={selectedShow}
-                  onValueChange={(item) => handleSelection(item)}
-                  style={{
-                    color: theme.colors.onBackground,
-                    backgroundColor: theme.colors.background,
-                  }}>
+                  onValueChange={(item) => handleSelection(item)}>
                   <Picker.Item
                     label="Import an upcoming show"
                     enabled={false}
@@ -106,20 +104,18 @@ export default function CreatePlaylistModal({
                   ))}
                 </Picker>
               </TouchableOpacity>
-              {isUpcomingShow === "true" && (
+              {true && (
                 <View
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-evenly",
                     alignItems: "center",
-                    backgroundColor: theme.colors.tertiaryContainer,
                     borderRadius: 5,
                     padding: 8,
+                    backgroundColor: theme["color-info-200"],
                   }}>
-                  <Ionicons name="star" color={theme.colors.onTertiaryContainer} size={18} />
-                  <Text variant="labelMedium" style={{ color: theme.colors.onTertiaryContainer }}>
-                    This was one of your upcoming shows!
-                  </Text>
+                  <Icon name="star" style={{ height: 24, width: 24 }} />
+                  <Text category="label">This was one of your upcoming shows!</Text>
                 </View>
               )}
             </View>
@@ -128,19 +124,20 @@ export default function CreatePlaylistModal({
       }
       footer={
         <>
-          {warning && <Text variant="labelMedium">{warning}</Text>}
+          {warning && <Text category="label">{warning}</Text>}
 
           {selectedShow && (
             <Button
+              appearance="outline"
               onPress={resetModal}
               disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
               Reset
             </Button>
           )}
           <Button
+            appearance="filled"
             onPress={() => playlist.startMutations(selectedImage, { uri: upcomingImageUri })}
-            mode="contained"
-            loading={playlist.mutationsPending}
+            accessoryLeft={playlist.mutationsPending ? LoadingIndicator : undefined}
             disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
             {playlist.mutationsPending ? playlist.currentOperation : "Create"}
           </Button>
