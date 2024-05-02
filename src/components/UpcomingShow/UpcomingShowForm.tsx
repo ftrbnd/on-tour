@@ -1,9 +1,9 @@
+import { Button } from "@ui-kitten/components";
 import { ImagePickerAsset } from "expo-image-picker";
 import { Formik, useFormikContext } from "formik";
 import moment from "moment";
 import { useMemo } from "react";
 import { View } from "react-native";
-import { Button } from "react-native-paper";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
@@ -56,11 +56,11 @@ function Form({ onSubmit, dismissModal }: FormProps) {
           justifyContent: "space-evenly",
           alignItems: "center",
         }}>
-        <Button mode="outlined" onPress={dismissModal}>
+        <Button appearance="outline" onPress={dismissModal}>
           Cancel
         </Button>
         <Button
-          mode="contained"
+          appearance="filled"
           onPress={onSubmit}
           disabled={!dirty || !noErrors || isSubmitting || isValidating}>
           Save

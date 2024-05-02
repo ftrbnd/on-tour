@@ -1,6 +1,6 @@
+import { Text } from "@ui-kitten/components";
 import { View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-import { Text, useTheme } from "react-native-paper";
 
 import UpcomingShowForm from "./UpcomingShowForm";
 import useImagePicker from "../../hooks/useImagePicker";
@@ -17,7 +17,6 @@ interface Props {
 export default function UpcomingShowModal({ visible, setVisible, existingShow }: Props) {
   const { selectedImage, pickImageAsync, warning } = useImagePicker();
   const [previousShowImage] = useMMKVString(`upcoming-show-${existingShow?.id}-image`);
-  const theme = useTheme();
 
   return (
     <AnimatedModal
@@ -25,7 +24,7 @@ export default function UpcomingShowModal({ visible, setVisible, existingShow }:
       setVisible={setVisible}
       header={
         <>
-          <Text variant="headlineLarge">Show Details</Text>
+          <Text category="h2">Show Details</Text>
           <View style={{ alignItems: "flex-end", gap: 4 }}>
             <PlaylistImage
               showImage={selectedImage !== null || previousShowImage !== undefined}
@@ -33,7 +32,7 @@ export default function UpcomingShowModal({ visible, setVisible, existingShow }:
               uri={selectedImage ? selectedImage.uri : previousShowImage}
             />
             {warning && (
-              <Text variant="labelSmall" style={{ color: theme.colors.error }}>
+              <Text category="label" status="warning">
                 {warning}
               </Text>
             )}

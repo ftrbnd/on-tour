@@ -1,7 +1,9 @@
+import { Text } from "@ui-kitten/components";
+import { Image } from "expo-image";
 import moment from "moment";
 import { useState } from "react";
+import { View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-import { List } from "react-native-paper";
 
 import UpcomingShowModal from "./UpcomingShowModal";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
@@ -17,13 +19,15 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
   return (
     <>
       <SwipeableItem onEdit={() => setModalVisible(true)} onDelete={() => deleteShow(show)}>
-        <List.Item
-          title={`${show.artist} - ${show.tour}`}
-          description={`${show.venue} / ${show.city} / ${moment(show.date).format("MMMM Do, YYYY")}`}
-          titleEllipsizeMode="tail"
-          left={() => <List.Icon icon={{ uri: showImage }} />}
-          style={{ padding: 8 }}
-        />
+        <View style={{ paddingVertical: 8, paddingHorizontal: 16 }}>
+          {showImage && <Image source={{ uri: showImage }} />}
+          <Text category="h6" ellipsizeMode="tail">
+            {show.artist} - {show.tour}
+          </Text>
+          <Text category="s1" ellipsizeMode="tail">
+            {show.venue} / {show.city} / {moment(show.date).format("MMMM Do, YYYY")}
+          </Text>
+        </View>
       </SwipeableItem>
 
       {modalVisible && (
