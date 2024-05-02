@@ -1,7 +1,6 @@
+import { Modal, useTheme } from "@ui-kitten/components";
 import { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
-import { Modal, Portal, useTheme } from "react-native-paper";
-import Animated, { SlideInDown, SlideOutUp } from "react-native-reanimated";
 
 interface Props {
   visible: boolean;
@@ -15,18 +14,16 @@ export default function AnimatedModal({ visible, setVisible, header, body, foote
   const theme = useTheme();
 
   return (
-    <Portal>
-      <Modal visible={visible} onDismiss={() => setVisible(false)}>
-        <Animated.View
-          entering={SlideInDown}
-          exiting={SlideOutUp}
-          style={[styles.modal, { backgroundColor: theme.colors.background }]}>
-          <View style={styles.header}>{header}</View>
-          {body && <View style={styles.body}>{body}</View>}
-          {footer && <View style={styles.footer}>{footer}</View>}
-        </Animated.View>
-      </Modal>
-    </Portal>
+    <Modal
+      visible={visible}
+      animationType="fade"
+      onBackdropPress={() => setVisible(false)}
+      backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
+      style={[styles.modal, { backgroundColor: theme["background-basic-color-2"] }]}>
+      <View style={styles.header}>{header}</View>
+      {body && <View style={styles.body}>{body}</View>}
+      {footer && <View style={styles.footer}>{footer}</View>}
+    </Modal>
   );
 }
 
