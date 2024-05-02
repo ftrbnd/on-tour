@@ -114,8 +114,14 @@ export default function CreatePlaylistModal({
                     padding: 8,
                     backgroundColor: theme["color-info-200"],
                   }}>
-                  <Icon name="star" style={{ height: 24, width: 24 }} />
-                  <Text category="label">This was one of your upcoming shows!</Text>
+                  <Icon
+                    name="star"
+                    style={{ height: 24, width: 24 }}
+                    fill={theme["text-info-color"]}
+                  />
+                  <Text category="label" style={{ color: theme["text-info-color"] }}>
+                    This was one of your upcoming shows!
+                  </Text>
                 </View>
               )}
             </View>

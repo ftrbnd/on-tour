@@ -1,8 +1,7 @@
-import { Entypo } from "@expo/vector-icons";
+import { Button, Icon, Text, useTheme } from "@ui-kitten/components";
 import { openBrowserAsync } from "expo-web-browser";
 import { View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
-import { Button, Text } from "react-native-paper";
 
 import PlaylistImage from "./PlaylistImage";
 import AnimatedModal from "../ui/AnimatedModal";
@@ -21,6 +20,7 @@ export default function PlaylistExistsModal({
   playlistTitle,
 }: Props) {
   const [playlistImage] = useMMKVString(`playlist-${playlistId}-image`);
+  const theme = useTheme();
 
   const openWebPage = async () => {
     try {
@@ -42,15 +42,21 @@ export default function PlaylistExistsModal({
         </>
       }
       body={
-        <Text variant="labelLarge" style={{ fontWeight: "bold", textAlign: "center" }}>
+        <Text category="s1" style={{ fontWeight: "bold", textAlign: "center" }}>
           {playlistTitle}
         </Text>
       }
       footer={
         <Button
-          mode="contained"
+          appearance="filled"
           onPress={openWebPage}
-          icon={({ color }) => <Entypo name="spotify" size={24} color={color} />}>
+          accessoryLeft={() => (
+            <Icon
+              name="external-link-outline"
+              style={{ height: 24, width: 24 }}
+              fill={theme["text-alternate-color"]}
+            />
+          )}>
           View your playlist
         </Button>
       }
