@@ -1,20 +1,25 @@
-import { Ionicons } from "@expo/vector-icons";
+import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
+import { BottomNavigation, BottomNavigationTab, Icon } from "@ui-kitten/components";
 import { Tabs } from "expo-router";
+
+const BottomTabBar = ({ navigation, state }: BottomTabBarProps) => (
+  <BottomNavigation
+    selectedIndex={state.index}
+    onSelect={(index) => navigation.navigate(state.routeNames[index])}>
+    <BottomNavigationTab icon={<Icon name="home-outline" />} />
+    <BottomNavigationTab icon={<Icon name="search-outline" />} />
+    <BottomNavigationTab icon={<Icon name="book-outline" />} />
+  </BottomNavigation>
+);
 
 export default function SharedLayout() {
   return (
-    <Tabs>
+    <Tabs tabBar={(props) => <BottomTabBar {...props} />}>
       <Tabs.Screen
         name="(home)"
         options={{
           headerShown: false,
           tabBarShowLabel: false,
-          tabBarIcon: ({ focused, color }) =>
-            focused ? (
-              <Ionicons name="home" size={24} color={color} />
-            ) : (
-              <Ionicons name="home-outline" size={24} color={color} />
-            ),
         }}
       />
       <Tabs.Screen
@@ -22,12 +27,6 @@ export default function SharedLayout() {
         options={{
           headerShown: false,
           tabBarShowLabel: false,
-          tabBarIcon: ({ focused, color }) =>
-            focused ? (
-              <Ionicons name="search" size={24} color={color} />
-            ) : (
-              <Ionicons name="search-outline" size={24} color={color} />
-            ),
         }}
       />
       <Tabs.Screen
@@ -35,12 +34,6 @@ export default function SharedLayout() {
         options={{
           headerShown: false,
           tabBarShowLabel: false,
-          tabBarIcon: ({ focused, color }) =>
-            focused ? (
-              <Ionicons name="library" size={24} color={color} />
-            ) : (
-              <Ionicons name="library-outline" size={24} color={color} />
-            ),
         }}
       />
     </Tabs>
