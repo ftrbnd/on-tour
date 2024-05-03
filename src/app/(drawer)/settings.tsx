@@ -4,6 +4,7 @@ import {
   Card,
   Divider,
   Icon,
+  Layout,
   Radio,
   RadioGroup,
   Text,
@@ -21,12 +22,12 @@ import { usePreferredTheme } from "@/src/providers/ThemeProvider";
 
 export default function Settings() {
   return (
-    <View style={{ flex: 1, padding: 16, gap: 32 }}>
+    <Layout level="2" style={{ flex: 1, padding: 16, gap: 32 }}>
       <ProfileCard />
       <Card>
         <ThemeSettings />
       </Card>
-    </View>
+    </Layout>
   );
 }
 
