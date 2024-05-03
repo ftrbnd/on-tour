@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import { Layout } from "@ui-kitten/components";
 import { useState, useEffect } from "react";
-import { View } from "react-native";
 
 import ArtistList from "@/src/components/Artist/ArtistList";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -27,7 +27,7 @@ export default function Following() {
   }, [data?.topArtists]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <Layout level="2" style={{ flex: 1 }}>
       <ArtistList
         artists={topArtists}
         isPlaceholderData={isPlaceholderData}
@@ -36,6 +36,6 @@ export default function Following() {
         onRefresh={refetch}
         refreshing={isRefetching}
       />
-    </View>
+    </Layout>
   );
 }

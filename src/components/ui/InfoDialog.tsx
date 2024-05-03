@@ -10,7 +10,7 @@ export default function InfoDialog({
   visible: boolean;
   setVisible: (vis: boolean) => void;
   title: string;
-  children: ReactElement;
+  children: ReactElement | string;
 }) {
   return (
     <Modal

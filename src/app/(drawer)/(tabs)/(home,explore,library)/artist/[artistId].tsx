@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { Layout } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
 
 import ParallaxSetlistList from "@/src/components/Setlist/ParallaxSetlistList";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -43,7 +43,7 @@ export default function ArtistPage() {
         }}
       />
 
-      <View style={{ flex: 1 }}>
+      <Layout level="2" style={{ flex: 1 }}>
         <ParallaxSetlistList
           setlists={setlists}
           isPlaceholderData={isPlaceholderData}
@@ -54,7 +54,7 @@ export default function ArtistPage() {
           onRefresh={refetch}
           refreshing={isRefetching}
         />
-      </View>
+      </Layout>
     </>
   );
 }

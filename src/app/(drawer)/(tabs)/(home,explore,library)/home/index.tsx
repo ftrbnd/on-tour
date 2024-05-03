@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { View } from "react-native";
+import { Layout } from "@ui-kitten/components";
 
 import SetlistList from "@/src/components/Setlist/SetlistList";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -27,13 +27,13 @@ export default function Recent() {
   });
 
   return (
-    <View style={{ flex: 1 }}>
+    <Layout level="2" style={{ flex: 1 }}>
       <SetlistList
         setlists={recentShows ?? []}
         loading={isLoading}
         onRefresh={refetch}
         refreshing={isRefetching}
       />
-    </View>
+    </Layout>
   );
 }

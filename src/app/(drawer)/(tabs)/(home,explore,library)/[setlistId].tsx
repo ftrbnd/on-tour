@@ -1,7 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Icon, Layout } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { FAB } from "react-native-paper";
 
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
@@ -28,7 +28,7 @@ export default function SetlistPage() {
         }}
       />
 
-      <View style={{ flex: 1 }}>
+      <Layout level="2" style={{ flex: 1 }}>
         <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />
 
         {playlistExists ? (
@@ -59,11 +59,13 @@ export default function SetlistPage() {
 
         <FAB
           variant={isUpcomingShow === "true" ? "tertiary" : "secondary"}
-          icon={({ color }) => <Ionicons name="cloud-upload" size={24} color={color} />}
+          icon={({ color }) => (
+            <Icon name="cloud-upload-outline" style={{ height: 24, width: 24 }} color={color} />
+          )}
           style={styles.fab}
           onPress={() => setModalVisible(true)}
         />
-      </View>
+      </Layout>
     </>
   );
 }
