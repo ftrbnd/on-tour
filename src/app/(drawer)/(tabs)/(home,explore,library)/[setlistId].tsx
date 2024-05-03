@@ -1,8 +1,7 @@
-import { Icon, Layout } from "@ui-kitten/components";
+import { Button, Icon, Layout } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { StyleSheet } from "react-native";
-import { FAB } from "react-native-paper";
+import { Platform, StyleSheet } from "react-native";
 
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
@@ -57,12 +56,9 @@ export default function SetlistPage() {
           </InfoDialog>
         )}
 
-        <FAB
-          variant={isUpcomingShow === "true" ? "tertiary" : "secondary"}
-          icon={({ color }) => (
-            <Icon name="cloud-upload-outline" style={{ height: 24, width: 24 }} color={color} />
-          )}
-          style={styles.fab}
+        <Button
+          accessoryLeft={<Icon name="cloud-upload-outline" />}
+          style={[styles.fab, Platform.OS === "android" ? styles.android : styles.ios]}
           onPress={() => setModalVisible(true)}
         />
       </Layout>
@@ -73,8 +69,21 @@ export default function SetlistPage() {
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    margin: 16,
     right: 0,
     bottom: 0,
+    margin: 16,
+    height: 65,
+    width: 65,
+    borderRadius: 65,
+  },
+  android: {
+    elevation: 4,
+    shadowColor: "#171717",
+  },
+  ios: {
+    shadowColor: "#171717",
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
 });

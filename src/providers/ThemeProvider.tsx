@@ -3,7 +3,6 @@ import { ApplicationProvider, IconRegistry } from "@ui-kitten/components";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { Appearance, ColorSchemeName, useColorScheme } from "react-native";
-import { PaperProvider } from "react-native-paper";
 
 import { storage } from "../utils/mmkv";
 
@@ -41,13 +40,10 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <PreferredThemeContext.Provider value={{ toggleTheme, usingSystemTheme }}>
-      {/* TODO: remove after conversion complete */}
-      <PaperProvider>
-        <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider {...eva} theme={eva[colorScheme ?? "light"]}>
-          {children}
-        </ApplicationProvider>
-      </PaperProvider>
+      <IconRegistry icons={EvaIconsPack} />
+      <ApplicationProvider {...eva} theme={eva[colorScheme ?? "light"]}>
+        {children}
+      </ApplicationProvider>
     </PreferredThemeContext.Provider>
   );
 }
