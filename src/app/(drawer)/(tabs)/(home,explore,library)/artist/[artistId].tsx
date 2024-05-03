@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { Layout } from "@ui-kitten/components";
+import { Layout, useTheme } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -17,6 +18,7 @@ export default function ArtistPage() {
   const { artistId }: { artistId: string } = useLocalSearchParams();
   const { session } = useAuth();
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   const { data: artist } = useQuery({
     queryKey: ["artist", artistId],
@@ -44,6 +46,9 @@ export default function ArtistPage() {
           headerShown: false,
         }}
       />
+
+      <StatusBar backgroundColor={theme["color-primary-default"]} />
+      {/* Android only */}
 
       <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
         <ParallaxSetlistList

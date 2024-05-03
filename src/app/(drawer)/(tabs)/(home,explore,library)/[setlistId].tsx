@@ -1,5 +1,6 @@
-import { Button, Icon, Layout } from "@ui-kitten/components";
+import { Button, Icon, Layout, useTheme } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,6 +16,7 @@ export default function SetlistPage() {
     useLocalSearchParams();
   const { playlists } = useCreatedPlaylists(null, setlistId);
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -28,6 +30,7 @@ export default function SetlistPage() {
           headerShown: false,
         }}
       />
+      <StatusBar backgroundColor={theme["color-primary-default"]} />
 
       <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
         <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />

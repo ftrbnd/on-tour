@@ -1,6 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { Card, Icon, Layout, Text, useTheme } from "@ui-kitten/components";
 import { Stack, router } from "expo-router";
+import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,9 +17,9 @@ const DetailsHeaderFlashList = withDetailsHeaderFlashList<CreatedPlaylist>(Flash
 
 export default function CreatedPlaylistsPage() {
   const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
-  const insets = useSafeAreaInsets();
 
   const { playlists } = useCreatedPlaylists();
+  const insets = useSafeAreaInsets();
   const theme = useTheme();
 
   return (
@@ -28,6 +29,7 @@ export default function CreatedPlaylistsPage() {
           headerShown: false,
         }}
       />
+      <StatusBar backgroundColor={theme["color-primary-default"]} />
 
       <Layout style={{ flex: 1, marginTop: -insets.top }}>
         <DetailsHeaderFlashList

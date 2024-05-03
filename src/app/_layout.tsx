@@ -1,6 +1,8 @@
+import { Layout } from "@ui-kitten/components";
 import { useFonts } from "expo-font";
 import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -55,11 +57,14 @@ function RoutingSetup() {
 
 function StackLayout() {
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <Stack screenOptions={{ headerShown: false }} initialRouteName="(drawer)">
-        <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)/sign-in" options={{ headerShown: false }} />
-      </Stack>
-    </SafeAreaView>
+    <Layout style={{ flex: 1 }}>
+      <StatusBar />
+      <SafeAreaView style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }} initialRouteName="(drawer)">
+          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/sign-in" options={{ headerShown: false }} />
+        </Stack>
+      </SafeAreaView>
+    </Layout>
   );
 }
