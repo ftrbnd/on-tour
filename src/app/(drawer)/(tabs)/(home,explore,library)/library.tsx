@@ -2,7 +2,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Button, Card, Icon, Layout, Text } from "@ui-kitten/components";
 import { useRouter, useSegments } from "expo-router";
 import { memo, useState } from "react";
-import { View } from "react-native";
+import { View, useColorScheme } from "react-native";
 
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
@@ -82,16 +82,25 @@ const Header = memo(function HeaderComponent({ setModalVisible }: HeaderProps) {
   );
 });
 
-const Title = ({ title, icon, onPress }: { title: string; icon: string; onPress: () => void }) => (
-  <View
-    style={{
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    }}>
-    <Text category="h4" style={{ textAlign: "left", paddingLeft: 16 }}>
-      {title}
-    </Text>
-    <Button appearance="ghost" accessoryLeft={<Icon name={icon} />} onPress={onPress} />
-  </View>
-);
+const Title = ({ title, icon, onPress }: { title: string; icon: string; onPress: () => void }) => {
+  const colorScheme = useColorScheme();
+
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+      }}>
+      <Text category="h4" style={{ textAlign: "left", paddingLeft: 16 }}>
+        {title}
+      </Text>
+      <Button
+        appearance="ghost"
+        status={colorScheme === "dark" ? "basic" : "primary"}
+        accessoryLeft={<Icon name={icon} />}
+        onPress={onPress}
+      />
+    </View>
+  );
+};

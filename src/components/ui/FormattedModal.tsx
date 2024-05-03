@@ -1,6 +1,8 @@
-import { Modal, useTheme } from "@ui-kitten/components";
+import { Modal, ModalService, useTheme } from "@ui-kitten/components";
 import { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
+
+ModalService.setShouldUseTopInsets = true;
 
 interface Props {
   visible: boolean;
@@ -10,7 +12,7 @@ interface Props {
   footer?: ReactNode;
 }
 
-export default function AnimatedModal({ visible, setVisible, header, body, footer }: Props) {
+export default function FormattedModal({ visible, setVisible, header, body, footer }: Props) {
   const theme = useTheme();
 
   return (
@@ -18,21 +20,23 @@ export default function AnimatedModal({ visible, setVisible, header, body, foote
       visible={visible}
       animationType="fade"
       onBackdropPress={() => setVisible(false)}
-      backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}
-      style={[styles.modal, { backgroundColor: theme["background-basic-color-2"] }]}>
-      <View style={styles.header}>{header}</View>
-      {body && <View style={styles.body}>{body}</View>}
-      {footer && <View style={styles.footer}>{footer}</View>}
+      style={{ width: "95%" }}
+      backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
+      <View style={[styles.modal, { backgroundColor: theme["background-basic-color-1"] }]}>
+        <View style={styles.header}>{header}</View>
+        {body && <View style={styles.body}>{body}</View>}
+        {footer && <View style={styles.footer}>{footer}</View>}
+      </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
   modal: {
-    gap: 12,
-    padding: 20,
-    margin: 20,
-    borderRadius: 20,
+    padding: 16,
+    margin: 16,
+    gap: 16,
+    borderRadius: 10,
   },
   header: {
     flexDirection: "row",

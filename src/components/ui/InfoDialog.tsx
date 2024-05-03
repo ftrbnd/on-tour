@@ -18,7 +18,7 @@ export default function InfoDialog({
       animationType="fade"
       onBackdropPress={() => setVisible(false)}
       backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-      <Layout style={{ padding: 16, gap: 32, borderRadius: 10 }}>
+      <Layout style={{ padding: 16, margin: 16, gap: 32, borderRadius: 10 }}>
         <Text category="h5">{title}</Text>
         <Layout>
           <Text category="p1">{children}</Text>

@@ -11,7 +11,7 @@ import useImagePicker from "../../hooks/useImagePicker";
 import usePlaylist from "../../hooks/usePlaylist";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { UpcomingShow } from "../../services/upcomingShows";
-import AnimatedModal from "../ui/AnimatedModal";
+import FormattedModal from "../ui/FormattedModal";
 import LoadingIndicator from "../ui/LoadingIndicator";
 
 interface ModalProps {
@@ -52,7 +52,7 @@ export default function CreatePlaylistModal({
   };
 
   return (
-    <AnimatedModal
+    <FormattedModal
       visible={visible}
       setVisible={setVisible}
       header={

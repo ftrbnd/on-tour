@@ -6,7 +6,7 @@ import UpcomingShowForm from "./UpcomingShowForm";
 import useImagePicker from "../../hooks/useImagePicker";
 import { UpcomingShow } from "../../services/upcomingShows";
 import PlaylistImage from "../Playlist/PlaylistImage";
-import AnimatedModal from "../ui/AnimatedModal";
+import FormattedModal from "../ui/FormattedModal";
 
 interface Props {
   visible: boolean;
@@ -19,7 +19,7 @@ export default function UpcomingShowModal({ visible, setVisible, existingShow }:
   const [previousShowImage] = useMMKVString(`upcoming-show-${existingShow?.id}-image`);
 
   return (
-    <AnimatedModal
+    <FormattedModal
       visible={visible}
       setVisible={setVisible}
       header={

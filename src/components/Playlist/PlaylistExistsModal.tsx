@@ -4,7 +4,7 @@ import { View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
 
 import PlaylistImage from "./PlaylistImage";
-import AnimatedModal from "../ui/AnimatedModal";
+import FormattedModal from "../ui/FormattedModal";
 
 interface Props {
   visible: boolean;
@@ -31,7 +31,7 @@ export default function PlaylistExistsModal({
   };
 
   return (
-    <AnimatedModal
+    <FormattedModal
       visible={visible}
       setVisible={setVisible}
       header={
@@ -54,7 +54,7 @@ export default function PlaylistExistsModal({
             <Icon
               name="external-link-outline"
               style={{ height: 24, width: 24 }}
-              fill={theme["text-alternate-color"]}
+              fill={theme["text-basic-color"]}
             />
           )}>
           View your playlist

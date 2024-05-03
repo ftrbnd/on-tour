@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { Icon, Input, Layout } from "@ui-kitten/components";
+import { Icon, Input, Layout, useTheme } from "@ui-kitten/components";
 import { useMemo, useRef, useState } from "react";
+import { useColorScheme } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
 
 import ArtistList from "@/src/components/Artist/ArtistList";
@@ -14,6 +15,8 @@ export default function Explore() {
 
   const { session } = useAuth();
   const inputRef = useRef<Input>(null);
+  const colorScheme = useColorScheme();
+  const theme = useTheme();
 
   const debounced = useDebouncedCallback(async (query) => {
     const results = await searchForArtists(session?.accessToken, query);
@@ -61,7 +64,7 @@ export default function Explore() {
           debounced(text);
         }}
         placeholder="Search for an artist"
-        status="primary"
+        status={colorScheme === "dark" ? "basic" : "primary"}
         ref={inputRef}
         accessoryLeft={<Icon name="search-outline" />}
         accessoryRight={
@@ -69,7 +72,11 @@ export default function Explore() {
             <Icon name="close-outline" onPress={exitSearch} />
           ) : undefined
         }
-        style={{ marginTop: 16, marginHorizontal: 16 }}
+        style={{
+          marginTop: 16,
+          marginHorizontal: 16,
+          backgroundColor: theme["background-basic-color-3"],
+        }}
       />
 
       <ArtistList

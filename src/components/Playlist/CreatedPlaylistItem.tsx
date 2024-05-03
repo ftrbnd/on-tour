@@ -50,7 +50,7 @@ function VerticalPlaylistItem({
           margin: 8,
           borderRadius: BORDER_RADIUS,
           borderWidth: 1,
-          borderColor: theme["color-basic-default-border"],
+          borderColor: theme["border-basic-color-4"],
         }}>
         <Image
           source={spotifyPlaylist ? { uri: spotifyPlaylist.images[0].url } : PlaylistIcon}
@@ -82,12 +82,20 @@ function VerticalPlaylistItem({
       anchor={renderToggleItemCard}>
       <View style={{ borderRadius: BORDER_RADIUS }}>
         <View style={styles.popoverItem}>
-          <Icon name="edit-outline" style={{ height: 24, width: 24 }} />
+          <Icon
+            name="edit-outline"
+            style={{ height: 24, width: 24 }}
+            fill={theme["text-basic-color"]}
+          />
           <Text onPress={openWebPage}>Edit</Text>
         </View>
 
         <View style={styles.popoverItem}>
-          <Icon name="trash-outline" style={{ height: 24, width: 24 }} />
+          <Icon
+            name="trash-outline"
+            style={{ height: 24, width: 24 }}
+            fill={theme["text-basic-color"]}
+          />
           <Text onPress={handleDelete}>Delete</Text>
         </View>
       </View>
