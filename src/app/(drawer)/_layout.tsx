@@ -5,19 +5,51 @@ import {
   IndexPath,
   TopNavigation,
   Text,
+  Icon,
+  useTheme,
 } from "@ui-kitten/components";
 import { Drawer } from "expo-router/drawer";
 
 import DrawerHeaderIcon from "@/src/components/ui/DrawerHeaderIcon";
 
-const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => (
-  <UIKittenDrawer
-    selectedIndex={new IndexPath(state.index)}
-    onSelect={(index) => navigation.navigate(state.routeNames[index.row])}>
-    <DrawerItem title="On Tour" />
-    <DrawerItem title="Settings" />
-  </UIKittenDrawer>
-);
+const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => {
+  const theme = useTheme();
+
+  return (
+    <UIKittenDrawer
+      selectedIndex={new IndexPath(state.index)}
+      onSelect={(index) => navigation.navigate(state.routeNames[index.row])}>
+      <DrawerItem
+        title={() => (
+          <Text category="h6" style={{ flex: 1, marginLeft: 8 }}>
+            On Tour
+          </Text>
+        )}
+        accessoryLeft={() => (
+          <Icon
+            name="home-outline"
+            fill={theme["text-basic-color"]}
+            style={{ height: 18, width: 18, marginLeft: 8 }}
+          />
+        )}
+      />
+      <DrawerItem
+        title={() => (
+          <Text category="h6" style={{ flex: 1, marginLeft: 8 }}>
+            Settings
+          </Text>
+        )}
+        accessoryLeft={() => (
+          <Icon
+            name="settings-outline"
+            fill={theme["text-basic-color"]}
+            style={{ height: 18, width: 18, marginLeft: 8 }}
+          />
+        )}
+      />
+    </UIKittenDrawer>
+  );
+};
 
 export default function DrawerLayout() {
   return (
