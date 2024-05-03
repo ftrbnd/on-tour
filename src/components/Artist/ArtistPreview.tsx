@@ -29,7 +29,7 @@ export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewP
           alignItems: "center",
         }}>
         <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Avatar source={artist.images ? { uri: artist.images[0].url } : ArtistIcon} />
+          <Avatar source={artist.images.length > 0 ? { uri: artist.images[0].url } : ArtistIcon} />
           <Text numberOfLines={1} ellipsizeMode="head" style={{ marginLeft: 8 }}>
             {artist.name}
           </Text>
