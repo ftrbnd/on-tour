@@ -43,7 +43,7 @@ export default function SetlistPage() {
             visible={modalVisible}
             setVisible={setModalVisible}
             setlistId={setlistId}
-            isUpcomingShow={isUpcomingShow}
+            isUpcomingShow={isUpcomingShow === "true"}
           />
         )}
 

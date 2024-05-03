@@ -104,7 +104,7 @@ function HorizontalPlaylistItem({
   const parsedDescription = spotifyPlaylist?.description.replaceAll("&#x2F;", "/") ?? "";
 
   return (
-    <Layout level="2" style={{ marginVertical: 8, borderRadius: BORDER_RADIUS }}>
+    <Layout style={{ marginVertical: 8, borderRadius: BORDER_RADIUS }}>
       <SwipeableItem onEdit={openWebPage} onDelete={handleDelete}>
         <View
           style={{

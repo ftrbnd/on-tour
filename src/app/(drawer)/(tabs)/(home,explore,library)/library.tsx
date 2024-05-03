@@ -7,7 +7,6 @@ import { View } from "react-native";
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
 import UpcomingShowModal from "@/src/components/UpcomingShow/UpcomingShowModal";
-import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { NestedSegment } from "@/src/utils/segments";
@@ -37,25 +36,19 @@ interface HeaderProps {
 }
 
 const Header = memo(function HeaderComponent({ setModalVisible }: HeaderProps) {
-  const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
-
   const { playlists } = useCreatedPlaylists();
   const router = useRouter();
   const segments = useSegments<NestedSegment>();
 
   return (
     <View style={{ flex: 1 }}>
-      <Title title="My Playlists" icon="info-outline" onPress={() => setInfoDialogVisible(true)} />
-
-      {infoDialogVisible && (
-        <InfoDialog
-          visible={infoDialogVisible}
-          setVisible={setInfoDialogVisible}
-          title="About Spotify's Web API">
-          Spotify's API doesn't allow us to remotely delete playlists - you are only deleting them
-          from our own database. To fully delete the playlist, please go to the Spotify app.
-        </InfoDialog>
-      )}
+      <Title
+        title="My Playlists"
+        icon="chevron-right-outline"
+        onPress={() =>
+          router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/createdPlaylists`)
+        }
+      />
 
       {playlists.length === 0 ? (
         <Card style={{ marginHorizontal: 16 }}>
@@ -82,18 +75,6 @@ const Header = memo(function HeaderComponent({ setModalVisible }: HeaderProps) {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <CreatedPlaylistItem playlist={item} />}
         />
-      )}
-      {playlists.length > 0 && (
-        <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-          <Button
-            appearance="ghost"
-            accessoryRight={<Icon name="chevron-right-outline" />}
-            onPress={() =>
-              router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/createdPlaylists`)
-            }>
-            View All
-          </Button>
-        </View>
       )}
 
       <Title title="My Upcoming Shows" icon="plus-outline" onPress={() => setModalVisible(true)} />

@@ -18,7 +18,7 @@ interface ModalProps {
   visible: boolean;
   setVisible: (vis: boolean) => void;
   setlistId: string;
-  isUpcomingShow?: "true" | "false";
+  isUpcomingShow?: boolean;
 }
 
 export default function CreatePlaylistModal({
@@ -104,7 +104,7 @@ export default function CreatePlaylistModal({
                   ))}
                 </Picker>
               </TouchableOpacity>
-              {true && (
+              {isUpcomingShow && (
                 <View
                   style={{
                     flexDirection: "row",
