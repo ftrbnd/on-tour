@@ -14,6 +14,7 @@ export default function FormattedSheet({ header, body, footer }: Props) {
 
   return (
     <ActionSheet
+      gestureEnabled
       containerStyle={{ ...styles.sheet, backgroundColor: theme["background-basic-color-1"] }}>
       <Layout style={{ gap: 32 }}>
         <View style={styles.header}>{header}</View>
@@ -27,6 +28,7 @@ export default function FormattedSheet({ header, body, footer }: Props) {
 const styles = StyleSheet.create({
   sheet: {
     padding: 16,
+    gap: 16,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },

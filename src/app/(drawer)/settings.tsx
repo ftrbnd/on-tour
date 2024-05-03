@@ -100,6 +100,7 @@ function ThemeSettings() {
       </View>
 
       <ActionSheet
+        gestureEnabled
         ref={actionSheetRef}
         snapPoints={[33, 66]}
         containerStyle={{
@@ -158,6 +159,7 @@ const styles = StyleSheet.create({
   actionSheet: {
     flex: 1,
     padding: 16,
+    gap: 16,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },
