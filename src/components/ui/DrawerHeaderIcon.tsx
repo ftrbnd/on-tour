@@ -10,14 +10,14 @@ import { useAuth } from "@/src/providers/AuthProvider";
 const blurhash =
   "|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[";
 
-export default function DrawerHeaderIcon({ marginLeft }: { marginLeft?: number }) {
+export default function DrawerHeaderIcon({ iconOnly }: { iconOnly?: boolean }) {
   const navigation = useNavigation();
   const { user } = useAuth();
   const theme = useTheme();
 
   return (
     <TouchableOpacity>
-      {user?.avatar && !marginLeft ? (
+      {user?.avatar && !iconOnly ? (
         <Image
           source={{
             uri: user.avatar,
@@ -35,7 +35,7 @@ export default function DrawerHeaderIcon({ marginLeft }: { marginLeft?: number }
       ) : (
         <Icon
           name="menu-outline"
-          style={{ marginLeft, height: 24, width: 24 }}
+          style={{ height: 24, width: 24 }}
           fill={theme["color-primary-default"]}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
