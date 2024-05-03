@@ -50,13 +50,7 @@ export default function CreatedPlaylistsPage() {
         estimatedItemSize={100}
         contentContainerStyle={{ padding: 8 }}
         data={playlists}
-        renderItem={({ item }) => (
-          <CreatedPlaylistItem
-            playlist={item}
-            horizontal
-            showSnackbar={() => setSnackbarVisible(true)}
-          />
-        )}
+        renderItem={({ item }) => <CreatedPlaylistItem playlist={item} horizontal />}
       />
 
       {infoDialogVisible && (

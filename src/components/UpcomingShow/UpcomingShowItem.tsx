@@ -4,6 +4,7 @@ import moment from "moment";
 import { useState } from "react";
 import { View } from "react-native";
 import { useMMKVString } from "react-native-mmkv";
+import { useToast } from "react-native-toast-notifications";
 
 import UpcomingShowModal from "./UpcomingShowModal";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
@@ -15,10 +16,20 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const { deleteShow } = useUpcomingShows();
+  const toast = useToast();
+
+  const handleDelete = async () => {
+    try {
+      await deleteShow(show);
+      toast.show("Upcoming show deleted");
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <>
-      <SwipeableItem onEdit={() => setModalVisible(true)} onDelete={() => deleteShow(show)}>
+      <SwipeableItem onEdit={() => setModalVisible(true)} onDelete={handleDelete}>
         <View style={{ paddingVertical: 8, paddingHorizontal: 16 }}>
           {showImage && <Image source={{ uri: showImage }} />}
           <Text category="h6" ellipsizeMode="tail">

@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ToastProvider } from "react-native-toast-notifications";
 
 import { AuthProvider } from "./AuthProvider";
 import QueryProvider from "./QueryProvider";
@@ -10,7 +11,9 @@ export default function Providers({ children }: { children: ReactNode }) {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
         <QueryProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </ThemeProvider>
         </QueryProvider>
       </AuthProvider>
     </GestureHandlerRootView>

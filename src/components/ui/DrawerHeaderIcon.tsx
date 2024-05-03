@@ -1,6 +1,5 @@
-import { Ionicons } from "@expo/vector-icons";
 import { DrawerActions } from "@react-navigation/native";
-import { useTheme } from "@ui-kitten/components";
+import { Icon, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
 import { StyleSheet } from "react-native";
@@ -34,11 +33,10 @@ export default function DrawerHeaderIcon({ marginLeft }: { marginLeft?: number }
           onTouchStart={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
       ) : (
-        <Ionicons
-          name="menu"
-          size={24}
-          style={{ marginLeft }}
-          color={theme["color-primary-default"]}
+        <Icon
+          name="menu-outline"
+          style={{ marginLeft, height: 24, width: 24 }}
+          fill={theme["color-primary-default"]}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
       )}

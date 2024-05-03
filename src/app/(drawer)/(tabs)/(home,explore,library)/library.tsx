@@ -1,10 +1,8 @@
-import { Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
+import { Button, Card, Icon, Layout, Text } from "@ui-kitten/components";
 import { useRouter, useSegments } from "expo-router";
 import { memo, useState } from "react";
 import { View } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { Button, Card, IconButton, Snackbar, Text } from "react-native-paper";
 
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
@@ -15,18 +13,14 @@ import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { NestedSegment } from "@/src/utils/segments";
 
 export default function Library() {
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
   const { upcomingShows } = useUpcomingShows();
 
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [snackbarVisible, setSnackbarVisible] = useState<boolean>(false);
-  const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
-
   return (
-    <View style={{ flex: 1 }}>
+    <Layout level="2" style={{ flex: 1 }}>
       <FlashList
-        ListHeaderComponent={
-          <Header setModalVisible={setModalVisible} setSnackbarVisible={setSnackbarVisible} />
-        }
+        ListHeaderComponent={<Header setModalVisible={setModalVisible} />}
         estimatedItemSize={100}
         data={upcomingShows}
         renderItem={({ item }) => <UpcomingShowItem show={item} />}
@@ -34,6 +28,24 @@ export default function Library() {
       />
 
       {modalVisible && <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />}
+    </Layout>
+  );
+}
+
+interface HeaderProps {
+  setModalVisible: (v: boolean) => void;
+}
+
+const Header = memo(function HeaderComponent({ setModalVisible }: HeaderProps) {
+  const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
+
+  const { playlists } = useCreatedPlaylists();
+  const router = useRouter();
+  const segments = useSegments<NestedSegment>();
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Title title="My Playlists" icon="info-outline" onPress={() => setInfoDialogVisible(true)} />
 
       {infoDialogVisible && (
         <InfoDialog
@@ -45,42 +57,20 @@ export default function Library() {
         </InfoDialog>
       )}
 
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={() => setSnackbarVisible(false)}
-        action={{
-          label: "Learn More",
-          onPress: () => setInfoDialogVisible(true),
-        }}>
-        Playlist deleted from On Tour!
-      </Snackbar>
-    </View>
-  );
-}
-
-interface HeaderProps {
-  setModalVisible: (v: boolean) => void;
-  setSnackbarVisible: (v: boolean) => void;
-}
-
-const Header = memo(function HeaderComponent({ setModalVisible, setSnackbarVisible }: HeaderProps) {
-  const { playlists } = useCreatedPlaylists();
-  const router = useRouter();
-  const segments = useSegments<NestedSegment>();
-
-  return (
-    <View style={{ flex: 1 }}>
-      <Text variant="headlineSmall" style={{ textAlign: "left", paddingTop: 16, paddingLeft: 16 }}>
-        My Playlists
-      </Text>
       {playlists.length === 0 ? (
-        <Card style={{ margin: 8 }}>
-          <Card.Actions>
-            <Text>Check out some setlists to get started!</Text>
-            <Button mode="text" onPress={() => router.replace("/explore")}>
+        <Card style={{ marginHorizontal: 16 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 4,
+            }}>
+            <Text category="s1">Check out some setlists to get started!</Text>
+            <Button appearance="ghost" onPress={() => router.replace("/explore")}>
               Explore
             </Button>
-          </Card.Actions>
+          </View>
         </Card>
       ) : (
         <FlashList
@@ -90,47 +80,37 @@ const Header = memo(function HeaderComponent({ setModalVisible, setSnackbarVisib
           contentContainerStyle={{ padding: 8 }}
           data={playlists}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <CreatedPlaylistItem playlist={item} showSnackbar={() => setSnackbarVisible(true)} />
-          )}
+          renderItem={({ item }) => <CreatedPlaylistItem playlist={item} />}
         />
       )}
       {playlists.length > 0 && (
         <View style={{ flexDirection: "row", justifyContent: "flex-end" }}>
-          <TouchableOpacity
+          <Button
+            appearance="ghost"
+            accessoryRight={<Icon name="chevron-right-outline" />}
             onPress={() =>
               router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/createdPlaylists`)
             }>
-            <Button
-              icon={({ color, size }) => (
-                <Ionicons name="arrow-forward" color={color} size={size} />
-              )}
-              contentStyle={{ flexDirection: "row-reverse" }}>
-              View All
-            </Button>
-          </TouchableOpacity>
+            View All
+          </Button>
         </View>
       )}
 
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}>
-        <Text
-          variant="headlineSmall"
-          style={{
-            textAlign: "left",
-            paddingLeft: 16,
-          }}>
-          My Upcoming Shows
-        </Text>
-        <IconButton
-          icon={({ color, size }) => <Ionicons name="add-circle" color={color} size={size} />}
-          onPress={() => setModalVisible(true)}
-        />
-      </View>
+      <Title title="My Upcoming Shows" icon="plus-outline" onPress={() => setModalVisible(true)} />
     </View>
   );
 });
+
+const Title = ({ title, icon, onPress }: { title: string; icon: string; onPress: () => void }) => (
+  <View
+    style={{
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    }}>
+    <Text category="h4" style={{ textAlign: "left", paddingLeft: 16 }}>
+      {title}
+    </Text>
+    <Button appearance="ghost" accessoryLeft={<Icon name={icon} />} onPress={onPress} />
+  </View>
+);
