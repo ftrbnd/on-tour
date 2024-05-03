@@ -9,6 +9,7 @@ import {
   RadioGroup,
   Text,
   Toggle,
+  useTheme,
 } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { useRef } from "react";
@@ -33,6 +34,7 @@ export default function Settings() {
 
 function ProfileCard() {
   const { session, user, signIn, signOut, isLoading } = useAuth();
+  const colorScheme = useColorScheme();
 
   return (
     <Card>
@@ -47,6 +49,7 @@ function ProfileCard() {
         </Text>
         <Button
           appearance="ghost"
+          status={colorScheme === "dark" ? "basic" : "primary"}
           accessoryLeft={
             isLoading ? (
               <LoadingIndicator status="primary" />
@@ -65,6 +68,7 @@ function ProfileCard() {
 
 function ThemeSettings() {
   const colorScheme = useColorScheme();
+  const theme = useTheme();
   const { toggleTheme, usingSystemTheme } = usePreferredTheme();
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
@@ -83,16 +87,25 @@ function ThemeSettings() {
     <TouchableOpacity onPress={() => actionSheetRef.current?.show()}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <Icon
+          fill={theme["text-basic-color"]}
           name={colorScheme === "dark" ? "moon-outline" : "sun-outline"}
           style={{ height: 36, width: 36 }}
         />
         <View style={{ marginLeft: 8, gap: 4 }}>
           <Text category="h6">{`Theme: ${usingSystemTheme ? "System" : capitalizedThemeName}`}</Text>
-          <Text category="s2">Change app appearance</Text>
+          <Text category="s2" appearance="hint">
+            Change app appearance
+          </Text>
         </View>
       </View>
 
-      <ActionSheet ref={actionSheetRef} snapPoints={[33, 66]} containerStyle={styles.actionSheet}>
+      <ActionSheet
+        ref={actionSheetRef}
+        snapPoints={[33, 66]}
+        containerStyle={{
+          ...styles.actionSheet,
+          backgroundColor: theme["background-basic-color-1"],
+        }}>
         <Text category="h3" style={{ textAlign: "center" }}>
           Theme
         </Text>
@@ -102,6 +115,7 @@ function ThemeSettings() {
               <Icon
                 name={colorScheme === "light" ? "sun" : "sun-outline"}
                 style={{ height: 36, width: 36 }}
+                fill={theme["text-basic-color"]}
               />
               <Radio checked={colorScheme === "light"} />
             </TouchableOpacity>
@@ -109,6 +123,7 @@ function ThemeSettings() {
               <Icon
                 name={colorScheme === "dark" ? "moon" : "moon-outline"}
                 style={{ height: 36, width: 36 }}
+                fill={theme["text-basic-color"]}
               />
               <Radio checked={colorScheme === "dark"} />
             </TouchableOpacity>
@@ -125,7 +140,11 @@ function ThemeSettings() {
             padding: 16,
           }}>
           <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-            <Icon name="smartphone-outline" style={{ height: 36, width: 36 }} />
+            <Icon
+              name="smartphone-outline"
+              style={{ height: 36, width: 36 }}
+              fill={theme["text-basic-color"]}
+            />
             <Text category="s1">Device settings</Text>
           </View>
           <Toggle checked={usingSystemTheme} onChange={(val) => handleSwitchToggle(val)} />

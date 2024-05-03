@@ -2,7 +2,7 @@ import { DrawerActions } from "@react-navigation/native";
 import { Icon, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { useNavigation } from "expo-router";
-import { StyleSheet } from "react-native";
+import { StyleSheet, useColorScheme } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -14,6 +14,7 @@ export default function DrawerHeaderIcon({ iconOnly }: { iconOnly?: boolean }) {
   const navigation = useNavigation();
   const { user } = useAuth();
   const theme = useTheme();
+  const colorScheme = useColorScheme();
 
   return (
     <TouchableOpacity>
@@ -36,7 +37,7 @@ export default function DrawerHeaderIcon({ iconOnly }: { iconOnly?: boolean }) {
         <Icon
           name="menu-outline"
           style={{ height: 24, width: 24 }}
-          fill={theme["color-primary-default"]}
+          fill={colorScheme === "dark" ? theme["color-basic-100"] : theme["color-primary-default"]}
           onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
         />
       )}
