@@ -1,11 +1,11 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Layout, useTheme } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ParallaxSetlistList from "@/src/components/Setlist/ParallaxSetlistList";
+import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { searchArtistSetlist } from "@/src/services/setlist-fm";
 import { getOneArtist } from "@/src/services/spotify";
@@ -46,9 +46,7 @@ export default function ArtistPage() {
           headerShown: false,
         }}
       />
-
-      <StatusBar backgroundColor={theme["color-primary-default"]} />
-      {/* Android only */}
+      <FocusAwareStatusBar backgroundColor={theme["color-primary-default"]} style="light" />
 
       <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
         <ParallaxSetlistList

@@ -1,7 +1,6 @@
 import { FlashList } from "@shopify/flash-list";
 import { Card, Icon, Layout, Text, useTheme } from "@ui-kitten/components";
 import { Stack, router } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,6 +8,7 @@ import { withDetailsHeaderFlashList } from "react-native-sticky-parallax-header"
 
 import { PlaylistIcon } from "@/src/assets/icons";
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
+import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import { CreatedPlaylist } from "@/src/services/createdPlaylists";
@@ -29,7 +29,7 @@ export default function CreatedPlaylistsPage() {
           headerShown: false,
         }}
       />
-      <StatusBar backgroundColor={theme["color-primary-default"]} />
+      <FocusAwareStatusBar backgroundColor={theme["color-primary-default"]} style="light" />
 
       <Layout style={{ flex: 1, marginTop: -insets.top }}>
         <DetailsHeaderFlashList

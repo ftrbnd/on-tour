@@ -1,6 +1,5 @@
 import { Button, Icon, Layout, useTheme } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -8,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
 import ParallaxSongsList from "@/src/components/Song/ParallaxSongsList";
+import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 
@@ -30,7 +30,7 @@ export default function SetlistPage() {
           headerShown: false,
         }}
       />
-      <StatusBar backgroundColor={theme["color-primary-default"]} />
+      <FocusAwareStatusBar backgroundColor={theme["color-primary-default"]} style="light" />
 
       <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
         <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />

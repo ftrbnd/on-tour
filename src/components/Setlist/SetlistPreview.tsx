@@ -1,6 +1,7 @@
-import { Card, Layout, Text, useTheme, Icon } from "@ui-kitten/components";
+import { Card, Text, useTheme, Icon } from "@ui-kitten/components";
 import { useRouter, useSegments } from "expo-router";
 import moment from "moment";
+import { View } from "react-native";
 
 import { NestedSegment } from "../../utils/segments";
 import { Setlist } from "../../utils/setlist-fm-types";
@@ -35,9 +36,9 @@ export default function SetlistPreview({
       {displayArtist && <Text category="h5">{setlist.artist.name}</Text>}
       {setlist.tour && <Text category="h6">{setlist.tour.name}</Text>}
 
-      <Layout
+      <View
         style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
-        <Layout style={{ gap: 4 }}>
+        <View style={{ gap: 4 }}>
           <Text
             category={
               displayArtist ? "s2" : "h6"
@@ -46,7 +47,7 @@ export default function SetlistPreview({
           <Text category="label">
             {moment(setlist.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}
           </Text>
-        </Layout>
+        </View>
 
         {isUpcomingShow && (
           <Icon
@@ -59,7 +60,7 @@ export default function SetlistPreview({
             fill={theme["text-info-color"]}
           />
         )}
-      </Layout>
+      </View>
     </Card>
   );
 }
