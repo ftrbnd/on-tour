@@ -48,14 +48,14 @@ function ProfileCard() {
           appearance="ghost"
           accessoryLeft={
             isLoading ? (
-              <LoadingIndicator />
+              <LoadingIndicator status="primary" />
             ) : (
               <Icon name="log-out-outline" style={{ height: 24, width: 24 }} />
             )
           }
           disabled={isLoading}
           onPress={session ? signOut : signIn}>
-          {isLoading ? "Signing out..." : session ? ` Sign out` : "Sign in"}
+          {isLoading ? "Signing out..." : session ? "Sign out" : "Sign in"}
         </Button>
       </View>
     </Card>
