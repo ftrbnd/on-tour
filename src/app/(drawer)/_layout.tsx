@@ -4,6 +4,7 @@ import {
   DrawerItem,
   IndexPath,
   TopNavigation,
+  Text,
 } from "@ui-kitten/components";
 import { Drawer } from "expo-router/drawer";
 
@@ -28,7 +29,7 @@ export default function DrawerLayout() {
           drawerLabel: "Settings",
           header: () => (
             <TopNavigation
-              title="Settings"
+              title={() => <Text category="h6">Settings</Text>}
               accessoryLeft={() => <DrawerHeaderIcon iconOnly />}
               alignment="center"
             />

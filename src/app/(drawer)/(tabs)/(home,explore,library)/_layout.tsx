@@ -1,4 +1,4 @@
-import { TopNavigation } from "@ui-kitten/components";
+import { Text, TopNavigation } from "@ui-kitten/components";
 import { Stack } from "expo-router";
 
 import DrawerHeaderIcon from "@/src/components/ui/DrawerHeaderIcon";
@@ -15,7 +15,7 @@ export default function Layout({ segment }: { segment: Group<Segment> }) {
       screenOptions={{
         header: () => (
           <TopNavigation
-            title={headerTitle}
+            title={() => <Text category="h6">{headerTitle}</Text>}
             accessoryLeft={() => <DrawerHeaderIcon />}
             alignment="center"
           />
