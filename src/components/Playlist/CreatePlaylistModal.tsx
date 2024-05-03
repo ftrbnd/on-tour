@@ -59,7 +59,6 @@ export default function CreatePlaylistModal({
         <>
           <Text category="h2">Playlist Details</Text>
           <PlaylistImage
-            showImage={selectedImage !== null || upcomingImageUri !== undefined}
             uri={selectedImage ? selectedImage.uri : upcomingImageUri}
             onPress={() => (playlist.mutationsPending ? null : pickImageAsync())}
           />

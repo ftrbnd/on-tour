@@ -27,7 +27,6 @@ export default function UpcomingShowModal({ visible, setVisible, existingShow }:
           <Text category="h2">Show Details</Text>
           <View style={{ alignItems: "flex-end", gap: 4 }}>
             <PlaylistImage
-              showImage={selectedImage !== null || previousShowImage !== undefined}
               onPress={pickImageAsync}
               uri={selectedImage ? selectedImage.uri : previousShowImage}
             />

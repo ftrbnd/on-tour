@@ -37,7 +37,7 @@ export default function PlaylistExistsModal({
       header={
         <>
           <View />
-          <PlaylistImage showImage={playlistImage !== undefined} uri={playlistImage} />
+          <PlaylistImage uri={playlistImage} />
           <View />
         </>
       }

@@ -4,39 +4,44 @@ import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 interface Props {
-  showImage: boolean;
   uri?: string;
   onPress?: () => void;
 }
 
-export default function PlaylistImage({ showImage, uri, onPress }: Props) {
+export default function PlaylistImage({ uri, onPress }: Props) {
   const theme = useTheme();
 
-  return showImage ? (
-    <Image
-      onTouchStart={onPress}
-      source={{
-        uri,
-        width: styles.image.width,
-        height: styles.image.height,
-      }}
-      contentFit="cover"
-      style={styles.image}
-      transition={1000}
-    />
-  ) : (
-    // TODO: onPress doesn't register
+  return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.image, { backgroundColor: theme["color-primary-200"] }]}>
-      <Icon
-        name="music"
-        fill={theme["text-basic-color"]}
-        style={{
-          height: styles.image.height * 0.66,
-          width: styles.image.width * 0.66,
-        }}
-      />
+      containerStyle={{
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: theme["border-basic-color-5"],
+      }}>
+      {uri ? (
+        <Image
+          source={{
+            uri,
+            width: styles.image.width,
+            height: styles.image.height,
+          }}
+          contentFit="cover"
+          style={styles.image}
+          transition={1000}
+        />
+      ) : (
+        <Icon
+          name="music"
+          fill={theme["text-hint-color"]}
+          style={[
+            styles.image,
+            {
+              backgroundColor: theme["background-basic-color-2"],
+            },
+          ]}
+        />
+      )}
     </TouchableOpacity>
   );
 }

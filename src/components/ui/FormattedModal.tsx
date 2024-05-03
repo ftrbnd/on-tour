@@ -1,4 +1,4 @@
-import { Modal, ModalService, useTheme } from "@ui-kitten/components";
+import { Layout, Modal, ModalService, useTheme } from "@ui-kitten/components";
 import { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
 
@@ -22,11 +22,11 @@ export default function FormattedModal({ visible, setVisible, header, body, foot
       onBackdropPress={() => setVisible(false)}
       style={{ width: "95%" }}
       backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-      <View style={[styles.modal, { backgroundColor: theme["background-basic-color-1"] }]}>
+      <Layout style={[styles.modal, { backgroundColor: theme["background-basic-color-1"] }]}>
         <View style={styles.header}>{header}</View>
         {body && <View style={styles.body}>{body}</View>}
         {footer && <View style={styles.footer}>{footer}</View>}
-      </View>
+      </Layout>
     </Modal>
   );
 }
