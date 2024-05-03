@@ -51,8 +51,8 @@ export default function CreatedPlaylistsPage() {
               />
             </TouchableOpacity>
           )}
-          rightTopIconOnPress={() =>
-            SheetManager.show("info-sheet", {
+          rightTopIconOnPress={async () =>
+            await SheetManager.show("info-sheet", {
               payload: {
                 title: "About Spotify's Web API",
                 description:

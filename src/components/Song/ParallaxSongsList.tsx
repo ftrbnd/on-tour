@@ -46,8 +46,8 @@ export default function ParallaxSongsList({ setlistId }: { setlistId: string }) 
       rightTopIcon={() => (
         <View style={{ flexDirection: "row", gap: 16 }}>
           <TouchableOpacity
-            onPress={() =>
-              SheetManager.show("info-sheet", {
+            onPress={async () =>
+              await SheetManager.show("info-sheet", {
                 payload: {
                   title: "Not the artist you were expecting?",
                   description:

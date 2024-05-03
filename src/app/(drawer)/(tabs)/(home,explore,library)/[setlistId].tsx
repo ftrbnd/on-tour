@@ -17,15 +17,15 @@ export default function SetlistPage() {
 
   const playlistExists = playlists.some((playlist) => playlist.setlistId === setlistId);
 
-  const openSheet = () =>
+  const openSheet = async () =>
     playlistExists
-      ? SheetManager.show("playlist-exists-sheet", {
+      ? await SheetManager.show("playlist-exists-sheet", {
           payload: {
             playlistId: playlists[0].id,
             playlistTitle: playlists[0].title,
           },
         })
-      : SheetManager.show("create-playlist-sheet", {
+      : await SheetManager.show("create-playlist-sheet", {
           payload: {
             setlistId,
             isUpcomingShow: isUpcomingShow === "true",

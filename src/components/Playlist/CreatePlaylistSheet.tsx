@@ -42,7 +42,7 @@ export default function CreatePlaylistSheet() {
     try {
       await playlist.startMutations(selectedImage, { uri: upcomingImageUri });
 
-      SheetManager.hide("create-playlist-sheet");
+      await SheetManager.hide("create-playlist-sheet");
       router.replace("/(drawer)/(tabs)/(library)/createdPlaylists");
     } catch (e) {
       console.error(e);

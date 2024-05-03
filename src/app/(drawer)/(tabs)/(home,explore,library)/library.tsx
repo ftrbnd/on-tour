@@ -72,7 +72,7 @@ const Header = memo(function HeaderComponent() {
       <Title
         title="My Upcoming Shows"
         icon="plus-outline"
-        onPress={() => SheetManager.show("upcoming-show-sheet")}
+        onPress={async () => await SheetManager.show("upcoming-show-sheet")}
       />
     </View>
   );

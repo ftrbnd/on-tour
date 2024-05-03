@@ -4,6 +4,7 @@ import { Formik, useFormikContext } from "formik";
 import moment from "moment";
 import { useMemo } from "react";
 import { View } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
@@ -103,6 +104,8 @@ export default function UpcomingShowForm({ initialValues, selectedImage }: Conta
       } else {
         await addShow(submission.show, submission.selectedImage);
       }
+
+      await SheetManager.hide("upcoming-show-sheet");
     } catch (e) {
       console.error(e);
     }

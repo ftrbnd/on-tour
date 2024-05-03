@@ -27,7 +27,7 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
 
   return (
     <SwipeableItem
-      onEdit={() => SheetManager.show("upcoming-show-sheet", { payload: show })}
+      onEdit={async () => await SheetManager.show("upcoming-show-sheet", { payload: show })}
       onDelete={handleDelete}>
       <View style={{ paddingVertical: 8, paddingHorizontal: 16 }}>
         {showImage && <Image source={{ uri: showImage }} />}
