@@ -2,6 +2,7 @@ import { Button, Icon, Layout } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
 import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
@@ -13,6 +14,7 @@ export default function SetlistPage() {
   const { setlistId, isUpcomingShow }: { setlistId: string; isUpcomingShow?: "true" | "false" } =
     useLocalSearchParams();
   const { playlists } = useCreatedPlaylists(null, setlistId);
+  const insets = useSafeAreaInsets();
 
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [dialogVisible, setDialogVisible] = useState<boolean>(false);
@@ -27,7 +29,7 @@ export default function SetlistPage() {
         }}
       />
 
-      <Layout level="2" style={{ flex: 1 }}>
+      <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
         <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />
 
         {playlistExists ? (

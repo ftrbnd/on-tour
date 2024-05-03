@@ -50,7 +50,7 @@ export default function ParallaxSetlistList({
       leftTopIcon={() => (
         <TouchableOpacity>
           <Icon
-            name="arrow-back"
+            name="chevron-left-outline"
             fill={theme["text-control-color"]}
             style={{ height: 24, width: 24 }}
           />
@@ -86,13 +86,13 @@ export default function ParallaxSetlistList({
       onEndReached={handleEndReached}
       ListEmptyComponent={
         loading ? (
-          <Card>
-            <Button disabled accessoryLeft={LoadingIndicator}>
+          <Card style={{ marginTop: 8 }}>
+            <Button appearance="ghost" disabled accessoryLeft={LoadingIndicator}>
               Loading...
             </Button>
           </Card>
         ) : artist ? (
-          <Card>
+          <Card style={{ marginTop: 8 }}>
             <Text category="label" style={{ textAlign: "center" }}>
               {artist && !loading ? "No setlists were found for this artist." : "Loading..."}
             </Text>

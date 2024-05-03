@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ToastProvider } from "react-native-toast-notifications";
 
 import { AuthProvider } from "./AuthProvider";
@@ -9,13 +10,15 @@ import ThemeProvider from "./ThemeProvider";
 export default function Providers({ children }: { children: ReactNode }) {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <QueryProvider>
-          <ThemeProvider>
-            <ToastProvider>{children}</ToastProvider>
-          </ThemeProvider>
-        </QueryProvider>
-      </AuthProvider>
+      <SafeAreaProvider>
+        <AuthProvider>
+          <QueryProvider>
+            <ThemeProvider>
+              <ToastProvider>{children}</ToastProvider>
+            </ThemeProvider>
+          </QueryProvider>
+        </AuthProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }

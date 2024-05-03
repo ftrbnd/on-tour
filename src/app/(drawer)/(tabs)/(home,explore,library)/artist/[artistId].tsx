@@ -2,6 +2,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { Layout } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ParallaxSetlistList from "@/src/components/Setlist/ParallaxSetlistList";
 import { useAuth } from "@/src/providers/AuthProvider";
@@ -15,6 +16,7 @@ export default function ArtistPage() {
 
   const { artistId }: { artistId: string } = useLocalSearchParams();
   const { session } = useAuth();
+  const insets = useSafeAreaInsets();
 
   const { data: artist } = useQuery({
     queryKey: ["artist", artistId],
@@ -43,7 +45,7 @@ export default function ArtistPage() {
         }}
       />
 
-      <Layout level="2" style={{ flex: 1 }}>
+      <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
         <ParallaxSetlistList
           setlists={setlists}
           isPlaceholderData={isPlaceholderData}
