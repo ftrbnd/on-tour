@@ -3,6 +3,7 @@ import { Divider, Icon, useTheme } from "@ui-kitten/components";
 import { router, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { View } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { withDetailsHeaderFlashList } from "react-native-sticky-parallax-header";
 
@@ -14,13 +15,7 @@ import { Song } from "@/src/utils/setlist-fm-types";
 
 const DetailsHeaderFlashList = withDetailsHeaderFlashList<Song>(FlashList);
 
-export default function ParallaxSongsList({
-  setlistId,
-  setDialogVisible,
-}: {
-  setlistId: string;
-  setDialogVisible: (vis: boolean) => void;
-}) {
+export default function ParallaxSongsList({ setlistId }: { setlistId: string }) {
   const setlist = useSetlist(setlistId);
   const theme = useTheme();
   const { artistImage } = useLocalSearchParams<{ artistImage?: string }>();
@@ -50,7 +45,16 @@ export default function ParallaxSongsList({
       leftTopIconOnPress={router.back}
       rightTopIcon={() => (
         <View style={{ flexDirection: "row", gap: 16 }}>
-          <TouchableOpacity onPress={() => setDialogVisible(true)}>
+          <TouchableOpacity
+            onPress={() =>
+              SheetManager.show("info-sheet", {
+                payload: {
+                  title: "Not the artist you were expecting?",
+                  description:
+                    "On Tour searches for setlists through setlist.fm, and will match with any artists whose names are similar.",
+                },
+              })
+            }>
             <Icon
               name="question-mark-circle-outline"
               fill={theme["text-control-color"]}

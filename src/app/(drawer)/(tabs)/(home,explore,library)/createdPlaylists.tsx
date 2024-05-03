@@ -1,7 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { Card, Icon, Layout, Text, useTheme } from "@ui-kitten/components";
 import { Stack, router } from "expo-router";
-import { useState } from "react";
+import { SheetManager } from "react-native-actions-sheet";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { withDetailsHeaderFlashList } from "react-native-sticky-parallax-header";
@@ -9,15 +9,12 @@ import { withDetailsHeaderFlashList } from "react-native-sticky-parallax-header"
 import { PlaylistIcon } from "@/src/assets/icons";
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
-import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import { CreatedPlaylist } from "@/src/services/createdPlaylists";
 
 const DetailsHeaderFlashList = withDetailsHeaderFlashList<CreatedPlaylist>(FlashList);
 
 export default function CreatedPlaylistsPage() {
-  const [infoDialogVisible, setInfoDialogVisible] = useState<boolean>(false);
-
   const { playlists } = useCreatedPlaylists();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
@@ -54,7 +51,15 @@ export default function CreatedPlaylistsPage() {
               />
             </TouchableOpacity>
           )}
-          rightTopIconOnPress={() => setInfoDialogVisible(true)}
+          rightTopIconOnPress={() =>
+            SheetManager.show("info-sheet", {
+              payload: {
+                title: "About Spotify's Web API",
+                description:
+                  "Spotify's API doesn't allow us to remotely delete playlists - you are only deleting them from our own database. To fully delete the playlist, please go to the Spotify app.",
+              },
+            })
+          }
           backgroundColor={theme["color-primary-default"]}
           containerStyle={{ backgroundColor: theme["background-basic-color-2"] }}
           contentIcon={PlaylistIcon}
@@ -75,16 +80,6 @@ export default function CreatedPlaylistsPage() {
             </Card>
           }
         />
-
-        {infoDialogVisible && (
-          <InfoDialog
-            visible={infoDialogVisible}
-            setVisible={setInfoDialogVisible}
-            title="About Spotify's Web API">
-            Spotify's API doesn't allow us to remotely delete playlists - you are only deleting them
-            from our own database. To fully delete the playlist, please go to the Spotify app.
-          </InfoDialog>
-        )}
       </Layout>
     </>
   );

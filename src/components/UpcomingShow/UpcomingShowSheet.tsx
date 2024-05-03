@@ -1,27 +1,21 @@
 import { Text } from "@ui-kitten/components";
 import { View } from "react-native";
+import { useSheetPayload } from "react-native-actions-sheet";
 import { useMMKVString } from "react-native-mmkv";
 
 import UpcomingShowForm from "./UpcomingShowForm";
 import useImagePicker from "../../hooks/useImagePicker";
-import { UpcomingShow } from "../../services/upcomingShows";
 import PlaylistImage from "../Playlist/PlaylistImage";
-import FormattedModal from "../ui/FormattedModal";
+import FormattedSheet from "../ui/FormattedSheet";
 
-interface Props {
-  visible: boolean;
-  setVisible: (vis: boolean) => void;
-  existingShow?: UpcomingShow;
-}
+export default function UpcomingShowSheet() {
+  const existingShow = useSheetPayload("upcoming-show-sheet");
 
-export default function UpcomingShowModal({ visible, setVisible, existingShow }: Props) {
   const { selectedImage, pickImageAsync, warning } = useImagePicker();
   const [previousShowImage] = useMMKVString(`upcoming-show-${existingShow?.id}-image`);
 
   return (
-    <FormattedModal
-      visible={visible}
-      setVisible={setVisible}
+    <FormattedSheet
       header={
         <>
           <Text category="h2">Show Details</Text>
@@ -38,13 +32,7 @@ export default function UpcomingShowModal({ visible, setVisible, existingShow }:
           </View>
         </>
       }
-      body={
-        <UpcomingShowForm
-          initialValues={existingShow}
-          selectedImage={selectedImage}
-          dismissModal={() => setVisible(false)}
-        />
-      }
+      body={<UpcomingShowForm initialValues={existingShow} selectedImage={selectedImage} />}
     />
   );
 }

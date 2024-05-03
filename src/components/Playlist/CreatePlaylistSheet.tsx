@@ -1,8 +1,10 @@
 import { Picker } from "@react-native-picker/picker";
 import { Button, Icon, Input, Text, useTheme } from "@ui-kitten/components";
+import { useRouter } from "expo-router";
 import moment from "moment";
 import { useRef, useState } from "react";
 import { View } from "react-native";
+import { SheetManager, useSheetPayload } from "react-native-actions-sheet";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
 
@@ -11,25 +13,16 @@ import useImagePicker from "../../hooks/useImagePicker";
 import usePlaylist from "../../hooks/usePlaylist";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { UpcomingShow } from "../../services/upcomingShows";
-import FormattedModal from "../ui/FormattedModal";
+import FormattedSheet from "../ui/FormattedSheet";
 import LoadingIndicator from "../ui/LoadingIndicator";
 
-interface ModalProps {
-  visible: boolean;
-  setVisible: (vis: boolean) => void;
-  setlistId: string;
-  isUpcomingShow?: boolean;
-}
-
-export default function CreatePlaylistModal({
-  visible,
-  setVisible,
-  setlistId,
-  isUpcomingShow,
-}: ModalProps) {
+export default function CreatePlaylistSheet() {
+  const { setlistId, isUpcomingShow } = useSheetPayload("create-playlist-sheet");
   const playlist = usePlaylist(setlistId);
   const { selectedImage, setSelectedImage, pickImageAsync, warning } = useImagePicker();
   const theme = useTheme();
+
+  const router = useRouter();
 
   const { upcomingShows } = useUpcomingShows();
   const [selectedShow, setSelectedShow] = useState<UpcomingShow | null>(null);
@@ -45,16 +38,25 @@ export default function CreatePlaylistModal({
     );
   };
 
-  const resetModal = () => {
+  const handlePress = async () => {
+    try {
+      await playlist.startMutations(selectedImage, { uri: upcomingImageUri });
+
+      SheetManager.hide("create-playlist-sheet");
+      router.replace("/(drawer)/(tabs)/(library)/createdPlaylists");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const reset = () => {
     playlist.setDefaults();
     setSelectedShow(null);
     setSelectedImage(null);
   };
 
   return (
-    <FormattedModal
-      visible={visible}
-      setVisible={setVisible}
+    <FormattedSheet
       header={
         <>
           <Text category="h2">Playlist Details</Text>
@@ -134,14 +136,14 @@ export default function CreatePlaylistModal({
           {selectedShow && (
             <Button
               appearance="outline"
-              onPress={resetModal}
+              onPress={reset}
               disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
               Reset
             </Button>
           )}
           <Button
             appearance="filled"
-            onPress={() => playlist.startMutations(selectedImage, { uri: upcomingImageUri })}
+            onPress={handlePress}
             accessoryLeft={playlist.mutationsPending ? LoadingIndicator : undefined}
             disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
             {playlist.mutationsPending ? playlist.currentOperation : "Create"}

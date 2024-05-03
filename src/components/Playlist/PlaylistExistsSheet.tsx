@@ -1,24 +1,15 @@
 import { Button, Icon, Text, useTheme } from "@ui-kitten/components";
 import { openBrowserAsync } from "expo-web-browser";
 import { View } from "react-native";
+import { useSheetPayload } from "react-native-actions-sheet";
 import { useMMKVString } from "react-native-mmkv";
 
 import PlaylistImage from "./PlaylistImage";
-import FormattedModal from "../ui/FormattedModal";
+import FormattedSheet from "../ui/FormattedSheet";
 
-interface Props {
-  visible: boolean;
-  setVisible: (vis: boolean) => void;
-  playlistId: string | null;
-  playlistTitle: string;
-}
+export default function PlaylistExistsSheet() {
+  const { playlistId, playlistTitle } = useSheetPayload("playlist-exists-sheet");
 
-export default function PlaylistExistsModal({
-  visible,
-  setVisible,
-  playlistId,
-  playlistTitle,
-}: Props) {
   const [playlistImage] = useMMKVString(`playlist-${playlistId}-image`);
   const theme = useTheme();
 
@@ -31,9 +22,7 @@ export default function PlaylistExistsModal({
   };
 
   return (
-    <FormattedModal
-      visible={visible}
-      setVisible={setVisible}
+    <FormattedSheet
       header={
         <>
           <View />
@@ -54,7 +43,7 @@ export default function PlaylistExistsModal({
             <Icon
               name="external-link-outline"
               style={{ height: 24, width: 24 }}
-              fill={theme["text-basic-color"]}
+              fill={theme["color-primary-100"]}
             />
           )}>
           View your playlist

@@ -1,42 +1,34 @@
-import { Layout, Modal, ModalService, useTheme } from "@ui-kitten/components";
+import { Layout, useTheme } from "@ui-kitten/components";
 import { ReactNode } from "react";
 import { StyleSheet, View } from "react-native";
-
-ModalService.setShouldUseTopInsets = true;
+import ActionSheet from "react-native-actions-sheet";
 
 interface Props {
-  visible: boolean;
-  setVisible: (v: boolean) => void;
   header: ReactNode;
   body?: ReactNode;
   footer?: ReactNode;
 }
 
-export default function FormattedModal({ visible, setVisible, header, body, footer }: Props) {
+export default function FormattedSheet({ header, body, footer }: Props) {
   const theme = useTheme();
 
   return (
-    <Modal
-      visible={visible}
-      animationType="fade"
-      onBackdropPress={() => setVisible(false)}
-      style={{ width: "95%" }}
-      backdropStyle={{ backgroundColor: "rgba(0, 0, 0, 0.5)" }}>
-      <Layout style={[styles.modal, { backgroundColor: theme["background-basic-color-1"] }]}>
+    <ActionSheet
+      containerStyle={{ ...styles.sheet, backgroundColor: theme["background-basic-color-1"] }}>
+      <Layout style={{ gap: 32 }}>
         <View style={styles.header}>{header}</View>
         {body && <View style={styles.body}>{body}</View>}
         {footer && <View style={styles.footer}>{footer}</View>}
       </Layout>
-    </Modal>
+    </ActionSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  modal: {
+  sheet: {
     padding: 16,
-    margin: 16,
-    gap: 16,
-    borderRadius: 10,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
   },
   header: {
     flexDirection: "row",

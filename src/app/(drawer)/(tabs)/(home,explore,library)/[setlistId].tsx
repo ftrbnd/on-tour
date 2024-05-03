@@ -1,14 +1,11 @@
 import { Button, Icon, Layout, useTheme } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
 import { Platform, StyleSheet } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
-import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
 import ParallaxSongsList from "@/src/components/Song/ParallaxSongsList";
 import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
-import InfoDialog from "@/src/components/ui/InfoDialog";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 
 export default function SetlistPage() {
@@ -18,10 +15,22 @@ export default function SetlistPage() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-
   const playlistExists = playlists.some((playlist) => playlist.setlistId === setlistId);
+
+  const openSheet = () =>
+    playlistExists
+      ? SheetManager.show("playlist-exists-sheet", {
+          payload: {
+            playlistId: playlists[0].id,
+            playlistTitle: playlists[0].title,
+          },
+        })
+      : SheetManager.show("create-playlist-sheet", {
+          payload: {
+            setlistId,
+            isUpcomingShow: isUpcomingShow === "true",
+          },
+        });
 
   return (
     <>
@@ -33,38 +42,12 @@ export default function SetlistPage() {
       <FocusAwareStatusBar backgroundColor={theme["color-primary-default"]} style="light" />
 
       <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
-        <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />
-
-        {playlistExists ? (
-          <PlaylistExistsModal
-            visible={modalVisible}
-            setVisible={setModalVisible}
-            playlistId={playlists[0].id}
-            playlistTitle={playlists[0].title}
-          />
-        ) : (
-          <CreatePlaylistModal
-            visible={modalVisible}
-            setVisible={setModalVisible}
-            setlistId={setlistId}
-            isUpcomingShow={isUpcomingShow === "true"}
-          />
-        )}
-
-        {dialogVisible && (
-          <InfoDialog
-            visible={dialogVisible}
-            setVisible={setDialogVisible}
-            title="Not the artist you were expecting?">
-            On Tour searches for setlists through setlist.fm, and will match with any artists whose
-            names are similar.
-          </InfoDialog>
-        )}
+        <ParallaxSongsList setlistId={setlistId} />
 
         <Button
           accessoryLeft={<Icon name="cloud-upload-outline" />}
           style={[styles.fab, Platform.OS === "android" ? styles.android : styles.ios]}
-          onPress={() => setModalVisible(true)}
+          onPress={openSheet}
         />
       </Layout>
     </>

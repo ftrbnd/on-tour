@@ -1,41 +1,33 @@
 import { FlashList } from "@shopify/flash-list";
 import { Button, Card, Icon, Layout, Text } from "@ui-kitten/components";
 import { useRouter, useSegments } from "expo-router";
-import { memo, useState } from "react";
+import { memo } from "react";
 import { View, useColorScheme } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
 
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
-import UpcomingShowModal from "@/src/components/UpcomingShow/UpcomingShowModal";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { NestedSegment } from "@/src/utils/segments";
 
 export default function Library() {
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-
   const { upcomingShows } = useUpcomingShows();
 
   return (
     <Layout level="2" style={{ flex: 1 }}>
       <FlashList
-        ListHeaderComponent={<Header setModalVisible={setModalVisible} />}
+        ListHeaderComponent={<Header />}
         estimatedItemSize={100}
         data={upcomingShows}
         renderItem={({ item }) => <UpcomingShowItem show={item} />}
         keyExtractor={(item) => item.id}
       />
-
-      {modalVisible && <UpcomingShowModal visible={modalVisible} setVisible={setModalVisible} />}
     </Layout>
   );
 }
 
-interface HeaderProps {
-  setModalVisible: (v: boolean) => void;
-}
-
-const Header = memo(function HeaderComponent({ setModalVisible }: HeaderProps) {
+const Header = memo(function HeaderComponent() {
   const { playlists } = useCreatedPlaylists();
   const router = useRouter();
   const segments = useSegments<NestedSegment>();
@@ -77,7 +69,11 @@ const Header = memo(function HeaderComponent({ setModalVisible }: HeaderProps) {
         />
       )}
 
-      <Title title="My Upcoming Shows" icon="plus-outline" onPress={() => setModalVisible(true)} />
+      <Title
+        title="My Upcoming Shows"
+        icon="plus-outline"
+        onPress={() => SheetManager.show("upcoming-show-sheet")}
+      />
     </View>
   );
 });
