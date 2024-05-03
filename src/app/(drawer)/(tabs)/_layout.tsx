@@ -4,6 +4,7 @@ import { Tabs } from "expo-router";
 
 const BottomTabBar = ({ navigation, state }: BottomTabBarProps) => (
   <BottomNavigation
+    style={{ marginTop: -1 }}
     selectedIndex={state.index}
     onSelect={(index) => navigation.navigate(state.routeNames[index])}>
     <BottomNavigationTab icon={<Icon name="home-outline" />} />

@@ -21,7 +21,8 @@ const TopTabBar = ({ navigation, state }: MaterialTopTabBarProps) => (
   <TabBar
     selectedIndex={state.index}
     onSelect={(index) => navigation.navigate(state.routeNames[index])}
-    style={{ paddingVertical: 12 }}>
+    style={{ paddingVertical: 12 }}
+    indicatorStyle={{ marginVertical: -1 }}>
     <Tab title="Following" />
     <Tab title="Recent" />
   </TabBar>
