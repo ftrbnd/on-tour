@@ -1,8 +1,11 @@
+import { Layout } from "@ui-kitten/components";
 import { useFonts } from "expo-font";
 import { Stack, router } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
+import FocusAwareStatusBar from "../components/ui/FocusAwareStatusBar";
 import Providers from "../providers";
 import { useAuth } from "../providers/AuthProvider";
 
@@ -54,9 +57,14 @@ function RoutingSetup() {
 
 function StackLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }} initialRouteName="(drawer)">
-      <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
-      <Stack.Screen name="(auth)/sign-in" options={{ headerShown: false }} />
-    </Stack>
+    <Layout style={{ flex: 1 }}>
+      <FocusAwareStatusBar />
+      <SafeAreaView style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }} initialRouteName="(drawer)">
+          <Stack.Screen name="(drawer)" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)/sign-in" options={{ headerShown: false }} />
+        </Stack>
+      </SafeAreaView>
+    </Layout>
   );
 }

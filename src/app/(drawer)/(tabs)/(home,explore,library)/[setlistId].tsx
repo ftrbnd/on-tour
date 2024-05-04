@@ -1,24 +1,36 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Button, Icon, Layout, useTheme } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
-import { View, StyleSheet } from "react-native";
-import { FAB } from "react-native-paper";
+import { Platform, StyleSheet } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import CreatePlaylistModal from "@/src/components/Playlist/CreatePlaylistModal";
-import PlaylistExistsModal from "@/src/components/Playlist/PlaylistExistsModal";
 import ParallaxSongsList from "@/src/components/Song/ParallaxSongsList";
-import InfoDialog from "@/src/components/ui/InfoDialog";
+import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 
 export default function SetlistPage() {
   const { setlistId, isUpcomingShow }: { setlistId: string; isUpcomingShow?: "true" | "false" } =
     useLocalSearchParams();
   const { playlists } = useCreatedPlaylists(null, setlistId);
-
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+  const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   const playlistExists = playlists.some((playlist) => playlist.setlistId === setlistId);
+
+  const openSheet = async () =>
+    playlistExists
+      ? await SheetManager.show("playlist-exists-sheet", {
+          payload: {
+            playlistId: playlists[0].id,
+            playlistTitle: playlists[0].title,
+          },
+        })
+      : await SheetManager.show("create-playlist-sheet", {
+          payload: {
+            setlistId,
+            isUpcomingShow: isUpcomingShow === "true",
+          },
+        });
 
   return (
     <>
@@ -27,43 +39,17 @@ export default function SetlistPage() {
           headerShown: false,
         }}
       />
+      <FocusAwareStatusBar backgroundColor={theme["color-primary-default"]} style="light" />
 
-      <View style={{ flex: 1 }}>
-        <ParallaxSongsList setlistId={setlistId} setDialogVisible={setDialogVisible} />
+      <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
+        <ParallaxSongsList setlistId={setlistId} />
 
-        {playlistExists ? (
-          <PlaylistExistsModal
-            visible={modalVisible}
-            setVisible={setModalVisible}
-            playlistId={playlists[0].id}
-            playlistTitle={playlists[0].title}
-          />
-        ) : (
-          <CreatePlaylistModal
-            visible={modalVisible}
-            setVisible={setModalVisible}
-            setlistId={setlistId}
-            isUpcomingShow={isUpcomingShow}
-          />
-        )}
-
-        {dialogVisible && (
-          <InfoDialog
-            visible={dialogVisible}
-            setVisible={setDialogVisible}
-            title="Not the artist you were expecting?">
-            On Tour searches for setlists through setlist.fm, and will match with any artists whose
-            names are similar.
-          </InfoDialog>
-        )}
-
-        <FAB
-          variant={isUpcomingShow === "true" ? "tertiary" : "secondary"}
-          icon={({ color }) => <Ionicons name="cloud-upload" size={24} color={color} />}
-          style={styles.fab}
-          onPress={() => setModalVisible(true)}
+        <Button
+          accessoryLeft={<Icon name="cloud-upload-outline" />}
+          style={[styles.fab, Platform.OS === "android" ? styles.android : styles.ios]}
+          onPress={openSheet}
         />
-      </View>
+      </Layout>
     </>
   );
 }
@@ -71,8 +57,21 @@ export default function SetlistPage() {
 const styles = StyleSheet.create({
   fab: {
     position: "absolute",
-    margin: 16,
     right: 0,
     bottom: 0,
+    margin: 16,
+    height: 65,
+    width: 65,
+    borderRadius: 65,
+  },
+  android: {
+    elevation: 4,
+    shadowColor: "#171717",
+  },
+  ios: {
+    shadowColor: "#171717",
+    shadowOffset: { width: -2, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
   },
 });

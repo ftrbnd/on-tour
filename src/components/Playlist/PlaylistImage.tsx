@@ -1,39 +1,47 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Icon, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useTheme } from "react-native-paper";
 
 interface Props {
-  showImage: boolean;
   uri?: string;
   onPress?: () => void;
 }
 
-export default function PlaylistImage({ showImage, uri, onPress }: Props) {
+export default function PlaylistImage({ uri, onPress }: Props) {
   const theme = useTheme();
 
-  return showImage ? (
-    <Image
-      onTouchStart={onPress}
-      source={{
-        uri,
-        width: styles.image.width,
-        height: styles.image.height,
-      }}
-      contentFit="cover"
-      style={styles.image}
-      transition={1000}
-    />
-  ) : (
+  return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.image, { backgroundColor: theme.colors.surfaceVariant }]}>
-      <Ionicons
-        name="musical-notes"
-        size={styles.image.height * 0.66}
-        color={theme.colors.secondary}
-      />
+      containerStyle={{
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: theme["border-basic-color-5"],
+      }}>
+      {uri ? (
+        <Image
+          source={{
+            uri,
+            width: styles.image.width,
+            height: styles.image.height,
+          }}
+          contentFit="cover"
+          style={styles.image}
+          transition={1000}
+        />
+      ) : (
+        <Icon
+          name="music"
+          fill={theme["text-hint-color"]}
+          style={[
+            styles.image,
+            {
+              backgroundColor: theme["background-basic-color-2"],
+            },
+          ]}
+        />
+      )}
     </TouchableOpacity>
   );
 }

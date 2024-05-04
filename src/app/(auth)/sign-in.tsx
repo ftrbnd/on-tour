@@ -1,10 +1,10 @@
-import { Entypo } from "@expo/vector-icons";
+import { Button, Icon, Text, useTheme } from "@ui-kitten/components";
 import { LinearGradient } from "expo-linear-gradient";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
-import { StyleSheet } from "react-native";
-import { Button, Text, useTheme } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
 
+import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
 import { useAuth } from "@/src/providers/AuthProvider";
 
 export default function Login() {
@@ -20,17 +20,19 @@ export default function Login() {
 
   return (
     <LinearGradient
-      colors={[theme.colors.secondary, theme.colors.secondaryContainer]}
+      colors={[theme["color-primary-200"], theme["color-primary-300"]]}
       style={styles.container}>
-      <Text style={[styles.display, { color: theme.colors.onSecondary }]}>On Tour</Text>
-      <Text style={[styles.paragraph, { color: theme.colors.onSecondaryContainer }]}>
-        Create playlists from your favorite shows
-      </Text>
+      <View style={{ gap: 8, justifyContent: "center", alignItems: "center" }}>
+        <Text category="h1" style={{ color: theme["text-basic-color"] }}>
+          On Tour
+        </Text>
+        <Text category="h6" style={{ color: theme["text-basic-color"] }}>
+          Create playlists from your favorite shows
+        </Text>
+      </View>
       <Button
-        loading={isLoading}
         disabled={isLoading}
-        icon={() => <Entypo name="spotify" size={24} color={theme.colors.onSecondaryContainer} />}
-        labelStyle={{ color: theme.colors.onSecondaryContainer }}
+        accessoryLeft={isLoading ? <LoadingIndicator /> : <Icon name="log-in-outline" />}
         onPress={signIn}>
         {isLoading ? "Authenticating..." : "Sign in with Spotify"}
       </Button>
@@ -41,15 +43,8 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    gap: 4,
+    gap: 32,
     justifyContent: "center",
     alignItems: "center",
-  },
-  display: {
-    fontWeight: "bold",
-    fontSize: 48,
-  },
-  paragraph: {
-    fontSize: 14,
   },
 });

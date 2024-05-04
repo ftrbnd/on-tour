@@ -1,71 +1,75 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useRef } from "react";
-import { ColorSchemeName, Platform, StyleSheet, View, useColorScheme } from "react-native";
-import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import {
   Avatar,
   Button,
   Card,
   Divider,
-  RadioButton,
-  Switch,
+  Icon,
+  Layout,
+  Radio,
+  RadioGroup,
   Text,
+  Toggle,
   useTheme,
-} from "react-native-paper";
+} from "@ui-kitten/components";
+import { Image } from "expo-image";
+import { useRef } from "react";
+import { ColorSchemeName, StyleSheet, View, useColorScheme } from "react-native";
+import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
+import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { usePreferredTheme } from "@/src/providers/ThemeProvider";
 
 export default function Settings() {
   return (
-    <View style={{ flex: 1, padding: 16, gap: 32 }}>
+    <Layout level="2" style={{ flex: 1, padding: 16, gap: 32 }}>
       <ProfileCard />
       <Card>
         <ThemeSettings />
       </Card>
-    </View>
+    </Layout>
   );
 }
 
 function ProfileCard() {
   const { session, user, signIn, signOut, isLoading } = useAuth();
+  const colorScheme = useColorScheme();
 
   return (
     <Card>
-      <Card.Title
-        title={
-          <Text variant="headlineMedium" numberOfLines={1} ellipsizeMode="head">
-            {user?.displayName ?? user?.providerId}
-          </Text>
-        }
-        titleStyle={{ marginLeft: 8 }}
-        left={() =>
-          user?.avatar ? (
-            <Avatar.Image source={{ uri: user.avatar }} size={50} />
-          ) : (
-            <Avatar.Icon icon={({ color }) => <Ionicons name="person" size={24} color={color} />} />
-          )
-        }
-        right={() => (
-          <Button
-            icon={({ color }) => <Ionicons name="log-out-outline" size={24} color={color} />}
-            loading={isLoading}
-            disabled={isLoading}
-            onPress={session ? signOut : signIn}>
-            {isLoading ? "Signing out..." : session ? ` Sign out` : "Sign in"}
-          </Button>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        {user?.avatar ? (
+          <Avatar source={{ uri: user.avatar }} ImageComponent={Image} />
+        ) : (
+          <Icon name="person" style={{ height: 24, width: 24, flex: 1 }} />
         )}
-        rightStyle={{ marginRight: 8 }}
-      />
+        <Text category="h3" numberOfLines={1} ellipsizeMode="head" style={{ margin: 8 }}>
+          {user?.displayName ?? user?.providerId}
+        </Text>
+        <Button
+          appearance="ghost"
+          status={colorScheme === "dark" ? "basic" : "primary"}
+          accessoryLeft={
+            isLoading ? (
+              <LoadingIndicator status="primary" />
+            ) : (
+              <Icon name="log-out-outline" style={{ height: 24, width: 24 }} />
+            )
+          }
+          disabled={isLoading}
+          onPress={session ? signOut : signIn}>
+          {isLoading ? "Signing out..." : session ? "Sign out" : "Sign in"}
+        </Button>
+      </View>
     </Card>
   );
 }
 
 function ThemeSettings() {
   const colorScheme = useColorScheme();
-  const { toggleTheme, usingSystemTheme } = usePreferredTheme();
   const theme = useTheme();
+  const { toggleTheme, usingSystemTheme } = usePreferredTheme();
 
   const actionSheetRef = useRef<ActionSheetRef>(null);
 
@@ -81,46 +85,53 @@ function ThemeSettings() {
 
   return (
     <TouchableOpacity onPress={() => actionSheetRef.current?.show()}>
-      <Card.Title
-        title={`Theme: ${usingSystemTheme ? "System" : capitalizedThemeName}`}
-        subtitle="Change app appearance"
-        subtitleStyle={{ color: "gray" }}
-        left={() => (
-          <Ionicons
-            name={colorScheme === "dark" ? "moon-outline" : "sunny-outline"}
-            size={24}
-            color={theme.colors.primary}
-          />
-        )}
-      />
+      <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <Icon
+          fill={theme["text-basic-color"]}
+          name={colorScheme === "dark" ? "moon-outline" : "sun-outline"}
+          style={{ height: 36, width: 36 }}
+        />
+        <View style={{ marginLeft: 8, gap: 4 }}>
+          <Text category="h6">{`Theme: ${usingSystemTheme ? "System" : capitalizedThemeName}`}</Text>
+          <Text category="s2" appearance="hint">
+            Change app appearance
+          </Text>
+        </View>
+      </View>
 
       <ActionSheet
+        gestureEnabled
         ref={actionSheetRef}
         snapPoints={[33, 66]}
-        containerStyle={{ ...styles.actionSheet, backgroundColor: theme.colors.background }}>
-        <Text variant="headlineSmall" style={{ textAlign: "center" }}>
+        containerStyle={{
+          ...styles.actionSheet,
+          backgroundColor: theme["background-basic-color-1"],
+        }}>
+        <Text category="h3" style={{ textAlign: "center" }}>
           Theme
         </Text>
-        <View style={{ flexDirection: "row", justifyContent: "space-evenly", padding: 16 }}>
-          <TouchableOpacity style={styles.radioButton} onPress={() => handleRadioCheck("light")}>
-            <Ionicons
-              name={colorScheme === "light" ? "sunny" : "sunny-outline"}
-              size={36}
-              color={colorScheme === "light" ? theme.colors.primary : "white"}
-            />
-            <RadioButton status={colorScheme === "light" ? "checked" : "unchecked"} value="light" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.radioButton} onPress={() => handleRadioCheck("dark")}>
-            <Ionicons
-              name={colorScheme === "dark" ? "moon" : "moon-outline"}
-              size={36}
-              color={colorScheme === "dark" ? theme.colors.primary : "black"}
-            />
-            <RadioButton status={colorScheme === "dark" ? "checked" : "unchecked"} value="dark" />
-          </TouchableOpacity>
-        </View>
+        <RadioGroup>
+          <View style={{ flexDirection: "row", justifyContent: "space-evenly", padding: 16 }}>
+            <TouchableOpacity style={styles.radioButton} onPress={() => handleRadioCheck("light")}>
+              <Icon
+                name={colorScheme === "light" ? "sun" : "sun-outline"}
+                style={{ height: 36, width: 36 }}
+                fill={theme["text-basic-color"]}
+              />
+              <Radio checked={colorScheme === "light"} />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.radioButton} onPress={() => handleRadioCheck("dark")}>
+              <Icon
+                name={colorScheme === "dark" ? "moon" : "moon-outline"}
+                style={{ height: 36, width: 36 }}
+                fill={theme["text-basic-color"]}
+              />
+              <Radio checked={colorScheme === "dark"} />
+            </TouchableOpacity>
+          </View>
+        </RadioGroup>
 
-        <Divider bold />
+        <Divider />
 
         <View
           style={{
@@ -130,14 +141,14 @@ function ThemeSettings() {
             padding: 16,
           }}>
           <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-            <Ionicons
-              name={Platform.OS === "ios" ? "phone-portrait-outline" : "phone-portrait-sharp"}
-              size={24}
-              color={colorScheme === "dark" ? "white" : "black"}
+            <Icon
+              name="smartphone-outline"
+              style={{ height: 36, width: 36 }}
+              fill={theme["text-basic-color"]}
             />
-            <Text variant="labelLarge">Device settings</Text>
+            <Text category="s1">Device settings</Text>
           </View>
-          <Switch value={usingSystemTheme} onValueChange={(val) => handleSwitchToggle(val)} />
+          <Toggle checked={usingSystemTheme} onChange={(val) => handleSwitchToggle(val)} />
         </View>
       </ActionSheet>
     </TouchableOpacity>
@@ -148,6 +159,7 @@ const styles = StyleSheet.create({
   actionSheet: {
     flex: 1,
     padding: 16,
+    gap: 16,
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
   },

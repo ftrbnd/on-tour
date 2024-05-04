@@ -1,7 +1,7 @@
+import { Text } from "@ui-kitten/components";
 import { ReactNode } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { RectButton, Swipeable, TouchableOpacity } from "react-native-gesture-handler";
-import { Text } from "react-native-paper";
 
 function renderRightAction(
   text: string,

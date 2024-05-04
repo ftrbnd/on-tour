@@ -1,12 +1,12 @@
-import { Entypo, Ionicons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
+import { Button, Card, Icon, Text, useTheme } from "@ui-kitten/components";
 import { router } from "expo-router";
 import { openBrowserAsync } from "expo-web-browser";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Button, Card, Text, useTheme } from "react-native-paper";
 import { withAvatarHeaderFlashList } from "react-native-sticky-parallax-header";
 
 import SetlistPreview from "./SetlistPreview";
+import LoadingIndicator from "../ui/LoadingIndicator";
 
 import { ArtistIcon } from "@/src/assets/icons";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
@@ -49,23 +49,28 @@ export default function ParallaxSetlistList({
       hasBorderRadius
       leftTopIcon={() => (
         <TouchableOpacity>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.onSecondaryContainer} />
+          <Icon
+            name="chevron-left-outline"
+            fill={theme["text-control-color"]}
+            style={{ height: 24, width: 24 }}
+          />
         </TouchableOpacity>
       )}
       leftTopIconOnPress={router.back}
       rightTopIcon={() => (
         <TouchableOpacity>
-          <Entypo name="spotify" size={24} color={theme.colors.onSecondaryContainer} />
+          <Icon
+            name="external-link-outline"
+            fill={theme["text-control-color"]}
+            style={{ height: 24, width: 24 }}
+          />
         </TouchableOpacity>
       )}
       rightTopIconOnPress={() => (artist ? openBrowserAsync(artist?.external_urls.spotify) : null)}
-      backgroundColor={theme.colors.secondaryContainer}
-      containerStyle={{ backgroundColor: theme.colors.surface }}
+      backgroundColor={theme["color-primary-default"]}
+      containerStyle={{ backgroundColor: theme["background-basic-color-2"] }}
       image={artist ? { uri: artist.images[1].url } : ArtistIcon}
       title={artist?.name ?? "Artist"}
-      titleStyle={{
-        color: theme.colors.onSecondaryContainer,
-      }}
       estimatedItemSize={150}
       contentContainerStyle={{ padding: 8 }}
       data={setlists}
@@ -81,20 +86,16 @@ export default function ParallaxSetlistList({
       onEndReached={handleEndReached}
       ListEmptyComponent={
         loading ? (
-          <Card>
-            <Card.Content>
-              <Button loading={loading} disabled>
-                Loading...
-              </Button>
-            </Card.Content>
+          <Card style={{ marginTop: 8 }}>
+            <Button appearance="ghost" disabled accessoryLeft={LoadingIndicator}>
+              Loading...
+            </Button>
           </Card>
         ) : artist ? (
-          <Card>
-            <Card.Content>
-              <Text variant="titleSmall" style={{ textAlign: "center" }}>
-                {artist && !loading ? "No setlists were found for this artist." : "Loading..."}
-              </Text>
-            </Card.Content>
+          <Card style={{ marginTop: 8 }}>
+            <Text category="label" style={{ textAlign: "center" }}>
+              {artist && !loading ? "No setlists were found for this artist." : "Loading..."}
+            </Text>
           </Card>
         ) : null
       }

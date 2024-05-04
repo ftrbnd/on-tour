@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { View } from "react-native";
-import { Searchbar } from "react-native-paper";
+import { Icon, Input, Layout, useTheme } from "@ui-kitten/components";
+import { useMemo, useRef, useState } from "react";
+import { useColorScheme } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
 
 import ArtistList from "@/src/components/Artist/ArtistList";
@@ -14,6 +14,9 @@ export default function Explore() {
   const [searchResults, setSearchResults] = useState<Artist[]>([]);
 
   const { session } = useAuth();
+  const inputRef = useRef<Input>(null);
+  const colorScheme = useColorScheme();
+  const theme = useTheme();
 
   const debounced = useDebouncedCallback(async (query) => {
     const results = await searchForArtists(session?.accessToken, query);
@@ -45,16 +48,35 @@ export default function Explore() {
     [relatedArtists],
   );
 
+  const exitSearch = () => {
+    setSearchQuery("");
+    setSearchResults([]);
+
+    inputRef.current?.blur();
+  };
+
   return (
-    <View style={{ flex: 1 }}>
-      <Searchbar
-        style={{ marginTop: 16, marginHorizontal: 16 }}
-        placeholder="Search for an artist"
+    <Layout level="2" style={{ flex: 1 }}>
+      <Input
+        value={searchQuery}
         onChangeText={(text) => {
           setSearchQuery(text);
           debounced(text);
         }}
-        value={searchQuery}
+        placeholder="Search for an artist"
+        status={colorScheme === "dark" ? "basic" : "primary"}
+        ref={inputRef}
+        accessoryLeft={<Icon name="search-outline" />}
+        accessoryRight={
+          inputRef.current?.isFocused() ? (
+            <Icon name="close-outline" onPress={exitSearch} />
+          ) : undefined
+        }
+        style={{
+          marginTop: 16,
+          marginHorizontal: 16,
+          backgroundColor: theme["background-basic-color-3"],
+        }}
       />
 
       <ArtistList
@@ -62,7 +84,8 @@ export default function Explore() {
         showsVerticalScrollIndicator={searchResults.length > 0}
         onRefresh={() => (searchResults.length > 0 ? null : refetch())}
         refreshing={isRefetching}
+        isSearchResult={searchResults.length > 0}
       />
-    </View>
+    </Layout>
   );
 }

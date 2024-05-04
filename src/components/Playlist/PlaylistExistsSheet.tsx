@@ -1,26 +1,17 @@
-import { Entypo } from "@expo/vector-icons";
+import { Button, Icon, Text, useTheme } from "@ui-kitten/components";
 import { openBrowserAsync } from "expo-web-browser";
 import { View } from "react-native";
+import { useSheetPayload } from "react-native-actions-sheet";
 import { useMMKVString } from "react-native-mmkv";
-import { Button, Text } from "react-native-paper";
 
 import PlaylistImage from "./PlaylistImage";
-import AnimatedModal from "../ui/AnimatedModal";
+import FormattedSheet from "../ui/FormattedSheet";
 
-interface Props {
-  visible: boolean;
-  setVisible: (vis: boolean) => void;
-  playlistId: string | null;
-  playlistTitle: string;
-}
+export default function PlaylistExistsSheet() {
+  const { playlistId, playlistTitle } = useSheetPayload("playlist-exists-sheet");
 
-export default function PlaylistExistsModal({
-  visible,
-  setVisible,
-  playlistId,
-  playlistTitle,
-}: Props) {
   const [playlistImage] = useMMKVString(`playlist-${playlistId}-image`);
+  const theme = useTheme();
 
   const openWebPage = async () => {
     try {
@@ -31,26 +22,30 @@ export default function PlaylistExistsModal({
   };
 
   return (
-    <AnimatedModal
-      visible={visible}
-      setVisible={setVisible}
+    <FormattedSheet
       header={
         <>
           <View />
-          <PlaylistImage showImage={playlistImage !== undefined} uri={playlistImage} />
+          <PlaylistImage uri={playlistImage} />
           <View />
         </>
       }
       body={
-        <Text variant="labelLarge" style={{ fontWeight: "bold", textAlign: "center" }}>
+        <Text category="s1" style={{ fontWeight: "bold", textAlign: "center" }}>
           {playlistTitle}
         </Text>
       }
       footer={
         <Button
-          mode="contained"
+          appearance="filled"
           onPress={openWebPage}
-          icon={({ color }) => <Entypo name="spotify" size={24} color={color} />}>
+          accessoryLeft={() => (
+            <Icon
+              name="external-link-outline"
+              style={{ height: 24, width: 24 }}
+              fill={theme["color-primary-100"]}
+            />
+          )}>
           View your playlist
         </Button>
       }

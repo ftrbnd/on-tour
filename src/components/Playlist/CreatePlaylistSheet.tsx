@@ -1,35 +1,28 @@
-import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import { Button, Icon, Input, Text, useTheme } from "@ui-kitten/components";
+import { useRouter } from "expo-router";
 import moment from "moment";
 import { useRef, useState } from "react";
 import { View } from "react-native";
+import { SheetManager, useSheetPayload } from "react-native-actions-sheet";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useMMKVString } from "react-native-mmkv";
-import { Button, Text, TextInput, useTheme } from "react-native-paper";
 
 import PlaylistImage from "./PlaylistImage";
 import useImagePicker from "../../hooks/useImagePicker";
 import usePlaylist from "../../hooks/usePlaylist";
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { UpcomingShow } from "../../services/upcomingShows";
-import AnimatedModal from "../ui/AnimatedModal";
+import FormattedSheet from "../ui/FormattedSheet";
+import LoadingIndicator from "../ui/LoadingIndicator";
 
-interface ModalProps {
-  visible: boolean;
-  setVisible: (vis: boolean) => void;
-  setlistId: string;
-  isUpcomingShow?: "true" | "false";
-}
-
-export default function CreatePlaylistModal({
-  visible,
-  setVisible,
-  setlistId,
-  isUpcomingShow,
-}: ModalProps) {
+export default function CreatePlaylistSheet() {
+  const { setlistId, isUpcomingShow } = useSheetPayload("create-playlist-sheet");
   const playlist = usePlaylist(setlistId);
   const { selectedImage, setSelectedImage, pickImageAsync, warning } = useImagePicker();
   const theme = useTheme();
+
+  const router = useRouter();
 
   const { upcomingShows } = useUpcomingShows();
   const [selectedShow, setSelectedShow] = useState<UpcomingShow | null>(null);
@@ -45,21 +38,29 @@ export default function CreatePlaylistModal({
     );
   };
 
-  const resetModal = () => {
+  const handlePress = async () => {
+    try {
+      await playlist.startMutations(selectedImage, { uri: upcomingImageUri });
+
+      await SheetManager.hide("create-playlist-sheet");
+      router.replace("/(drawer)/(tabs)/(library)/createdPlaylists");
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const reset = () => {
     playlist.setDefaults();
     setSelectedShow(null);
     setSelectedImage(null);
   };
 
   return (
-    <AnimatedModal
-      visible={visible}
-      setVisible={setVisible}
+    <FormattedSheet
       header={
         <>
-          <Text variant="headlineLarge">Playlist Details</Text>
+          <Text category="h2">Playlist Details</Text>
           <PlaylistImage
-            showImage={selectedImage !== null || upcomingImageUri !== undefined}
             uri={selectedImage ? selectedImage.uri : upcomingImageUri}
             onPress={() => (playlist.mutationsPending ? null : pickImageAsync())}
           />
@@ -67,14 +68,16 @@ export default function CreatePlaylistModal({
       }
       body={
         <>
-          <TextInput
+          <Input
             label="Name"
+            placeholder="Name"
             value={playlist.name ?? ""}
             onChangeText={(text) => playlist.setName(text)}
             multiline
           />
-          <TextInput
+          <Input
             label="Description"
+            placeholder="Description"
             value={playlist.description ?? ""}
             onChangeText={(text) => playlist.setDescription(text)}
             multiline
@@ -88,36 +91,47 @@ export default function CreatePlaylistModal({
                   ref={pickerRef}
                   selectedValue={selectedShow}
                   onValueChange={(item) => handleSelection(item)}
-                  style={{
-                    color: theme.colors.onBackground,
-                    backgroundColor: theme.colors.background,
-                  }}>
+                  dropdownIconColor={theme["text-basic-color"]}
+                  numberOfLines={1}
+                  mode="dropdown"
+                  style={{ backgroundColor: theme["background-basic-color-2"] }}>
                   <Picker.Item
                     label="Import an upcoming show"
                     enabled={false}
-                    style={{ color: "gray" }}
+                    style={{
+                      color: theme["text-hint-color"],
+                      backgroundColor: theme["background-basic-color-2"],
+                    }}
                   />
                   {upcomingShows.map((show) => (
                     <Picker.Item
                       key={show.id}
                       label={`${show.artist} - ${show.tour}`}
                       value={show}
+                      style={{
+                        color: theme["text-basic-color"],
+                        backgroundColor: theme["background-basic-color-2"],
+                      }}
                     />
                   ))}
                 </Picker>
               </TouchableOpacity>
-              {isUpcomingShow === "true" && (
+              {isUpcomingShow && (
                 <View
                   style={{
                     flexDirection: "row",
                     justifyContent: "space-evenly",
                     alignItems: "center",
-                    backgroundColor: theme.colors.tertiaryContainer,
                     borderRadius: 5,
                     padding: 8,
+                    backgroundColor: theme["color-info-200"],
                   }}>
-                  <Ionicons name="star" color={theme.colors.onTertiaryContainer} size={18} />
-                  <Text variant="labelMedium" style={{ color: theme.colors.onTertiaryContainer }}>
+                  <Icon
+                    name="star"
+                    style={{ height: 24, width: 24 }}
+                    fill={theme["text-info-color"]}
+                  />
+                  <Text category="label" style={{ color: theme["text-info-color"] }}>
                     This was one of your upcoming shows!
                   </Text>
                 </View>
@@ -128,19 +142,20 @@ export default function CreatePlaylistModal({
       }
       footer={
         <>
-          {warning && <Text variant="labelMedium">{warning}</Text>}
+          {warning && <Text category="label">{warning}</Text>}
 
           {selectedShow && (
             <Button
-              onPress={resetModal}
+              appearance="outline"
+              onPress={reset}
               disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
               Reset
             </Button>
           )}
           <Button
-            onPress={() => playlist.startMutations(selectedImage, { uri: upcomingImageUri })}
-            mode="contained"
-            loading={playlist.mutationsPending}
+            appearance="filled"
+            onPress={handlePress}
+            accessoryLeft={playlist.mutationsPending ? LoadingIndicator : undefined}
             disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
             {playlist.mutationsPending ? playlist.currentOperation : "Create"}
           </Button>

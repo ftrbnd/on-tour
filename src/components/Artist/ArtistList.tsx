@@ -11,6 +11,7 @@ interface Props {
   showsVerticalScrollIndicator?: boolean;
   onRefresh?: () => void;
   refreshing?: boolean;
+  isSearchResult?: boolean;
 }
 
 export default function ArtistList({
@@ -21,6 +22,7 @@ export default function ArtistList({
   showsVerticalScrollIndicator,
   onRefresh,
   refreshing,
+  isSearchResult,
 }: Props) {
   const handleEndReached = () => (!isPlaceholderData && next && setNext ? setNext(next) : null);
 
@@ -29,7 +31,7 @@ export default function ArtistList({
       estimatedItemSize={75}
       contentContainerStyle={{ padding: 8 }}
       data={artists}
-      renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={false} />}
+      renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={isSearchResult} />}
       onEndReached={handleEndReached}
       onEndReachedThreshold={next ? 0.5 : null}
       showsVerticalScrollIndicator={showsVerticalScrollIndicator}

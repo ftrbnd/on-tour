@@ -1,10 +1,10 @@
-import { Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 import { FlashList } from "@shopify/flash-list";
+import { Divider, Icon, useTheme } from "@ui-kitten/components";
 import { router, useLocalSearchParams } from "expo-router";
 import moment from "moment";
 import { View } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Divider, useTheme } from "react-native-paper";
 import { withDetailsHeaderFlashList } from "react-native-sticky-parallax-header";
 
 import SongItem from "./SongItem";
@@ -15,13 +15,7 @@ import { Song } from "@/src/utils/setlist-fm-types";
 
 const DetailsHeaderFlashList = withDetailsHeaderFlashList<Song>(FlashList);
 
-export default function ParallaxSongsList({
-  setlistId,
-  setDialogVisible,
-}: {
-  setlistId: string;
-  setDialogVisible: (vis: boolean) => void;
-}) {
+export default function ParallaxSongsList({ setlistId }: { setlistId: string }) {
   const setlist = useSetlist(setlistId);
   const theme = useTheme();
   const { artistImage } = useLocalSearchParams<{ artistImage?: string }>();
@@ -41,37 +35,49 @@ export default function ParallaxSongsList({
       hasBorderRadius
       leftTopIcon={() => (
         <TouchableOpacity>
-          <Ionicons name="arrow-back" size={24} color={theme.colors.onSecondaryContainer} />
+          <Icon
+            name="chevron-left-outline"
+            fill={theme["text-control-color"]}
+            style={{ height: 24, width: 24 }}
+          />
         </TouchableOpacity>
       )}
       leftTopIconOnPress={router.back}
       rightTopIcon={() => (
         <View style={{ flexDirection: "row", gap: 16 }}>
-          <TouchableOpacity onPress={() => setDialogVisible(true)}>
-            <SimpleLineIcons name="question" size={24} color={theme.colors.onPrimaryContainer} />
+          <TouchableOpacity
+            onPress={async () =>
+              await SheetManager.show("info-sheet", {
+                payload: {
+                  title: "Not the artist you were expecting?",
+                  description:
+                    "On Tour searches for setlists through setlist.fm, and will match with any artists whose names are similar.",
+                },
+              })
+            }>
+            <Icon
+              name="question-mark-circle-outline"
+              fill={theme["text-control-color"]}
+              style={{ height: 24, width: 24 }}
+            />
           </TouchableOpacity>
           <TouchableOpacity onPress={setlist.openWebpage}>
-            <Ionicons name="open-outline" size={24} color={theme.colors.onPrimaryContainer} />
+            <Icon
+              name="external-link-outline"
+              fill={theme["text-control-color"]}
+              style={{ height: 24, width: 24 }}
+            />
           </TouchableOpacity>
         </View>
       )}
-      backgroundColor={theme.colors.secondaryContainer}
-      containerStyle={{ backgroundColor: theme.colors.surface }}
+      backgroundColor={theme["color-primary-default"]}
+      containerStyle={{ backgroundColor: theme["background-basic-color-2"] }}
       title={setlist.data?.tour?.name ?? cityAndCountry}
-      titleStyle={{ color: theme.colors.onSecondaryContainer }}
       subtitle={setlist.data?.artist.name ?? "Artist"}
       image={image.uri ? image : ArtistIcon}
       tag={setlist.data?.tour ? `${cityAndCountry}\n${venue}` : `${date}\n${venue}`}
-      tagStyle={{
-        backgroundColor: theme.colors.surface,
-        color: theme.colors.onSurface,
-        borderRadius: 25,
-      }}
       contentIcon={PlaylistIcon}
       contentIconNumber={setlist.songs.length}
-      contentIconNumberStyle={{
-        color: "#000",
-      }}
       estimatedItemSize={150}
       contentContainerStyle={{ padding: 8 }}
       data={setlist.songs}

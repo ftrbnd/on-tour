@@ -1,9 +1,11 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
+import { Layout, useTheme } from "@ui-kitten/components";
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import ParallaxSetlistList from "@/src/components/Setlist/ParallaxSetlistList";
+import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { searchArtistSetlist } from "@/src/services/setlist-fm";
 import { getOneArtist } from "@/src/services/spotify";
@@ -15,6 +17,8 @@ export default function ArtistPage() {
 
   const { artistId }: { artistId: string } = useLocalSearchParams();
   const { session } = useAuth();
+  const insets = useSafeAreaInsets();
+  const theme = useTheme();
 
   const { data: artist } = useQuery({
     queryKey: ["artist", artistId],
@@ -42,8 +46,9 @@ export default function ArtistPage() {
           headerShown: false,
         }}
       />
+      <FocusAwareStatusBar backgroundColor={theme["color-primary-default"]} style="light" />
 
-      <View style={{ flex: 1 }}>
+      <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
         <ParallaxSetlistList
           setlists={setlists}
           isPlaceholderData={isPlaceholderData}
@@ -54,7 +59,7 @@ export default function ArtistPage() {
           onRefresh={refetch}
           refreshing={isRefetching}
         />
-      </View>
+      </Layout>
     </>
   );
 }

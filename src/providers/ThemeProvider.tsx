@@ -1,43 +1,10 @@
-import {
-  DefaultTheme as NavigationLightTheme,
-  DarkTheme as NavigationDarkTheme,
-  ThemeProvider as NavigationThemeProvider,
-} from "@react-navigation/native";
-import { useFonts } from "expo-font";
+import * as eva from "@eva-design/eva";
+import { ApplicationProvider, IconRegistry } from "@ui-kitten/components";
+import { EvaIconsPack } from "@ui-kitten/eva-icons";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { Appearance, ColorSchemeName, useColorScheme } from "react-native";
-import {
-  MD3LightTheme,
-  MD3DarkTheme,
-  PaperProvider,
-  adaptNavigationTheme,
-  configureFonts,
-} from "react-native-paper";
 
 import { storage } from "../utils/mmkv";
-
-const { LightTheme, DarkTheme } = adaptNavigationTheme({
-  reactNavigationLight: NavigationLightTheme,
-  reactNavigationDark: NavigationDarkTheme,
-});
-
-const CombinedLightTheme = {
-  ...MD3LightTheme,
-  ...LightTheme,
-  colors: {
-    ...MD3LightTheme.colors,
-    ...LightTheme.colors,
-  },
-};
-
-const CombinedDarkTheme = {
-  ...MD3DarkTheme,
-  ...DarkTheme,
-  colors: {
-    ...MD3DarkTheme.colors,
-    ...DarkTheme.colors,
-  },
-};
 
 interface PreferredThemeContextProps {
   toggleTheme: (theme: ColorSchemeName) => void;
@@ -51,23 +18,7 @@ const PreferredThemeContext = createContext<PreferredThemeContextProps>({
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
   const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    InterVariable: require("../assets/fonts/InterVariable.ttf"),
-  });
-
   const [usingSystemTheme, setUsingSystemTheme] = useState<boolean>(true);
-
-  const theme = colorScheme === "dark" ? CombinedDarkTheme : CombinedLightTheme;
-  const fontTheme = {
-    ...theme,
-    fonts: configureFonts({
-      config: {
-        fontFamily: "InterVariable",
-      },
-    }),
-  };
-
-  const configuredTheme = loaded ? fontTheme : theme;
 
   useEffect(() => {
     async function loadTheme() {
@@ -89,9 +40,10 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
 
   return (
     <PreferredThemeContext.Provider value={{ toggleTheme, usingSystemTheme }}>
-      <PaperProvider theme={configuredTheme}>
-        <NavigationThemeProvider value={configuredTheme}>{children}</NavigationThemeProvider>
-      </PaperProvider>
+      <IconRegistry icons={EvaIconsPack} />
+      <ApplicationProvider {...eva} theme={eva[colorScheme ?? "light"]}>
+        {children}
+      </ApplicationProvider>
     </PreferredThemeContext.Provider>
   );
 }

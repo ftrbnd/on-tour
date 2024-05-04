@@ -1,8 +1,7 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Card, Text, useTheme, Icon } from "@ui-kitten/components";
 import { useRouter, useSegments } from "expo-router";
 import moment from "moment";
 import { View } from "react-native";
-import { Card, Text, useTheme } from "react-native-paper";
 
 import { NestedSegment } from "../../utils/segments";
 import { Setlist } from "../../utils/setlist-fm-types";
@@ -34,29 +33,34 @@ export default function SetlistPreview({
 
   return (
     <Card style={{ margin: 4 }} onPress={openSetlistPage}>
-      <Card.Title
-        title={setlist.artist.name}
-        titleVariant="titleLarge"
-        subtitle={setlist.tour?.name}
-        subtitleVariant="titleMedium"
-      />
-      <Card.Content style={{ flexDirection: "row", justifyContent: "space-between" }}>
-        <View>
-          <Text variant="titleSmall">{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>
-          <Text variant="titleSmall">{setlist.venue.name}</Text>
-          <Text variant="titleSmall">
+      {displayArtist && <Text category="h5">{setlist.artist.name}</Text>}
+      {setlist.tour && <Text category="h6">{setlist.tour.name}</Text>}
+
+      <View
+        style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
+        <View style={{ gap: 4 }}>
+          <Text
+            category={
+              displayArtist ? "s2" : "h6"
+            }>{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>
+          <Text category={displayArtist ? "s2" : "s1"}>{setlist.venue.name}</Text>
+          <Text category="label">
             {moment(setlist.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}
           </Text>
         </View>
+
         {isUpcomingShow && (
-          <Ionicons
+          <Icon
             name="star"
-            size={24}
-            color={theme.colors.tertiary}
-            style={{ alignSelf: "flex-end" }}
+            style={{
+              alignSelf: "flex-end",
+              height: 24,
+              width: 24,
+            }}
+            fill={theme["text-info-color"]}
           />
         )}
-      </Card.Content>
+      </View>
     </Card>
   );
 }

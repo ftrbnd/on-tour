@@ -1,9 +1,10 @@
+import { Button } from "@ui-kitten/components";
 import { ImagePickerAsset } from "expo-image-picker";
 import { Formik, useFormikContext } from "formik";
 import moment from "moment";
 import { useMemo } from "react";
 import { View } from "react-native";
-import { Button } from "react-native-paper";
+import { SheetManager } from "react-native-actions-sheet";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
@@ -16,13 +17,11 @@ import { UpcomingShow } from "@/src/services/upcomingShows";
 
 interface FormProps {
   onSubmit: () => void;
-  dismissModal: () => void;
 }
 
 interface ContainerProps {
   initialValues?: UpcomingShow;
   selectedImage: ImagePickerAsset | null;
-  dismissModal: () => void;
 }
 
 type NewUpcomingShow = Omit<UpcomingShow, "id" | "userId">;
@@ -38,7 +37,7 @@ const validationSchema = z.object({
   venue: z.string().trim().min(1, { message: "Required" }),
 });
 
-function Form({ onSubmit, dismissModal }: FormProps) {
+function Form({ onSubmit }: FormProps) {
   const { dirty, errors, isSubmitting, isValidating } = useFormikContext<NewUpcomingShow>();
   const noErrors = JSON.stringify(errors) === "{}";
 
@@ -56,11 +55,8 @@ function Form({ onSubmit, dismissModal }: FormProps) {
           justifyContent: "space-evenly",
           alignItems: "center",
         }}>
-        <Button mode="outlined" onPress={dismissModal}>
-          Cancel
-        </Button>
         <Button
-          mode="contained"
+          appearance="filled"
           onPress={onSubmit}
           disabled={!dirty || !noErrors || isSubmitting || isValidating}>
           Save
@@ -70,11 +66,7 @@ function Form({ onSubmit, dismissModal }: FormProps) {
   );
 }
 
-export default function UpcomingShowForm({
-  initialValues,
-  selectedImage,
-  dismissModal,
-}: ContainerProps) {
+export default function UpcomingShowForm({ initialValues, selectedImage }: ContainerProps) {
   const { addShow, updateShow } = useUpcomingShows();
   const { user } = useAuth();
 
@@ -113,7 +105,7 @@ export default function UpcomingShowForm({
         await addShow(submission.show, submission.selectedImage);
       }
 
-      dismissModal();
+      await SheetManager.hide("upcoming-show-sheet");
     } catch (e) {
       console.error(e);
     }
@@ -124,7 +116,7 @@ export default function UpcomingShowForm({
       initialValues={initialValues ?? initialEmptyValues}
       onSubmit={handleSubmit}
       validationSchema={toFormikValidationSchema(validationSchema)}>
-      {({ handleSubmit }) => <Form onSubmit={handleSubmit} dismissModal={dismissModal} />}
+      {({ handleSubmit }) => <Form onSubmit={handleSubmit} />}
     </Formik>
   );
 }

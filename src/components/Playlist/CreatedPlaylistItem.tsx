@@ -1,10 +1,11 @@
-import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "@tanstack/react-query";
+import { Icon, Layout, Popover, Text, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { openBrowserAsync } from "expo-web-browser";
 import { useState } from "react";
-import { View } from "react-native";
-import { Card, Menu, Surface, Text } from "react-native-paper";
+import { StyleSheet, View } from "react-native";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useToast } from "react-native-toast-notifications";
 
 import useCreatedPlaylists from "../../hooks/useCreatedPlaylists";
 import { CreatedPlaylist } from "../../services/createdPlaylists";
@@ -17,7 +18,6 @@ import { Playlist, TrackItem } from "@/src/utils/spotify-types";
 
 interface Props {
   playlist: CreatedPlaylist;
-  showSnackbar?: () => void;
   horizontal?: boolean;
 }
 
@@ -25,54 +25,81 @@ interface ItemProps extends Props {
   openWebPage: () => void;
   handleDelete: () => void;
   spotifyPlaylist: Playlist<TrackItem> | undefined;
-  menuVisible: boolean;
-  setMenuVisible: (v: boolean) => void;
+  popoverVisible: boolean;
+  setPopoverVisible: (v: boolean) => void;
 }
+
+const BORDER_RADIUS = 10;
 
 function VerticalPlaylistItem({
   playlist,
   openWebPage,
   handleDelete,
   spotifyPlaylist,
-  menuVisible,
-  setMenuVisible,
+  popoverVisible,
+  setPopoverVisible,
 }: ItemProps) {
+  const theme = useTheme();
+
+  const renderToggleItemCard = () => (
+    <TouchableOpacity onPress={openWebPage} onLongPress={() => setPopoverVisible(true)}>
+      <Layout
+        style={{
+          height: 250,
+          width: 200,
+          margin: 8,
+          borderRadius: BORDER_RADIUS,
+          borderWidth: 1,
+          borderColor: theme["border-basic-color-4"],
+        }}>
+        <Image
+          source={spotifyPlaylist ? { uri: spotifyPlaylist.images[0].url } : PlaylistIcon}
+          style={{
+            height: 200,
+            width: 200,
+            borderTopLeftRadius: BORDER_RADIUS,
+            borderTopRightRadius: BORDER_RADIUS,
+          }}
+        />
+
+        <Text
+          numberOfLines={2}
+          style={{
+            paddingVertical: 4,
+            paddingHorizontal: 8,
+          }}>
+          {playlist.title}
+        </Text>
+      </Layout>
+    </TouchableOpacity>
+  );
+
   return (
-    <Menu
-      visible={menuVisible}
-      onDismiss={() => setMenuVisible(false)}
-      anchor={
-        <Card
-          style={{ width: 200, margin: 8 }}
-          onPress={openWebPage}
-          onLongPress={() => setMenuVisible(true)}>
-          <Card.Cover
-            source={spotifyPlaylist ? { uri: spotifyPlaylist.images[0].url } : PlaylistIcon}
-            style={{ borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}
+    <Popover
+      animationType="fade"
+      visible={popoverVisible}
+      onBackdropPress={() => setPopoverVisible(false)}
+      anchor={renderToggleItemCard}>
+      <View style={{ borderRadius: BORDER_RADIUS }}>
+        <View style={styles.popoverItem}>
+          <Icon
+            name="edit-outline"
+            style={{ height: 24, width: 24 }}
+            fill={theme["text-basic-color"]}
           />
-          <Card.Title
-            title={playlist.title}
-            titleNumberOfLines={2}
-            titleStyle={{ padding: 4 }}
-            titleVariant="labelSmall"
+          <Text onPress={openWebPage}>Edit</Text>
+        </View>
+
+        <View style={styles.popoverItem}>
+          <Icon
+            name="trash-outline"
+            style={{ height: 24, width: 24 }}
+            fill={theme["text-basic-color"]}
           />
-        </Card>
-      }>
-      <Menu.Item
-        title="Edit"
-        onPress={openWebPage}
-        leadingIcon={({ color, size }) => (
-          <Ionicons name="pencil-outline" color={color} size={size} />
-        )}
-      />
-      <Menu.Item
-        title="Delete"
-        onPress={handleDelete}
-        leadingIcon={({ color, size }) => (
-          <Ionicons name="trash-outline" color={color} size={size} />
-        )}
-      />
-    </Menu>
+          <Text onPress={handleDelete}>Delete</Text>
+        </View>
+      </View>
+    </Popover>
   );
 }
 
@@ -85,12 +112,13 @@ function HorizontalPlaylistItem({
   const parsedDescription = spotifyPlaylist?.description.replaceAll("&#x2F;", "/") ?? "";
 
   return (
-    <Surface style={{ margin: 8, borderRadius: 10 }}>
+    <Layout style={{ marginVertical: 8, borderRadius: BORDER_RADIUS }}>
       <SwipeableItem onEdit={openWebPage} onDelete={handleDelete}>
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
+            borderRadius: BORDER_RADIUS,
           }}>
           <Image
             source={
@@ -98,17 +126,22 @@ function HorizontalPlaylistItem({
                 ? { uri: spotifyPlaylist.images[0].url, height: 100, width: 100 }
                 : PlaylistIcon
             }
-            style={{ borderTopLeftRadius: 10, borderBottomLeftRadius: 10, height: 100, width: 100 }}
+            style={{
+              borderTopLeftRadius: BORDER_RADIUS,
+              borderBottomLeftRadius: BORDER_RADIUS,
+              height: 100,
+              width: 100,
+            }}
           />
           <View style={{ flex: 1 }}>
             <Text
-              variant="labelLarge"
+              category="h6"
               numberOfLines={2}
               style={{ flex: 1, paddingHorizontal: 8, paddingTop: 8 }}>
               {playlist.title}
             </Text>
             <Text
-              variant="labelSmall"
+              category="c2"
               numberOfLines={2}
               style={{ flex: 1, paddingHorizontal: 8, paddingBottom: 8 }}>
               {parsedDescription}
@@ -116,14 +149,15 @@ function HorizontalPlaylistItem({
           </View>
         </View>
       </SwipeableItem>
-    </Surface>
+    </Layout>
   );
 }
 
 export default function CreatedPlaylistItem(props: Props) {
-  const [menuVisible, setMenuVisible] = useState<boolean>(false);
+  const [popoverVisible, setPopoverVisible] = useState<boolean>(false);
 
   const { session } = useAuth();
+  const toast = useToast();
 
   const { data: spotifyPlaylist } = useQuery({
     queryKey: ["playlists", props.playlist.id],
@@ -144,7 +178,7 @@ export default function CreatedPlaylistItem(props: Props) {
   const handleDelete = async () => {
     try {
       await removeFromDatabase();
-      if (props.showSnackbar) props.showSnackbar();
+      toast.show("Playlist deleted from On Tour");
     } catch (e) {
       console.error(e);
     }
@@ -156,8 +190,8 @@ export default function CreatedPlaylistItem(props: Props) {
       openWebPage={openWebPage}
       handleDelete={handleDelete}
       spotifyPlaylist={spotifyPlaylist}
-      menuVisible={menuVisible}
-      setMenuVisible={setMenuVisible}
+      popoverVisible={popoverVisible}
+      setPopoverVisible={setPopoverVisible}
     />
   ) : (
     <VerticalPlaylistItem
@@ -165,8 +199,18 @@ export default function CreatedPlaylistItem(props: Props) {
       openWebPage={openWebPage}
       handleDelete={handleDelete}
       spotifyPlaylist={spotifyPlaylist}
-      menuVisible={menuVisible}
-      setMenuVisible={setMenuVisible}
+      popoverVisible={popoverVisible}
+      setPopoverVisible={setPopoverVisible}
     />
   );
 }
+
+const styles = StyleSheet.create({
+  popoverItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    gap: 4,
+  },
+});
