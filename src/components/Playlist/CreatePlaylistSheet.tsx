@@ -90,17 +90,28 @@ export default function CreatePlaylistSheet() {
                 <Picker
                   ref={pickerRef}
                   selectedValue={selectedShow}
-                  onValueChange={(item) => handleSelection(item)}>
+                  onValueChange={(item) => handleSelection(item)}
+                  dropdownIconColor={theme["text-basic-color"]}
+                  numberOfLines={1}
+                  mode="dropdown"
+                  style={{ backgroundColor: theme["background-basic-color-2"] }}>
                   <Picker.Item
                     label="Import an upcoming show"
                     enabled={false}
-                    style={{ color: "gray" }}
+                    style={{
+                      color: theme["text-hint-color"],
+                      backgroundColor: theme["background-basic-color-2"],
+                    }}
                   />
                   {upcomingShows.map((show) => (
                     <Picker.Item
                       key={show.id}
                       label={`${show.artist} - ${show.tour}`}
                       value={show}
+                      style={{
+                        color: theme["text-basic-color"],
+                        backgroundColor: theme["background-basic-color-2"],
+                      }}
                     />
                   ))}
                 </Picker>
