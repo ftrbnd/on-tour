@@ -54,12 +54,12 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
       if (context?.previousPlaylists) {
         queryClient.setQueryData<CreatedPlaylist[]>([QUERY_KEY], context.previousPlaylists);
       }
-      toast.show("Failed to save playlist", {
+      toast.show("Failed to save playlist.", {
         type: "danger",
       });
     },
     onSuccess: async () => {
-      toast.show("Successfully saved playlist");
+      toast.show("Successfully saved playlist!");
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
@@ -86,12 +86,12 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
       if (context?.previousPlaylists) {
         queryClient.setQueryData<CreatedPlaylist[]>([QUERY_KEY], context.previousPlaylists);
       }
-      toast.show("Failed to delete playlist", {
+      toast.show("Failed to delete playlist.", {
         type: "danger",
       });
     },
     onSuccess: async () => {
-      toast.show("Successfully deleted playlist");
+      toast.show("Successfully deleted playlist!");
     },
 
     onSettled: async () => {

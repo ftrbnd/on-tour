@@ -4,6 +4,7 @@ import { ImagePickerAsset } from "expo-image-picker";
 import { openBrowserAsync } from "expo-web-browser";
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { useToast } from "react-native-toast-notifications";
 
 import useCreatedPlaylists from "./useCreatedPlaylists";
 import useSetlist from "./useSetlist";
@@ -28,6 +29,7 @@ interface PreSavedImage {
 export default function usePlaylist(setlistId: string) {
   const { data: setlist, songs, spotifyTracks } = useSetlist(setlistId);
   const { session, user } = useAuth();
+  const toast = useToast();
 
   const [playlist, setPlaylist] = useState<Playlist<TrackItem> | null>(null);
   const { addToDatabase } = useCreatedPlaylists(playlist?.id);
@@ -43,25 +45,28 @@ export default function usePlaylist(setlistId: string) {
   const createPlaylistMutation = useMutation({
     mutationFn: (body: CreatePlaylistRequestBody) =>
       createPlaylist(session?.accessToken, user?.providerId, body),
-    onSuccess: async (playlist) => {
-      console.log("Playlist created!");
-      setPlaylist(playlist);
-      await handleUpdatePlaylist(playlist);
+    onError: () => {
+      toast.show("Failed to create playlist.", {
+        type: "danger",
+      });
     },
-    onError: (error) => {
-      console.error("Create mutation failed", error);
+    onSuccess: async (data) => {
+      setPlaylist(data);
+      await handleUpdatePlaylist(data);
     },
   });
 
   const updatePlaylistTracksMutation = useMutation({
     mutationFn: (body: UpdatePlaylistRequestBody) =>
       addSongsToPlaylist(session?.accessToken, { playlistId: body.playlistId, uris: body.uris }),
-    onSuccess: async (_updatedPlaylist, body) => {
-      setTracksFound(body.found ?? null);
-      setAddedTracks(true);
+    onError: () => {
+      toast.show("Failed to add tracks to playlist.", {
+        type: "danger",
+      });
     },
-    onError: (error) => {
-      console.error("Tracks mutation failed", error);
+    onSuccess: async (_data, variables) => {
+      setTracksFound(variables.found ?? null);
+      setAddedTracks(true);
     },
   });
 
@@ -71,11 +76,10 @@ export default function usePlaylist(setlistId: string) {
         playlistId: body.playlistId,
         base64: body.base64,
       }),
-    onSuccess: (_, body) => {
-      console.log("Playlist image updated!");
-    },
-    onError: (error) => {
-      console.error("Image mutation failed", error);
+    onError: () => {
+      toast.show("Failed to add image to playlist.", {
+        type: "danger",
+      });
     },
   });
 

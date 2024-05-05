@@ -47,12 +47,12 @@ export default function useUpcomingShows() {
       if (context?.previousShows) {
         queryClient.setQueryData<UpcomingShow[]>([QUERY_KEY], context.previousShows);
       }
-      toast.show("Failed to save upcoming show", {
+      toast.show("Failed to save upcoming show.", {
         type: "danger",
       });
     },
     onSuccess: () => {
-      toast.show("Successfully saved upcoming show");
+      toast.show("Successfully saved upcoming show!");
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
@@ -77,12 +77,12 @@ export default function useUpcomingShows() {
     },
     onError: (_error, _variables, context) => {
       if (context?.previousShows) queryClient.setQueryData([QUERY_KEY], context.previousShows);
-      toast.show("Failed to update upcoming show", {
+      toast.show("Failed to update upcoming show.", {
         type: "danger",
       });
     },
     onSuccess: () => {
-      toast.show("Successfully updated upcoming show");
+      toast.show("Successfully updated upcoming show!");
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
@@ -109,7 +109,7 @@ export default function useUpcomingShows() {
       if (context?.previousShows) {
         queryClient.setQueryData<UpcomingShow[]>([QUERY_KEY], context.previousShows);
       }
-      toast.show("Failed to delete upcoming show", {
+      toast.show("Failed to delete upcoming show.", {
         type: "danger",
       });
     },
