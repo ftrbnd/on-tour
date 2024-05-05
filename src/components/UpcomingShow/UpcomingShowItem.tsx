@@ -4,7 +4,6 @@ import moment from "moment";
 import { View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { useMMKVString } from "react-native-mmkv";
-import { useToast } from "react-native-toast-notifications";
 
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { UpcomingShow } from "../../services/upcomingShows";
@@ -14,12 +13,10 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
   const [showImage] = useMMKVString(`upcoming-show-${show.id}-image`);
 
   const { deleteShow } = useUpcomingShows();
-  const toast = useToast();
 
   const handleDelete = async () => {
     try {
       await deleteShow(show);
-      toast.show("Upcoming show deleted");
     } catch (e) {
       console.error(e);
     }

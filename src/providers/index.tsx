@@ -13,15 +13,15 @@ export default function Providers({ children }: { children: ReactNode }) {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <AuthProvider>
-          <QueryProvider>
-            <ThemeProvider>
-              <SheetProvider>
-                <ToastProvider>{children}</ToastProvider>
-              </SheetProvider>
-            </ThemeProvider>
-          </QueryProvider>
-        </AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <QueryProvider>
+              <ThemeProvider>
+                <SheetProvider>{children}</SheetProvider>
+              </ThemeProvider>
+            </QueryProvider>
+          </AuthProvider>
+        </ToastProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

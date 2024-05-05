@@ -5,7 +5,6 @@ import { openBrowserAsync } from "expo-web-browser";
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useToast } from "react-native-toast-notifications";
 
 import useCreatedPlaylists from "../../hooks/useCreatedPlaylists";
 import { CreatedPlaylist } from "../../services/createdPlaylists";
@@ -157,7 +156,6 @@ export default function CreatedPlaylistItem(props: Props) {
   const [popoverVisible, setPopoverVisible] = useState<boolean>(false);
 
   const { session } = useAuth();
-  const toast = useToast();
 
   const { data: spotifyPlaylist } = useQuery({
     queryKey: ["playlists", props.playlist.id],
@@ -178,7 +176,6 @@ export default function CreatedPlaylistItem(props: Props) {
   const handleDelete = async () => {
     try {
       await removeFromDatabase();
-      toast.show("Playlist deleted from On Tour");
     } catch (e) {
       console.error(e);
     }

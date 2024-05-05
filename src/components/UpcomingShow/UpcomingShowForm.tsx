@@ -93,6 +93,8 @@ export default function UpcomingShowForm({ initialValues, selectedImage }: Conta
         selectedImage,
       };
 
+      await SheetManager.hide("upcoming-show-sheet");
+
       if (initialValues) {
         await updateShow(
           {
@@ -104,8 +106,6 @@ export default function UpcomingShowForm({ initialValues, selectedImage }: Conta
       } else {
         await addShow(submission.show, submission.selectedImage);
       }
-
-      await SheetManager.hide("upcoming-show-sheet");
     } catch (e) {
       console.error(e);
     }
