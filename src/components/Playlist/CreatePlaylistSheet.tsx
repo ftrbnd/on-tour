@@ -120,8 +120,9 @@ export default function CreatePlaylistSheet() {
                 <View
                   style={{
                     flexDirection: "row",
-                    justifyContent: "space-evenly",
+                    justifyContent: "center",
                     alignItems: "center",
+                    gap: 8,
                     borderRadius: 5,
                     padding: 8,
                     backgroundColor: theme["color-info-200"],

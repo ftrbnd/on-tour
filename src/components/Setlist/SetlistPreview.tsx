@@ -33,33 +33,46 @@ export default function SetlistPreview({
 
   return (
     <Card style={{ margin: 4 }} onPress={openSetlistPage}>
-      {displayArtist && <Text category="h5">{setlist.artist.name}</Text>}
-      {setlist.tour && <Text category="h6">{setlist.tour.name}</Text>}
+      <View style={{ gap: 8 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+          }}>
+          <View>
+            {displayArtist && <Text category="h5">{setlist.artist.name}</Text>}
+            {setlist.tour && (
+              <Text category={displayArtist ? "s1" : "h6"}>{setlist.tour.name}</Text>
+            )}
+          </View>
 
-      <View
-        style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-end" }}>
-        <View style={{ gap: 4 }}>
-          <Text
-            category={
-              displayArtist ? "s2" : "h6"
-            }>{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>
-          <Text category={displayArtist ? "s2" : "s1"}>{setlist.venue.name}</Text>
+          {isUpcomingShow && (
+            <Icon
+              name="star"
+              style={{
+                alignSelf: "flex-end",
+                height: 24,
+                width: 24,
+              }}
+              fill={theme["text-info-color"]}
+            />
+          )}
+        </View>
+
+        <Text category={displayArtist ? "s2" : "s1"}>{setlist.venue.name}</Text>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+          }}>
+          <Text category="c1">{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>
           <Text category="label">
             {moment(setlist.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}
           </Text>
         </View>
-
-        {isUpcomingShow && (
-          <Icon
-            name="star"
-            style={{
-              alignSelf: "flex-end",
-              height: 24,
-              width: 24,
-            }}
-            fill={theme["text-info-color"]}
-          />
-        )}
       </View>
     </Card>
   );

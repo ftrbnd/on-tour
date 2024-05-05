@@ -22,7 +22,6 @@ export default function FormikDateInput({ name }: Props) {
   return (
     <>
       <Datepicker
-        // date={fieldValueDate}
         min={today}
         label="Date"
         placeholder={formattedDate}
