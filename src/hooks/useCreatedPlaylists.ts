@@ -31,9 +31,9 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
         title: vars.title,
       }),
     onMutate: async (newCreatedPlaylist) => {
-      await queryClient.cancelQueries({ queryKey: [QUERY_KEY] });
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY, setlistId] });
 
-      const previousPlaylists = queryClient.getQueryData<CreatedPlaylist[]>([QUERY_KEY]);
+      const previousPlaylists = queryClient.getQueryData<CreatedPlaylist[]>([QUERY_KEY, setlistId]);
 
       const optimisticPlaylist: CreatedPlaylist = {
         ...newCreatedPlaylist,
@@ -43,7 +43,7 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
 
       if (previousPlaylists) {
         queryClient.setQueryData<CreatedPlaylist[]>(
-          [QUERY_KEY],
+          [QUERY_KEY, setlistId],
           [...previousPlaylists, optimisticPlaylist],
         );
       }
@@ -52,7 +52,10 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
     },
     onError: async (_error, _variables, context) => {
       if (context?.previousPlaylists) {
-        queryClient.setQueryData<CreatedPlaylist[]>([QUERY_KEY], context.previousPlaylists);
+        queryClient.setQueryData<CreatedPlaylist[]>(
+          [QUERY_KEY, setlistId],
+          context.previousPlaylists,
+        );
       }
       toast.show("Failed to save playlist.", {
         type: "danger",
@@ -62,20 +65,20 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
       toast.show("Successfully saved playlist!");
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY, setlistId] });
     },
   });
 
   const removeFromDatabaseMutation = useMutation({
     mutationFn: () => deleteCreatedPlaylist(session?.token, user?.id, playlistId),
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: [QUERY_KEY] });
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY, setlistId] });
 
-      const previousPlaylists = queryClient.getQueryData<CreatedPlaylist[]>([QUERY_KEY]);
+      const previousPlaylists = queryClient.getQueryData<CreatedPlaylist[]>([QUERY_KEY, setlistId]);
 
       if (previousPlaylists) {
         queryClient.setQueryData<CreatedPlaylist[]>(
-          [QUERY_KEY],
+          [QUERY_KEY, setlistId],
           previousPlaylists.filter((playlist) => playlist.id !== playlistId),
         );
       }
@@ -84,7 +87,10 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
     },
     onError: (_error, _variables, context) => {
       if (context?.previousPlaylists) {
-        queryClient.setQueryData<CreatedPlaylist[]>([QUERY_KEY], context.previousPlaylists);
+        queryClient.setQueryData<CreatedPlaylist[]>(
+          [QUERY_KEY, setlistId],
+          context.previousPlaylists,
+        );
       }
       toast.show("Failed to delete playlist.", {
         type: "danger",
@@ -95,7 +101,7 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
     },
 
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY, setlistId] });
     },
   });
 
