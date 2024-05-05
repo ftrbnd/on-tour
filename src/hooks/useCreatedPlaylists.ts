@@ -11,14 +11,14 @@ import {
 
 const QUERY_KEY = "created-playlists";
 
-export default function useCreatedPlaylists(playlistId?: string | null, setlistId?: string | null) {
+export default function useCreatedPlaylists(playlistId?: string | null) {
   const { session, user } = useAuth();
   const queryClient = useQueryClient();
   const toast = useToast();
 
   const { data } = useQuery({
-    queryKey: [QUERY_KEY, setlistId],
-    queryFn: () => getCreatedPlaylists(session?.token, user?.id, setlistId),
+    queryKey: [QUERY_KEY],
+    queryFn: () => getCreatedPlaylists(session?.token, user?.id),
     enabled: session !== null && user !== null,
   });
 
@@ -31,9 +31,9 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
         title: vars.title,
       }),
     onMutate: async (newCreatedPlaylist) => {
-      await queryClient.cancelQueries({ queryKey: [QUERY_KEY, setlistId] });
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY] });
 
-      const previousPlaylists = queryClient.getQueryData<CreatedPlaylist[]>([QUERY_KEY, setlistId]);
+      const previousPlaylists = queryClient.getQueryData<CreatedPlaylist[]>([QUERY_KEY]);
 
       const optimisticPlaylist: CreatedPlaylist = {
         ...newCreatedPlaylist,
@@ -43,7 +43,7 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
 
       if (previousPlaylists) {
         queryClient.setQueryData<CreatedPlaylist[]>(
-          [QUERY_KEY, setlistId],
+          [QUERY_KEY],
           [...previousPlaylists, optimisticPlaylist],
         );
       }
@@ -52,10 +52,7 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
     },
     onError: async (_error, _variables, context) => {
       if (context?.previousPlaylists) {
-        queryClient.setQueryData<CreatedPlaylist[]>(
-          [QUERY_KEY, setlistId],
-          context.previousPlaylists,
-        );
+        queryClient.setQueryData<CreatedPlaylist[]>([QUERY_KEY], context.previousPlaylists);
       }
       toast.show("Failed to save playlist.", {
         type: "danger",
@@ -65,20 +62,20 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
       toast.show("Successfully saved playlist!");
     },
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY, setlistId] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
   });
 
   const removeFromDatabaseMutation = useMutation({
     mutationFn: () => deleteCreatedPlaylist(session?.token, user?.id, playlistId),
     onMutate: async () => {
-      await queryClient.cancelQueries({ queryKey: [QUERY_KEY, setlistId] });
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY] });
 
-      const previousPlaylists = queryClient.getQueryData<CreatedPlaylist[]>([QUERY_KEY, setlistId]);
+      const previousPlaylists = queryClient.getQueryData<CreatedPlaylist[]>([QUERY_KEY]);
 
       if (previousPlaylists) {
         queryClient.setQueryData<CreatedPlaylist[]>(
-          [QUERY_KEY, setlistId],
+          [QUERY_KEY],
           previousPlaylists.filter((playlist) => playlist.id !== playlistId),
         );
       }
@@ -87,10 +84,7 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
     },
     onError: (_error, _variables, context) => {
       if (context?.previousPlaylists) {
-        queryClient.setQueryData<CreatedPlaylist[]>(
-          [QUERY_KEY, setlistId],
-          context.previousPlaylists,
-        );
+        queryClient.setQueryData<CreatedPlaylist[]>([QUERY_KEY], context.previousPlaylists);
       }
       toast.show("Failed to delete playlist.", {
         type: "danger",
@@ -101,7 +95,7 @@ export default function useCreatedPlaylists(playlistId?: string | null, setlistI
     },
 
     onSettled: async () => {
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY, setlistId] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
   });
 

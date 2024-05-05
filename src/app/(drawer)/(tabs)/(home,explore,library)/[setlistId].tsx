@@ -11,7 +11,7 @@ import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 export default function SetlistPage() {
   const { setlistId, isUpcomingShow }: { setlistId: string; isUpcomingShow?: "true" | "false" } =
     useLocalSearchParams();
-  const { playlists } = useCreatedPlaylists(null, setlistId);
+  const { playlists } = useCreatedPlaylists();
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
