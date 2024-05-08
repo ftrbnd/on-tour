@@ -17,14 +17,14 @@ import FormattedSheet from "../ui/FormattedSheet";
 import LoadingIndicator from "../ui/LoadingIndicator";
 
 export default function CreatePlaylistSheet() {
-  const { setlistId, isUpcomingShow } = useSheetPayload("create-playlist-sheet");
+  const { setlistId, upcomingShowId } = useSheetPayload("create-playlist-sheet");
   const playlist = usePlaylist(setlistId);
   const { selectedImage, setSelectedImage, pickImageAsync, warning } = useImagePicker();
   const theme = useTheme();
 
   const router = useRouter();
 
-  const { upcomingShows } = useUpcomingShows();
+  const { upcomingShows, deleteShow } = useUpcomingShows();
   const [selectedShow, setSelectedShow] = useState<UpcomingShow | null>(null);
   const [upcomingImageUri] = useMMKVString(`upcoming-show-${selectedShow?.id}-image`);
 
@@ -41,6 +41,9 @@ export default function CreatePlaylistSheet() {
   const handlePress = async () => {
     try {
       await playlist.startMutations(selectedImage, { uri: upcomingImageUri });
+
+      const showToDelete = upcomingShows.find((show) => show.id === upcomingShowId) ?? selectedShow;
+      if (showToDelete) await deleteShow(showToDelete);
 
       await SheetManager.hide("create-playlist-sheet");
       router.replace("/(drawer)/(tabs)/(library)/createdPlaylists");
@@ -116,7 +119,7 @@ export default function CreatePlaylistSheet() {
                   ))}
                 </Picker>
               </TouchableOpacity>
-              {isUpcomingShow && (
+              {upcomingShowId && (
                 <View
                   style={{
                     flexDirection: "row",

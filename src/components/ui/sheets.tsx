@@ -17,7 +17,7 @@ declare module "react-native-actions-sheet" {
     "create-playlist-sheet": SheetDefinition<{
       payload: {
         setlistId: string;
-        isUpcomingShow?: boolean;
+        upcomingShowId?: string;
       };
     }>;
     "playlist-exists-sheet": SheetDefinition<{

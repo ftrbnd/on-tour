@@ -6,11 +6,13 @@ import { View } from "react-native";
 import { NestedSegment } from "../../utils/segments";
 import { Setlist } from "../../utils/setlist-fm-types";
 
+import { UpcomingShow } from "@/src/services/upcomingShows";
+
 interface SetlistProps {
   setlist: Setlist;
   displayArtist?: boolean;
   artistImage?: string;
-  isUpcomingShow?: boolean;
+  isUpcomingShow?: UpcomingShow;
 }
 
 export default function SetlistPreview({
@@ -26,8 +28,8 @@ export default function SetlistPreview({
   const openSetlistPage = () => {
     router.push(
       !displayArtist
-        ? `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?artistImage=${artistImage}&isUpcomingShow=${isUpcomingShow}`
-        : `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?isUpcomingShow=${isUpcomingShow}`,
+        ? `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?artistImage=${artistImage}&upcomingShowId=${isUpcomingShow?.id}`
+        : `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?upcomingShowId=${isUpcomingShow?.id}`,
     );
   };
 

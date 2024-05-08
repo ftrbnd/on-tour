@@ -9,7 +9,7 @@ import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 
 export default function SetlistPage() {
-  const { setlistId, isUpcomingShow }: { setlistId: string; isUpcomingShow?: "true" | "false" } =
+  const { setlistId, upcomingShowId }: { setlistId: string; upcomingShowId?: string } =
     useLocalSearchParams();
   const { playlists } = useCreatedPlaylists();
   const insets = useSafeAreaInsets();
@@ -28,7 +28,7 @@ export default function SetlistPage() {
       : await SheetManager.show("create-playlist-sheet", {
           payload: {
             setlistId,
-            isUpcomingShow: isUpcomingShow === "true",
+            upcomingShowId,
           },
         });
 
