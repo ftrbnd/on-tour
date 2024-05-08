@@ -6,8 +6,12 @@ export default function useImagePicker() {
   const [selectedImage, setSelectedImage] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
 
+  const [status, requestPermission] = ImagePicker.useMediaLibraryPermissions();
+
   const pickImageAsync = async () => {
     try {
+      if (!status?.granted) return await requestPermission();
+
       const result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
         aspect: [1, 1],

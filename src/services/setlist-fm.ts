@@ -67,11 +67,6 @@ export async function getRecentShows(artists: Artist[] | undefined): Promise<Set
     if (!artists) throw new Error("Artists are required");
     if (artists.length === 0) return [];
 
-    console.log(
-      "Artists:",
-      artists.map((a) => a.name),
-    );
-
     const recentSetlists: Setlist[] = [];
 
     for (const artist of artists) {

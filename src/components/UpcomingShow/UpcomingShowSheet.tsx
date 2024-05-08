@@ -10,9 +10,9 @@ import FormattedSheet from "../ui/FormattedSheet";
 
 export default function UpcomingShowSheet() {
   const existingShow = useSheetPayload("upcoming-show-sheet");
+  const [existingShowImage] = useMMKVString(`upcoming-show-${existingShow?.id}-image`);
 
   const { selectedImage, pickImageAsync, warning } = useImagePicker();
-  const [previousShowImage] = useMMKVString(`upcoming-show-${existingShow?.id}-image`);
 
   return (
     <FormattedSheet
@@ -22,7 +22,7 @@ export default function UpcomingShowSheet() {
           <View style={{ alignItems: "flex-end", gap: 4 }}>
             <PlaylistImage
               onPress={pickImageAsync}
-              uri={selectedImage ? selectedImage.uri : previousShowImage}
+              uri={selectedImage ? selectedImage.uri : existingShowImage}
             />
             {warning && (
               <Text category="label" status="warning">

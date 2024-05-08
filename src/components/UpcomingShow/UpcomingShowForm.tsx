@@ -5,6 +5,7 @@ import moment from "moment";
 import { useMemo } from "react";
 import { View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
+import { useMMKVString } from "react-native-mmkv";
 import { z } from "zod";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 
@@ -17,6 +18,8 @@ import { UpcomingShow } from "@/src/services/upcomingShows";
 
 interface FormProps {
   onSubmit: () => void;
+  existingShow?: UpcomingShow;
+  selectedImage?: ImagePickerAsset | null;
 }
 
 interface ContainerProps {
@@ -37,9 +40,13 @@ const validationSchema = z.object({
   venue: z.string().trim().min(1, { message: "Required" }),
 });
 
-function Form({ onSubmit }: FormProps) {
+function Form({ onSubmit, existingShow, selectedImage }: FormProps) {
   const { dirty, errors, isSubmitting, isValidating } = useFormikContext<NewUpcomingShow>();
   const noErrors = JSON.stringify(errors) === "{}";
+
+  const [existingImage] = useMMKVString(`upcoming-show-${existingShow?.id}-image`);
+  const hasDifferentImage =
+    selectedImage !== undefined && selectedImage !== null && existingImage !== selectedImage.uri;
 
   return (
     <>
@@ -58,7 +65,7 @@ function Form({ onSubmit }: FormProps) {
         <Button
           appearance="filled"
           onPress={onSubmit}
-          disabled={!dirty || !noErrors || isSubmitting || isValidating}>
+          disabled={(!dirty || !noErrors || isSubmitting || isValidating) && !hasDifferentImage}>
           Save
         </Button>
       </View>
@@ -116,7 +123,9 @@ export default function UpcomingShowForm({ initialValues, selectedImage }: Conta
       initialValues={initialValues ?? initialEmptyValues}
       onSubmit={handleSubmit}
       validationSchema={toFormikValidationSchema(validationSchema)}>
-      {({ handleSubmit }) => <Form onSubmit={handleSubmit} />}
+      {({ handleSubmit }) => (
+        <Form onSubmit={handleSubmit} existingShow={initialValues} selectedImage={selectedImage} />
+      )}
     </Formik>
   );
 }
