@@ -19,7 +19,7 @@ export async function searchArtistSetlist(
         "x-api-key": env.EXPO_PUBLIC_SETLIST_FM_API_KEY,
       },
     });
-    if (res.status === 429) return { setlists: [] };
+    if (res.status === 429 || res.status === 404) return { setlists: [] };
     if (!res.ok) throw new Error(`Failed to fetch "${query}" from setlist.fm`);
 
     const setlists: Setlists = await res.json();
@@ -66,6 +66,11 @@ export async function getRecentShows(artists: Artist[] | undefined): Promise<Set
   try {
     if (!artists) throw new Error("Artists are required");
     if (artists.length === 0) return [];
+
+    console.log(
+      "Artists:",
+      artists.map((a) => a.name),
+    );
 
     const recentSetlists: Setlist[] = [];
 
