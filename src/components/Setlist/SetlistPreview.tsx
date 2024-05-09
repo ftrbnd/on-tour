@@ -25,9 +25,12 @@ export default function SetlistPreview({
   const segments = useSegments<NestedSegment>();
   const theme = useTheme();
 
+  const location = `${setlist.venue.city.name}, ${setlist.venue.city.country.name}`;
+  const timestamp = moment(setlist.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY");
+
   const openSetlistPage = () => {
     router.push(
-      `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?artistImage=${artistImage}&upcomingShowId=${isUpcomingShow?.id}`,
+      `/${segments[0]}/${segments[1]}/${segments[2]}/${setlist.id}?artistImage=${artistImage}&upcomingShowId=${isUpcomingShow?.id}&tour=${setlist.tour?.name}&location=${location}&venue=${setlist.venue.name}&timestamp=${timestamp}`,
     );
   };
 
@@ -68,10 +71,8 @@ export default function SetlistPreview({
             justifyContent: "space-between",
             alignItems: "flex-end",
           }}>
-          <Text category="c1">{`${setlist.venue.city.name}, ${setlist.venue.city.country.name}`}</Text>
-          <Text category="label">
-            {moment(setlist.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}
-          </Text>
+          <Text category="c1">{location}</Text>
+          <Text category="label">{timestamp}</Text>
         </View>
       </View>
     </Card>

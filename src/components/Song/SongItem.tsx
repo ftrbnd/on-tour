@@ -1,10 +1,9 @@
-import { Icon, Text } from "@ui-kitten/components";
+import { Icon, Text, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { openBrowserAsync } from "expo-web-browser";
+import { Skeleton } from "moti/skeleton";
 import ContextMenu from "react-native-context-menu-view";
 import { TouchableOpacity } from "react-native-gesture-handler";
-
-import LoadingIndicator from "../ui/LoadingIndicator";
 
 import { Song } from "@/src/utils/setlist-fm-types";
 import { Image as SpotifyImage } from "@/src/utils/spotify-types";
@@ -17,6 +16,8 @@ interface Props {
 }
 
 export default function SongItem({ item, loading, image, link }: Props) {
+  const theme = useTheme();
+
   const openSongLink = async () => {
     try {
       if (link) await openBrowserAsync(link);
@@ -38,7 +39,12 @@ export default function SongItem({ item, loading, image, link }: Props) {
           paddingVertical: 16,
         }}>
         {loading ? (
-          <LoadingIndicator size="large" />
+          <Skeleton
+            radius="round"
+            height={48}
+            width={48}
+            colors={[theme["background-basic-color-2"], theme["background-basic-color-4"]]}
+          />
         ) : image ? (
           <Image source={{ uri: image.url }} style={{ height: 48, width: 48, borderRadius: 25 }} />
         ) : (
