@@ -28,7 +28,7 @@ export default function SetlistPage() {
       : await SheetManager.show("create-playlist-sheet", {
           payload: {
             setlistId,
-            upcomingShowId,
+            upcomingShowId: upcomingShowId !== "undefined" ? upcomingShowId : undefined,
           },
         });
 
