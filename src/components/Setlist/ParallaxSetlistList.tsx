@@ -90,19 +90,20 @@ export default function ParallaxSetlistList({
           isUpcomingShow={isUpcomingShow(item, upcomingShows)}
         />
       )}
+      ListHeaderComponentStyle={{ marginBottom: 8 }}
       onEndReachedThreshold={nextPage ? 0.5 : null}
       onEndReached={handleEndReached}
       ListEmptyComponent={
         isPending ? (
           <Skeletons />
         ) : loading ? (
-          <Card style={{ marginTop: 8 }}>
+          <Card>
             <Button appearance="ghost" disabled accessoryLeft={LoadingIndicator}>
               Loading...
             </Button>
           </Card>
         ) : artist ? (
-          <Card style={{ marginTop: 8 }}>
+          <Card>
             <Text category="label" style={{ textAlign: "center" }}>
               No setlists were found for this artist.
             </Text>

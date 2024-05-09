@@ -56,7 +56,7 @@ const Header = memo(function HeaderComponent() {
   const Skeletons = () => [...Array(3).keys()].map((i) => <VerticalPlaylistItemSkeleton key={i} />);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, marginTop: 8 }}>
       <Title
         title="My Playlists"
         icon="chevron-right-outline"
