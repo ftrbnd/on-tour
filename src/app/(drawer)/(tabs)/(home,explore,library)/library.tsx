@@ -66,6 +66,7 @@ const Header = memo(function HeaderComponent() {
           data={playlists}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <CreatedPlaylistItem playlist={item} />}
+          scrollEnabled={playlists.length < 2}
         />
       )}
 

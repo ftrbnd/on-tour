@@ -1,8 +1,7 @@
-import { Icon, MenuItem, OverflowMenu, Text } from "@ui-kitten/components";
+import { Icon, Text } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { openBrowserAsync } from "expo-web-browser";
-import { useState } from "react";
-import { View } from "react-native";
+import ContextMenu from "react-native-context-menu-view";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
 import LoadingIndicator from "../ui/LoadingIndicator";
@@ -18,22 +17,19 @@ interface Props {
 }
 
 export default function SongItem({ item, loading, image, link }: Props) {
-  const [menuVisible, setMenuVisible] = useState<boolean>(false);
-
   const openSongLink = async () => {
     try {
       if (link) await openBrowserAsync(link);
     } catch (e) {
       console.error(e);
-    } finally {
-      setMenuVisible(false);
     }
   };
 
-  const renderToggleItem = () => {
-    return (
+  return (
+    <ContextMenu
+      actions={[{ title: link ? "View on Spotify" : "Track not found", disabled: !link }]}
+      onPress={openSongLink}>
       <TouchableOpacity
-        onPress={() => setMenuVisible(true)}
         style={{
           flexDirection: "row",
           alignItems: "center",
@@ -50,26 +46,6 @@ export default function SongItem({ item, loading, image, link }: Props) {
         )}
         <Text category="s1">{item.name}</Text>
       </TouchableOpacity>
-    );
-  };
-
-  return (
-    <View>
-      <OverflowMenu
-        anchor={renderToggleItem}
-        visible={menuVisible}
-        onSelect={openSongLink}
-        onBackdropPress={() => setMenuVisible(false)}>
-        <MenuItem
-          title={link ? "View on Spotify" : "Track not found"}
-          accessoryLeft={
-            <Icon
-              name={link ? "external-link-outline" : "info-outline"}
-              style={{ height: 24, width: 24 }}
-            />
-          }
-        />
-      </OverflowMenu>
-    </View>
+    </ContextMenu>
   );
 }
