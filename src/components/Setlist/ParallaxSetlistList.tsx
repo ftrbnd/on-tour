@@ -7,6 +7,7 @@ import { withAvatarHeaderFlashList } from "react-native-sticky-parallax-header";
 
 import SetlistPreview from "./SetlistPreview";
 import LoadingIndicator from "../ui/LoadingIndicator";
+import SetlistPreviewSkeleton from "../ui/skeletons/SetlistPreviewSkeleton";
 
 import { ArtistIcon } from "@/src/assets/icons";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
@@ -16,6 +17,7 @@ import { Artist } from "@/src/utils/spotify-types";
 
 interface Props {
   setlists: Setlist[];
+  isPending: boolean;
   isPlaceholderData?: boolean;
   nextPage?: number;
   setNextPage?: (num: number) => void;
@@ -29,6 +31,7 @@ const AvatarHeaderFlashList = withAvatarHeaderFlashList<Setlist>(FlashList);
 
 export default function ParallaxSetlistList({
   setlists,
+  isPending,
   isPlaceholderData,
   nextPage,
   setNextPage,
@@ -42,6 +45,9 @@ export default function ParallaxSetlistList({
 
   const handleEndReached = () =>
     !isPlaceholderData && nextPage && setNextPage ? setNextPage(nextPage) : null;
+
+  const Skeletons = () =>
+    [...Array(10).keys()].map((i) => <SetlistPreviewSkeleton key={i} condensed />);
 
   return (
     <AvatarHeaderFlashList
@@ -85,7 +91,9 @@ export default function ParallaxSetlistList({
       onEndReachedThreshold={nextPage ? 0.5 : null}
       onEndReached={handleEndReached}
       ListEmptyComponent={
-        loading ? (
+        isPending ? (
+          <Skeletons />
+        ) : loading ? (
           <Card style={{ marginTop: 8 }}>
             <Button appearance="ghost" disabled accessoryLeft={LoadingIndicator}>
               Loading...
@@ -94,7 +102,7 @@ export default function ParallaxSetlistList({
         ) : artist ? (
           <Card style={{ marginTop: 8 }}>
             <Text category="label" style={{ textAlign: "center" }}>
-              {artist && !loading ? "No setlists were found for this artist." : "Loading..."}
+              No setlists were found for this artist.
             </Text>
           </Card>
         ) : null

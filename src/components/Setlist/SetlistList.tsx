@@ -3,6 +3,7 @@ import { Button, Card } from "@ui-kitten/components";
 
 import SetlistPreview from "./SetlistPreview";
 import LoadingIndicator from "../ui/LoadingIndicator";
+import SetlistPreviewSkeleton from "../ui/skeletons/SetlistPreviewSkeleton";
 
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { isUpcomingShow } from "@/src/utils/helpers";
@@ -10,6 +11,7 @@ import { Setlist } from "@/src/utils/setlist-fm-types";
 
 interface Props {
   setlists: Setlist[];
+  isPending: boolean;
   isPlaceholderData?: boolean;
   nextPage?: number;
   setNextPage?: (num: number) => void;
@@ -20,6 +22,7 @@ interface Props {
 
 export default function SetlistList({
   setlists,
+  isPending,
   isPlaceholderData,
   nextPage,
   setNextPage,
@@ -31,6 +34,8 @@ export default function SetlistList({
 
   const handleEndReached = () =>
     !isPlaceholderData && nextPage && setNextPage ? setNextPage(nextPage) : null;
+
+  const Skeletons = () => [...Array(5).keys()].map((i) => <SetlistPreviewSkeleton key={i} />);
 
   return (
     <FlashList
@@ -48,11 +53,15 @@ export default function SetlistList({
       onEndReachedThreshold={nextPage ? 0.5 : null}
       onEndReached={handleEndReached}
       ListEmptyComponent={
-        <Card>
-          <Button disabled accessoryLeft={LoadingIndicator}>
-            {loading ? "Loading..." : "No setlists were found."}
-          </Button>
-        </Card>
+        isPending ? (
+          <Skeletons />
+        ) : (
+          <Card>
+            <Button disabled accessoryLeft={loading ? LoadingIndicator : undefined}>
+              {loading ? "Loading..." : "No setlists were found."}
+            </Button>
+          </Card>
+        )
       }
       refreshing={refreshing}
       onRefresh={onRefresh}

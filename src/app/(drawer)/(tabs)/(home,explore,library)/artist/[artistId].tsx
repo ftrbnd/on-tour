@@ -26,7 +26,7 @@ export default function ArtistPage() {
     enabled: session != null,
   });
 
-  const { data, isPlaceholderData, refetch, isRefetching, isLoading } = useQuery({
+  const { data, isPending, isPlaceholderData, refetch, isRefetching, isLoading } = useQuery({
     queryKey: ["setlists", artist?.name, nextPage],
     queryFn: () => searchArtistSetlist(artist?.name, nextPage),
     enabled: artist !== undefined,
@@ -51,6 +51,7 @@ export default function ArtistPage() {
       <Layout level="2" style={{ flex: 1, marginTop: -insets.top }}>
         <ParallaxSetlistList
           setlists={setlists}
+          isPending={isPending}
           isPlaceholderData={isPlaceholderData}
           nextPage={data?.nextPage}
           setNextPage={setNextPage}

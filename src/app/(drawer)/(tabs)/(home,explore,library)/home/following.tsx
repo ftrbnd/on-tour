@@ -13,7 +13,7 @@ export default function Following() {
 
   const { session } = useAuth();
 
-  const { data, isPlaceholderData, refetch, isRefetching } = useQuery({
+  const { data, isPending, isPlaceholderData, refetch, isRefetching } = useQuery({
     queryKey: ["top-artists", next],
     queryFn: () => getTopArtists(session?.accessToken, next),
     enabled: session !== null,
@@ -30,6 +30,7 @@ export default function Following() {
     <Layout level="2" style={{ flex: 1 }}>
       <ArtistList
         artists={topArtists}
+        isPending={isPending}
         isPlaceholderData={isPlaceholderData}
         showsVerticalScrollIndicator={false}
         next={data?.next}

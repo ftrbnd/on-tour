@@ -23,7 +23,7 @@ export default function Explore() {
     setSearchResults(results);
   }, 1000);
 
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["top-artists"],
     queryFn: () => getTopArtists(session?.accessToken),
     enabled: session !== null,
@@ -31,6 +31,7 @@ export default function Explore() {
 
   const {
     data: relatedArtists,
+    isPending,
     refetch,
     isRefetching,
   } = useQuery({
@@ -81,6 +82,7 @@ export default function Explore() {
 
       <ArtistList
         artists={searchResults.length > 0 ? searchResults : shuffledArtists ?? []}
+        isPending={isLoading || isPending}
         showsVerticalScrollIndicator={searchResults.length > 0}
         onRefresh={() => (searchResults.length > 0 ? null : refetch())}
         refreshing={isRefetching}
