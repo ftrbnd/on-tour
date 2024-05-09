@@ -22,7 +22,6 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
     }
   };
 
-  // TODO: add "remove image" option on press and hold
   return (
     <SwipeableItem
       onEdit={async () => await SheetManager.show("upcoming-show-sheet", { payload: show })}

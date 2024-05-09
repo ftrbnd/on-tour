@@ -23,6 +23,7 @@ export default function UpcomingShowSheet() {
             <PlaylistImage
               onPress={pickImageAsync}
               uri={selectedImage ? selectedImage.uri : existingShowImage}
+              existingShowId={existingShow?.id}
             />
             {warning && (
               <Text category="label" status="warning">

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImagePickerAsset } from "expo-image-picker";
+import moment from "moment";
 import { useToast } from "react-native-toast-notifications";
 
 import { useAuth } from "../providers/AuthProvider";
@@ -13,6 +14,15 @@ import {
 import { storage } from "../utils/mmkv";
 
 const QUERY_KEY = "upcoming-shows";
+
+function sortByDate(shows: UpcomingShow[]) {
+  return shows.sort((a, b) => {
+    const timeA = moment(a.date).unix();
+    const timeB = moment(b.date).unix();
+
+    return timeA - timeB;
+  });
+}
 
 export default function useUpcomingShows() {
   const { session, user } = useAuth();
@@ -38,7 +48,10 @@ export default function useUpcomingShows() {
       };
 
       if (previousShows) {
-        queryClient.setQueryData<UpcomingShow[]>([QUERY_KEY], [...previousShows, optimisticShow]);
+        queryClient.setQueryData<UpcomingShow[]>(
+          [QUERY_KEY],
+          sortByDate([...previousShows, optimisticShow]),
+        );
       }
 
       return { previousShows };
@@ -69,7 +82,9 @@ export default function useUpcomingShows() {
       if (previousShows) {
         queryClient.setQueryData<UpcomingShow[]>(
           [QUERY_KEY],
-          previousShows.map((show) => (show.id === updatedShow.id ? updatedShow : show)),
+          sortByDate(
+            previousShows.map((show) => (show.id === updatedShow.id ? updatedShow : show)),
+          ),
         );
       }
 
@@ -99,7 +114,7 @@ export default function useUpcomingShows() {
       if (previousShows) {
         queryClient.setQueryData<UpcomingShow[]>(
           [QUERY_KEY],
-          previousShows.filter((show) => show.id !== deletedShow.id),
+          sortByDate(previousShows.filter((show) => show.id !== deletedShow.id)),
         );
       }
 

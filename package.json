@@ -51,6 +51,7 @@
     "react-dom": "18.2.0",
     "react-native": "0.73.6",
     "react-native-actions-sheet": "^0.9.3",
+    "react-native-context-menu-view": "^1.16.0",
     "react-native-gesture-handler": "^2.16.0",
     "react-native-mmkv": "^2.12.2",
     "react-native-pager-view": "6.2.3",
