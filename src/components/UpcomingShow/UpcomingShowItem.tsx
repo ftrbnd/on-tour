@@ -1,10 +1,9 @@
 import { Text } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import moment from "moment";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { useMMKVString } from "react-native-mmkv";
-import { useToast } from "react-native-toast-notifications";
 
 import useUpcomingShows from "../../hooks/useUpcomingShows";
 import { UpcomingShow } from "../../services/upcomingShows";
@@ -14,12 +13,10 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
   const [showImage] = useMMKVString(`upcoming-show-${show.id}-image`);
 
   const { deleteShow } = useUpcomingShows();
-  const toast = useToast();
 
   const handleDelete = async () => {
     try {
       await deleteShow(show);
-      toast.show("Upcoming show deleted");
     } catch (e) {
       console.error(e);
     }
@@ -29,15 +26,33 @@ export default function UpcomingShowItem({ show }: { show: UpcomingShow }) {
     <SwipeableItem
       onEdit={async () => await SheetManager.show("upcoming-show-sheet", { payload: show })}
       onDelete={handleDelete}>
-      <View style={{ paddingVertical: 8, paddingHorizontal: 16 }}>
-        {showImage && <Image source={{ uri: showImage }} />}
-        <Text category="h6" ellipsizeMode="tail">
-          {show.artist} - {show.tour}
-        </Text>
-        <Text category="s1" ellipsizeMode="tail">
-          {show.venue} / {show.city} / {moment(show.date).format("MMMM Do, YYYY")}
-        </Text>
+      <View style={styles.item}>
+        <View style={{ flex: 1 }}>
+          <Text category="h6" ellipsizeMode="tail">
+            {show.artist} - {show.tour}
+          </Text>
+          <Text category="s1" ellipsizeMode="tail">
+            {show.venue} / {show.city} / {moment(show.date).format("MMMM Do, YYYY")}
+          </Text>
+        </View>
+        {showImage && <Image source={{ uri: showImage }} style={styles.image} />}
       </View>
     </SwipeableItem>
   );
 }
+
+const styles = StyleSheet.create({
+  item: {
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  image: {
+    height: 40,
+    width: 40,
+    borderRadius: 5,
+  },
+});

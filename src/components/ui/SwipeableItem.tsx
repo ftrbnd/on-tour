@@ -1,5 +1,5 @@
 import { Text } from "@ui-kitten/components";
-import { ReactNode } from "react";
+import { ReactNode, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { RectButton, Swipeable, TouchableOpacity } from "react-native-gesture-handler";
 
@@ -33,12 +33,25 @@ export default function SwipeableItem({
   onEdit: () => void;
   onDelete: () => void;
 }) {
+  const ref = useRef<Swipeable>(null);
+
+  const handleEdit = () => {
+    onEdit();
+    ref.current?.close();
+  };
+
+  const handleDelete = () => {
+    onDelete();
+    ref.current?.close();
+  };
+
   return (
     <Swipeable
+      ref={ref}
       renderRightActions={(progress) => (
         <View style={{ width: 192, flexDirection: "row" }}>
-          {renderRightAction("Edit", "lightgray", 192, progress, onEdit)}
-          {renderRightAction("Delete", "red", 128, progress, onDelete)}
+          {renderRightAction("Edit", "lightgray", 192, progress, handleEdit)}
+          {renderRightAction("Delete", "red", 128, progress, handleDelete)}
         </View>
       )}
       friction={2}

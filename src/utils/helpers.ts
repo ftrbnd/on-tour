@@ -9,10 +9,10 @@ export const createPlaylistName = (setlist: Setlist | undefined) => {
   return `${setlist.artist?.name} - ${location}`;
 };
 
-export const isUpcomingShow = (setlist: Setlist, shows: UpcomingShow[]): boolean => {
+export const isUpcomingShow = (setlist: Setlist, shows: UpcomingShow[]) => {
   const adjustedDate = `${setlist.eventDate.substring(6)}-${setlist.eventDate.substring(3, 5)}-${setlist.eventDate.substring(0, 2)}`;
 
-  const maybeIsUpcomingShow = shows.some((show) => {
+  const maybeIsUpcomingShow = shows.find((show) => {
     return (
       show.date === adjustedDate &&
       show.artist.toLowerCase() === setlist.artist.name.toLowerCase() &&

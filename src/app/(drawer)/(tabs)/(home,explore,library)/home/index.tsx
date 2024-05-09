@@ -17,6 +17,7 @@ export default function Recent() {
 
   const {
     data: recentShows,
+    isPending,
     isLoading,
     refetch,
     isRefetching,
@@ -30,6 +31,7 @@ export default function Recent() {
     <Layout level="2" style={{ flex: 1 }}>
       <SetlistList
         setlists={recentShows ?? []}
+        isPending={isPending}
         loading={isLoading}
         onRefresh={refetch}
         refreshing={isRefetching}

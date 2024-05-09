@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImagePickerAsset } from "expo-image-picker";
+import moment from "moment";
+import { useToast } from "react-native-toast-notifications";
 
 import { useAuth } from "../providers/AuthProvider";
 import {
@@ -11,46 +13,126 @@ import {
 } from "../services/upcomingShows";
 import { storage } from "../utils/mmkv";
 
+const QUERY_KEY = "upcoming-shows";
+
+function sortByDate(shows: UpcomingShow[]) {
+  return shows.sort((a, b) => {
+    const timeA = moment(a.date).unix();
+    const timeB = moment(b.date).unix();
+
+    return timeA - timeB;
+  });
+}
+
 export default function useUpcomingShows() {
   const { session, user } = useAuth();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
-  const { data: upcomingShows } = useQuery({
-    queryKey: ["upcoming-shows"],
+  const { data: upcomingShows, isPending } = useQuery({
+    queryKey: [QUERY_KEY],
     queryFn: () => getUpcomingShows(session?.token, user?.id),
     enabled: session !== null && user !== null,
   });
 
   const addMutation = useMutation({
     mutationFn: (newShow: Omit<UpcomingShow, "id">) => addUpcomingShow(session?.token, newShow),
-    onSuccess: async (show) => {
-      console.log("Added new upcoming show!");
-      await queryClient.invalidateQueries({ queryKey: ["upcoming-shows"] });
+    onMutate: async (newShow) => {
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY] });
+
+      const previousShows = queryClient.getQueryData<UpcomingShow[]>([QUERY_KEY]);
+
+      const optimisticShow: UpcomingShow = {
+        ...newShow,
+        id: "temp-id",
+      };
+
+      if (previousShows) {
+        queryClient.setQueryData<UpcomingShow[]>(
+          [QUERY_KEY],
+          sortByDate([...previousShows, optimisticShow]),
+        );
+      }
+
+      return { previousShows };
     },
-    onError: () => {
-      console.error("Failed to add new upcoming show");
+    onError: (_error, _variables, context) => {
+      if (context?.previousShows) {
+        queryClient.setQueryData<UpcomingShow[]>([QUERY_KEY], context.previousShows);
+      }
+      toast.show("Failed to save upcoming show.", {
+        type: "danger",
+      });
+    },
+    onSuccess: () => {
+      toast.show("Successfully saved upcoming show!");
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
   });
 
   const updateMutation = useMutation({
     mutationFn: (show: UpcomingShow) => updateUpcomingShow(session?.token, show),
-    onSuccess: async (show) => {
-      console.log("Successfully updated upcoming show!");
-      await queryClient.invalidateQueries({ queryKey: ["upcoming-shows"] });
+    onMutate: async (updatedShow) => {
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY] });
+
+      const previousShows = queryClient.getQueryData<UpcomingShow[]>([QUERY_KEY]);
+
+      if (previousShows) {
+        queryClient.setQueryData<UpcomingShow[]>(
+          [QUERY_KEY],
+          sortByDate(
+            previousShows.map((show) => (show.id === updatedShow.id ? updatedShow : show)),
+          ),
+        );
+      }
+
+      return { previousShows, updatedShow };
     },
-    onError: () => {
-      console.error("Failed to update upcoming show");
+    onError: (_error, _variables, context) => {
+      if (context?.previousShows) queryClient.setQueryData([QUERY_KEY], context.previousShows);
+      toast.show("Failed to update upcoming show.", {
+        type: "danger",
+      });
+    },
+    onSuccess: () => {
+      toast.show("Successfully updated upcoming show!");
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: (show: UpcomingShow) => deleteUpcomingShow(session?.token, show),
-    onSuccess: async (show) => {
-      console.log("Successfully deleted upcoming show!");
-      await queryClient.invalidateQueries({ queryKey: ["upcoming-shows"] });
+    onMutate: async (deletedShow) => {
+      await queryClient.cancelQueries({ queryKey: [QUERY_KEY] });
+
+      const previousShows = queryClient.getQueryData<UpcomingShow[]>([QUERY_KEY]);
+
+      if (previousShows) {
+        queryClient.setQueryData<UpcomingShow[]>(
+          [QUERY_KEY],
+          sortByDate(previousShows.filter((show) => show.id !== deletedShow.id)),
+        );
+      }
+
+      return { previousShows };
     },
-    onError: () => {
-      console.error("Failed to delete upcoming show");
+    onError: (_error, _variables, context) => {
+      if (context?.previousShows) {
+        queryClient.setQueryData<UpcomingShow[]>([QUERY_KEY], context.previousShows);
+      }
+      toast.show("Failed to delete upcoming show.", {
+        type: "danger",
+      });
+    },
+    onSuccess: async () => {
+      toast.show("Successfully deleted upcoming show!");
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
     },
   });
 
@@ -92,5 +174,6 @@ export default function useUpcomingShows() {
     addShow: handleAddUpcomingShow,
     updateShow: handleUpdateUpcomingShow,
     deleteShow: handleDeleteUpcomingShow,
+    isPending,
   };
 }

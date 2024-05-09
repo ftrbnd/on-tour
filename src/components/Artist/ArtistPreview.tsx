@@ -17,7 +17,9 @@ export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewP
   const router = useRouter();
 
   const openArtistPage = () => {
-    router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/artist/${artist.id}`);
+    router.push(
+      `/${segments[0]}/${segments[1]}/${segments[2]}/artist/${artist.id}?name=${artist.name}&image=${artist.images[0].url}`,
+    );
   };
 
   return (

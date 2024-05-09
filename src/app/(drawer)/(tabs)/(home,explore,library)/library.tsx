@@ -7,12 +7,16 @@ import { SheetManager } from "react-native-actions-sheet";
 
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
 import UpcomingShowItem from "@/src/components/UpcomingShow/UpcomingShowItem";
+import UpcomingShowItemSkeleton from "@/src/components/ui/skeletons/UpcomingShowItemSkeleton";
+import VerticalPlaylistItemSkeleton from "@/src/components/ui/skeletons/VerticalPlaylistItemSkeleton";
 import useCreatedPlaylists from "@/src/hooks/useCreatedPlaylists";
 import useUpcomingShows from "@/src/hooks/useUpcomingShows";
 import { NestedSegment } from "@/src/utils/segments";
 
 export default function Library() {
-  const { upcomingShows } = useUpcomingShows();
+  const { upcomingShows, isPending } = useUpcomingShows();
+
+  const Skeletons = () => [...Array(10).keys()].map((i) => <UpcomingShowItemSkeleton key={i} />);
 
   return (
     <Layout level="2" style={{ flex: 1 }}>
@@ -22,18 +26,37 @@ export default function Library() {
         data={upcomingShows}
         renderItem={({ item }) => <UpcomingShowItem show={item} />}
         keyExtractor={(item) => item.id}
+        ListEmptyComponent={
+          isPending ? (
+            <Skeletons />
+          ) : (
+            <Card style={{ marginHorizontal: 16 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 4,
+                }}>
+                <Text category="s1">You have no upcoming shows.</Text>
+              </View>
+            </Card>
+          )
+        }
       />
     </Layout>
   );
 }
 
 const Header = memo(function HeaderComponent() {
-  const { playlists } = useCreatedPlaylists();
+  const { playlists, isPending } = useCreatedPlaylists();
   const router = useRouter();
   const segments = useSegments<NestedSegment>();
 
+  const Skeletons = () => [...Array(3).keys()].map((i) => <VerticalPlaylistItemSkeleton key={i} />);
+
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, marginTop: 8 }}>
       <Title
         title="My Playlists"
         icon="chevron-right-outline"
@@ -42,7 +65,7 @@ const Header = memo(function HeaderComponent() {
         }
       />
 
-      {playlists.length === 0 ? (
+      {playlists.length === 0 && !isPending ? (
         <Card style={{ marginHorizontal: 16 }}>
           <View
             style={{
@@ -66,6 +89,8 @@ const Header = memo(function HeaderComponent() {
           data={playlists}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => <CreatedPlaylistItem playlist={item} />}
+          scrollEnabled={playlists.length < 2}
+          ListEmptyComponent={isPending ? <Skeletons /> : null}
         />
       )}
 

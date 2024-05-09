@@ -4,6 +4,7 @@ import { Redirect, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 
+import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
 import { useAuth } from "@/src/providers/AuthProvider";
 
@@ -22,6 +23,8 @@ export default function Login() {
     <LinearGradient
       colors={[theme["color-primary-200"], theme["color-primary-300"]]}
       style={styles.container}>
+      <FocusAwareStatusBar backgroundColor={theme["color-primary-200"]} />
+
       <View style={{ gap: 8, justifyContent: "center", alignItems: "center" }}>
         <Text category="h1" style={{ color: theme["text-basic-color"] }}>
           On Tour

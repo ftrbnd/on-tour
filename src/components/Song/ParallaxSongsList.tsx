@@ -18,17 +18,29 @@ const DetailsHeaderFlashList = withDetailsHeaderFlashList<Song>(FlashList);
 export default function ParallaxSongsList({ setlistId }: { setlistId: string }) {
   const setlist = useSetlist(setlistId);
   const theme = useTheme();
-  const { artistImage } = useLocalSearchParams<{ artistImage?: string }>();
+  const { artistImage, tour, location, venue, timestamp } = useLocalSearchParams<{
+    artistImage?: string;
+    tour?: string;
+    location?: string;
+    venue?: string;
+    timestamp?: string;
+  }>();
 
-  const image = { uri: setlist.spotifyArtist ? setlist.spotifyArtist.images[1].url : artistImage };
+  const image = {
+    uri: setlist.spotifyArtist
+      ? setlist.spotifyArtist.images[1].url
+      : artistImage !== "undefined"
+        ? artistImage
+        : undefined,
+  };
 
   const cityAndCountry = setlist.data
     ? `${setlist.data.venue.city.name}, ${setlist.data.venue.city.country.name}`
-    : "Unknown location";
+    : location ?? "Unknown location";
   const date = setlist.data
     ? `${moment(setlist.data.eventDate, "DD-MM-YYYY").format("MMMM Do, YYYY")}`
-    : "Unknown date";
-  const venue = setlist.data ? `${setlist.data.venue.name}` : "Unknown venue";
+    : timestamp ?? "Unknown date";
+  const venueName = setlist.data ? `${setlist.data.venue.name}` : venue ?? "Unknown venue";
 
   return (
     <DetailsHeaderFlashList
@@ -72,10 +84,16 @@ export default function ParallaxSongsList({ setlistId }: { setlistId: string }) 
       )}
       backgroundColor={theme["color-primary-default"]}
       containerStyle={{ backgroundColor: theme["background-basic-color-2"] }}
-      title={setlist.data?.tour?.name ?? cityAndCountry}
+      title={
+        setlist.data?.tour
+          ? setlist.data.tour?.name
+          : tour !== "undefined"
+            ? tour
+            : location ?? cityAndCountry
+      }
       subtitle={setlist.data?.artist.name ?? "Artist"}
       image={image.uri ? image : ArtistIcon}
-      tag={setlist.data?.tour ? `${cityAndCountry}\n${venue}` : `${date}\n${venue}`}
+      tag={setlist.data?.tour ? `${cityAndCountry}\n${venueName}` : `${date}\n${venueName}`}
       contentIcon={PlaylistIcon}
       contentIconNumber={setlist.songs.length}
       estimatedItemSize={150}

@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Icon, Layout, Popover, Text, useTheme } from "@ui-kitten/components";
+import { Layout, Text, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { openBrowserAsync } from "expo-web-browser";
-import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { NativeSyntheticEvent, View } from "react-native";
+import ContextMenu, {
+  ContextMenuAction,
+  ContextMenuOnPressNativeEvent,
+} from "react-native-context-menu-view";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { useToast } from "react-native-toast-notifications";
 
 import useCreatedPlaylists from "../../hooks/useCreatedPlaylists";
 import { CreatedPlaylist } from "../../services/createdPlaylists";
@@ -24,82 +26,59 @@ interface Props {
 interface ItemProps extends Props {
   openWebPage: () => void;
   handleDelete: () => void;
-  spotifyPlaylist: Playlist<TrackItem> | undefined;
-  popoverVisible: boolean;
-  setPopoverVisible: (v: boolean) => void;
+  spotifyPlaylist?: Playlist<TrackItem>;
 }
 
 const BORDER_RADIUS = 10;
+const ACTIONS: ContextMenuAction[] = [{ title: "Edit" }, { title: "Delete", destructive: true }];
 
-function VerticalPlaylistItem({
-  playlist,
-  openWebPage,
-  handleDelete,
-  spotifyPlaylist,
-  popoverVisible,
-  setPopoverVisible,
-}: ItemProps) {
+function VerticalPlaylistItem({ playlist, openWebPage, handleDelete, spotifyPlaylist }: ItemProps) {
   const theme = useTheme();
 
-  const renderToggleItemCard = () => (
-    <TouchableOpacity onPress={openWebPage} onLongPress={() => setPopoverVisible(true)}>
-      <Layout
-        style={{
-          height: 250,
-          width: 200,
-          margin: 8,
-          borderRadius: BORDER_RADIUS,
-          borderWidth: 1,
-          borderColor: theme["border-basic-color-4"],
-        }}>
-        <Image
-          source={spotifyPlaylist ? { uri: spotifyPlaylist.images[0].url } : PlaylistIcon}
-          style={{
-            height: 200,
-            width: 200,
-            borderTopLeftRadius: BORDER_RADIUS,
-            borderTopRightRadius: BORDER_RADIUS,
-          }}
-        />
-
-        <Text
-          numberOfLines={2}
-          style={{
-            paddingVertical: 4,
-            paddingHorizontal: 8,
-          }}>
-          {playlist.title}
-        </Text>
-      </Layout>
-    </TouchableOpacity>
-  );
+  const handleContextMenuPress = (e: NativeSyntheticEvent<ContextMenuOnPressNativeEvent>) => {
+    switch (e.nativeEvent.index) {
+      case 0:
+        openWebPage();
+        break;
+      case 1:
+        handleDelete();
+        break;
+    }
+  };
 
   return (
-    <Popover
-      animationType="fade"
-      visible={popoverVisible}
-      onBackdropPress={() => setPopoverVisible(false)}
-      anchor={renderToggleItemCard}>
-      <View style={{ borderRadius: BORDER_RADIUS }}>
-        <View style={styles.popoverItem}>
-          <Icon
-            name="edit-outline"
-            style={{ height: 24, width: 24 }}
-            fill={theme["text-basic-color"]}
+    <TouchableOpacity onPress={openWebPage} onLongPress={() => null}>
+      <ContextMenu actions={ACTIONS} onPress={handleContextMenuPress}>
+        <Layout
+          style={{
+            height: 250,
+            width: 200,
+            margin: 8,
+            borderRadius: BORDER_RADIUS,
+            borderWidth: 1,
+            borderColor: theme["border-basic-color-4"],
+          }}>
+          <Image
+            source={spotifyPlaylist ? { uri: spotifyPlaylist.images[0].url } : PlaylistIcon}
+            style={{
+              height: 200,
+              width: 200,
+              borderTopLeftRadius: BORDER_RADIUS,
+              borderTopRightRadius: BORDER_RADIUS,
+            }}
           />
-          <Text onPress={openWebPage}>Edit</Text>
-        </View>
 
-        <View style={styles.popoverItem}>
-          <Icon
-            name="trash-outline"
-            style={{ height: 24, width: 24 }}
-            fill={theme["text-basic-color"]}
-          />
-          <Text onPress={handleDelete}>Delete</Text>
-        </View>
-      </View>
-    </Popover>
+          <Text
+            numberOfLines={2}
+            style={{
+              paddingVertical: 4,
+              paddingHorizontal: 8,
+            }}>
+            {playlist.title}
+          </Text>
+        </Layout>
+      </ContextMenu>
+    </TouchableOpacity>
   );
 }
 
@@ -154,10 +133,7 @@ function HorizontalPlaylistItem({
 }
 
 export default function CreatedPlaylistItem(props: Props) {
-  const [popoverVisible, setPopoverVisible] = useState<boolean>(false);
-
   const { session } = useAuth();
-  const toast = useToast();
 
   const { data: spotifyPlaylist } = useQuery({
     queryKey: ["playlists", props.playlist.id],
@@ -178,7 +154,6 @@ export default function CreatedPlaylistItem(props: Props) {
   const handleDelete = async () => {
     try {
       await removeFromDatabase();
-      toast.show("Playlist deleted from On Tour");
     } catch (e) {
       console.error(e);
     }
@@ -190,8 +165,6 @@ export default function CreatedPlaylistItem(props: Props) {
       openWebPage={openWebPage}
       handleDelete={handleDelete}
       spotifyPlaylist={spotifyPlaylist}
-      popoverVisible={popoverVisible}
-      setPopoverVisible={setPopoverVisible}
     />
   ) : (
     <VerticalPlaylistItem
@@ -199,18 +172,6 @@ export default function CreatedPlaylistItem(props: Props) {
       openWebPage={openWebPage}
       handleDelete={handleDelete}
       spotifyPlaylist={spotifyPlaylist}
-      popoverVisible={popoverVisible}
-      setPopoverVisible={setPopoverVisible}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  popoverItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    gap: 4,
-  },
-});

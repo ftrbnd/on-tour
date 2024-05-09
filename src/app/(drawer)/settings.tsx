@@ -1,32 +1,68 @@
-import {
-  Avatar,
-  Button,
-  Card,
-  Divider,
-  Icon,
-  Layout,
-  Radio,
-  RadioGroup,
-  Text,
-  Toggle,
-  useTheme,
-} from "@ui-kitten/components";
+import { useQueryClient } from "@tanstack/react-query";
+import { Avatar, Button, Card, Divider, Icon, Layout, Text } from "@ui-kitten/components";
 import { Image } from "expo-image";
-import { useRef } from "react";
-import { ColorSchemeName, StyleSheet, View, useColorScheme } from "react-native";
-import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import { Alert, View, useColorScheme } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
+import { useToast } from "react-native-toast-notifications";
 
 import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
+import SettingsItem from "@/src/components/ui/SettingsItem";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { usePreferredTheme } from "@/src/providers/ThemeProvider";
+import { clientPersister } from "@/src/utils/mmkv";
 
 export default function Settings() {
+  const { usingSystemTheme } = usePreferredTheme();
+  const colorScheme = useColorScheme();
+  const queryClient = useQueryClient();
+  const toast = useToast();
+
+  const capitalizedThemeName = colorScheme?.replace(colorScheme[0], colorScheme[0].toUpperCase());
+
+  const handleThemePress = () => {
+    SheetManager.show("theme-sheet");
+  };
+
+  const handleCachePress = () => {
+    Alert.alert(
+      "Are you sure you want to clear the cache?",
+      ``,
+      [
+        { text: "Cancel", onPress: () => null },
+        { text: "Clear", onPress: clearCache },
+      ],
+      { cancelable: true, userInterfaceStyle: colorScheme ?? "unspecified" },
+    );
+  };
+
+  const clearCache = async () => {
+    await clientPersister.removeClient();
+
+    await queryClient.invalidateQueries({ refetchType: "none" });
+    queryClient.clear();
+
+    toast.show("Cleared the cache");
+  };
+
   return (
     <Layout level="2" style={{ flex: 1, padding: 16, gap: 32 }}>
       <ProfileCard />
-      <Card>
-        <ThemeSettings />
+      <Card disabled>
+        <View style={{ gap: 16 }}>
+          <SettingsItem
+            title={`Theme: ${usingSystemTheme ? "System" : capitalizedThemeName}`}
+            subtitle="Change app appearance"
+            icon={colorScheme === "dark" ? "moon-outline" : "sun-outline"}
+            onPress={handleThemePress}
+          />
+          <Divider />
+          <SettingsItem
+            title="Cache"
+            subtitle="Clear the app's storage"
+            icon="trash-outline"
+            onPress={handleCachePress}
+          />
+        </View>
       </Card>
     </Layout>
   );
@@ -65,107 +101,3 @@ function ProfileCard() {
     </Card>
   );
 }
-
-function ThemeSettings() {
-  const colorScheme = useColorScheme();
-  const theme = useTheme();
-  const { toggleTheme, usingSystemTheme } = usePreferredTheme();
-
-  const actionSheetRef = useRef<ActionSheetRef>(null);
-
-  const handleRadioCheck = (value: ColorSchemeName) => {
-    toggleTheme(value);
-  };
-
-  const handleSwitchToggle = (switchChecked: boolean) => {
-    if (switchChecked) toggleTheme(null);
-  };
-
-  const capitalizedThemeName = colorScheme?.replace(colorScheme[0], colorScheme[0].toUpperCase());
-
-  return (
-    <TouchableOpacity onPress={() => actionSheetRef.current?.show()}>
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Icon
-          fill={theme["text-basic-color"]}
-          name={colorScheme === "dark" ? "moon-outline" : "sun-outline"}
-          style={{ height: 36, width: 36 }}
-        />
-        <View style={{ marginLeft: 8, gap: 4 }}>
-          <Text category="h6">{`Theme: ${usingSystemTheme ? "System" : capitalizedThemeName}`}</Text>
-          <Text category="s2" appearance="hint">
-            Change app appearance
-          </Text>
-        </View>
-      </View>
-
-      <ActionSheet
-        gestureEnabled
-        ref={actionSheetRef}
-        snapPoints={[33, 66]}
-        containerStyle={{
-          ...styles.actionSheet,
-          backgroundColor: theme["background-basic-color-1"],
-        }}>
-        <Text category="h3" style={{ textAlign: "center" }}>
-          Theme
-        </Text>
-        <RadioGroup>
-          <View style={{ flexDirection: "row", justifyContent: "space-evenly", padding: 16 }}>
-            <TouchableOpacity style={styles.radioButton} onPress={() => handleRadioCheck("light")}>
-              <Icon
-                name={colorScheme === "light" ? "sun" : "sun-outline"}
-                style={{ height: 36, width: 36 }}
-                fill={theme["text-basic-color"]}
-              />
-              <Radio checked={colorScheme === "light"} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.radioButton} onPress={() => handleRadioCheck("dark")}>
-              <Icon
-                name={colorScheme === "dark" ? "moon" : "moon-outline"}
-                style={{ height: 36, width: 36 }}
-                fill={theme["text-basic-color"]}
-              />
-              <Radio checked={colorScheme === "dark"} />
-            </TouchableOpacity>
-          </View>
-        </RadioGroup>
-
-        <Divider />
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: 16,
-          }}>
-          <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-            <Icon
-              name="smartphone-outline"
-              style={{ height: 36, width: 36 }}
-              fill={theme["text-basic-color"]}
-            />
-            <Text category="s1">Device settings</Text>
-          </View>
-          <Toggle checked={usingSystemTheme} onChange={(val) => handleSwitchToggle(val)} />
-        </View>
-      </ActionSheet>
-    </TouchableOpacity>
-  );
-}
-
-const styles = StyleSheet.create({
-  actionSheet: {
-    flex: 1,
-    padding: 16,
-    gap: 16,
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-  },
-  radioButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 8,
-  },
-});

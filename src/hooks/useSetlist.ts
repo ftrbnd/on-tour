@@ -17,15 +17,15 @@ export default function useSetlist(id: string) {
   const songs = setlist?.sets.set.flatMap((s) => s.song).filter((s) => !s.tape) ?? [];
 
   const { data: spotifyTracks, isLoading: spotifyTracksLoading } = useQuery({
-    queryKey: ["spotify-tracks", id],
+    queryKey: ["setlist", id, "spotify-tracks"],
     queryFn: () => getMultipleTracks(session?.accessToken, [...songs], setlist),
-    enabled: session !== null && setlist !== undefined && songs !== null,
+    enabled: session !== null && setlist !== undefined && songs.length > 0,
   });
 
   const { data: spotifyArtists, isLoading: spotifyArtistsLoading } = useQuery({
-    queryKey: ["setlist-artist", setlist?.id],
+    queryKey: ["setlist", id, "spotify-artist"],
     queryFn: () => searchForArtists(session?.accessToken, setlist?.artist.name),
-    enabled: session != null,
+    enabled: session != null && setlist !== undefined,
   });
 
   const openWebpage = async () => {
