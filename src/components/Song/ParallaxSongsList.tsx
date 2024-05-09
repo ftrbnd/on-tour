@@ -26,8 +26,6 @@ export default function ParallaxSongsList({ setlistId }: { setlistId: string }) 
     timestamp?: string;
   }>();
 
-  console.log({ location });
-
   const image = {
     uri: setlist.spotifyArtist
       ? setlist.spotifyArtist.images[1].url

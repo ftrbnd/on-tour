@@ -29,7 +29,7 @@ export default function useUpcomingShows() {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const { data: upcomingShows } = useQuery({
+  const { data: upcomingShows, isPending } = useQuery({
     queryKey: [QUERY_KEY],
     queryFn: () => getUpcomingShows(session?.token, user?.id),
     enabled: session !== null && user !== null,
@@ -174,5 +174,6 @@ export default function useUpcomingShows() {
     addShow: handleAddUpcomingShow,
     updateShow: handleUpdateUpcomingShow,
     deleteShow: handleDeleteUpcomingShow,
+    isPending,
   };
 }

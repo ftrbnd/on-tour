@@ -16,7 +16,7 @@ export default function useCreatedPlaylists(playlistId?: string | null) {
   const queryClient = useQueryClient();
   const toast = useToast();
 
-  const { data } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: [QUERY_KEY],
     queryFn: () => getCreatedPlaylists(session?.token, user?.id),
     enabled: session !== null && user !== null,
@@ -103,5 +103,6 @@ export default function useCreatedPlaylists(playlistId?: string | null) {
     addToDatabase: addToDatabaseMutation.mutateAsync,
     removeFromDatabase: removeFromDatabaseMutation.mutateAsync,
     playlists: data ?? [],
+    isPending,
   };
 }

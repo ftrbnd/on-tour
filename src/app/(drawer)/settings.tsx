@@ -9,6 +9,7 @@ import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
 import SettingsItem from "@/src/components/ui/SettingsItem";
 import { useAuth } from "@/src/providers/AuthProvider";
 import { usePreferredTheme } from "@/src/providers/ThemeProvider";
+import { clientPersister } from "@/src/utils/mmkv";
 
 export default function Settings() {
   const { usingSystemTheme } = usePreferredTheme();
@@ -34,8 +35,12 @@ export default function Settings() {
     );
   };
 
-  const clearCache = () => {
+  const clearCache = async () => {
+    await clientPersister.removeClient();
+
+    await queryClient.invalidateQueries({ refetchType: "none" });
     queryClient.clear();
+
     toast.show("Cleared the cache");
   };
 
