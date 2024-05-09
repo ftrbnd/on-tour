@@ -31,6 +31,7 @@ export default function Following() {
       <ArtistList
         artists={topArtists}
         isPlaceholderData={isPlaceholderData}
+        showsVerticalScrollIndicator={false}
         next={data?.next}
         setNext={setNext}
         onRefresh={refetch}

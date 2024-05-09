@@ -1,6 +1,7 @@
 import { SheetDefinition, registerSheet } from "react-native-actions-sheet";
 
 import InfoSheet from "./InfoSheet";
+import ThemeSheet from "./ThemeSheet";
 import CreatePlaylistSheet from "../Playlist/CreatePlaylistSheet";
 import PlaylistExistsSheet from "../Playlist/PlaylistExistsSheet";
 import UpcomingShowSheet from "../UpcomingShow/UpcomingShowSheet";
@@ -11,6 +12,7 @@ registerSheet("create-playlist-sheet", CreatePlaylistSheet);
 registerSheet("playlist-exists-sheet", PlaylistExistsSheet);
 registerSheet("upcoming-show-sheet", UpcomingShowSheet);
 registerSheet("info-sheet", InfoSheet);
+registerSheet("theme-sheet", ThemeSheet);
 
 declare module "react-native-actions-sheet" {
   interface Sheets {
@@ -35,6 +37,7 @@ declare module "react-native-actions-sheet" {
         description: string;
       };
     }>;
+    "theme-sheet": SheetDefinition;
   }
 }
 

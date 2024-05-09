@@ -44,6 +44,7 @@ export default function SetlistList({
           isUpcomingShow={isUpcomingShow(item, upcomingShows)}
         />
       )}
+      showsVerticalScrollIndicator={false}
       onEndReachedThreshold={nextPage ? 0.5 : null}
       onEndReached={handleEndReached}
       ListEmptyComponent={
