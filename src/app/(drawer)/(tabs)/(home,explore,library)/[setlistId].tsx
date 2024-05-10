@@ -15,14 +15,14 @@ export default function SetlistPage() {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
 
-  const playlistExists = playlists.some((playlist) => playlist.setlistId === setlistId);
+  const playlistExists = playlists.find((playlist) => playlist.setlistId === setlistId);
 
   const openSheet = async () =>
     playlistExists
       ? await SheetManager.show("playlist-exists-sheet", {
           payload: {
-            playlistId: playlists[0].id,
-            playlistTitle: playlists[0].title,
+            playlistId: playlistExists.id,
+            playlistTitle: playlistExists.title,
           },
         })
       : await SheetManager.show("create-playlist-sheet", {

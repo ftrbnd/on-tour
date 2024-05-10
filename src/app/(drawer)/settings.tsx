@@ -70,7 +70,6 @@ export default function Settings() {
 
 function ProfileCard() {
   const { session, user, signIn, signOut, isLoading } = useAuth();
-  const colorScheme = useColorScheme();
 
   return (
     <Card>
@@ -85,7 +84,7 @@ function ProfileCard() {
         </Text>
         <Button
           appearance="ghost"
-          status={colorScheme === "dark" ? "basic" : "primary"}
+          status="primary"
           accessoryLeft={
             isLoading ? (
               <LoadingIndicator status="primary" />

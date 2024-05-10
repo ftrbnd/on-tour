@@ -1,16 +1,27 @@
+import { useQuery } from "@tanstack/react-query";
 import { Button, Icon, Text, useTheme } from "@ui-kitten/components";
 import { openBrowserAsync } from "expo-web-browser";
 import { View } from "react-native";
 import { useSheetPayload } from "react-native-actions-sheet";
-import { useMMKVString } from "react-native-mmkv";
 
 import PlaylistImage from "./PlaylistImage";
 import FormattedSheet from "../ui/FormattedSheet";
 
+import { useAuth } from "@/src/providers/AuthProvider";
+import { getOnePlaylist } from "@/src/services/spotify";
+
 export default function PlaylistExistsSheet() {
   const { playlistId, playlistTitle } = useSheetPayload("playlist-exists-sheet");
+  const { session } = useAuth();
 
-  const [playlistImage] = useMMKVString(`playlist-${playlistId}-image`);
+  const { data: spotifyPlaylist } = useQuery({
+    queryKey: ["playlists", playlistId],
+    queryFn: () => getOnePlaylist(session?.accessToken, playlistId),
+    enabled: session !== null && playlistId !== null,
+  });
+
+  const playlistImage = spotifyPlaylist?.images[1].url;
+
   const theme = useTheme();
 
   const openWebPage = async () => {

@@ -4,6 +4,7 @@ import { EvaIconsPack } from "@ui-kitten/eva-icons";
 import { ReactNode, createContext, useContext, useEffect, useState } from "react";
 import { Appearance, ColorSchemeName, useColorScheme } from "react-native";
 
+import { default as customTheme } from "../assets/theme.json";
 import { storage } from "../utils/mmkv";
 
 interface PreferredThemeContextProps {
@@ -41,7 +42,7 @@ export default function ThemeProvider({ children }: { children: ReactNode }) {
   return (
     <PreferredThemeContext.Provider value={{ toggleTheme, usingSystemTheme }}>
       <IconRegistry icons={EvaIconsPack} />
-      <ApplicationProvider {...eva} theme={eva[colorScheme ?? "light"]}>
+      <ApplicationProvider {...eva} theme={{ ...eva[colorScheme ?? "light"], ...customTheme }}>
         {children}
       </ApplicationProvider>
     </PreferredThemeContext.Provider>

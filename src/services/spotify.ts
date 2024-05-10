@@ -191,7 +191,7 @@ export async function addSongsToPlaylist(
 
 export async function getOnePlaylist(
   token: string | null | undefined,
-  id: string | undefined,
+  id: string | null | undefined,
 ): Promise<Playlist> {
   try {
     if (!token) throw new Error("Access token required");
