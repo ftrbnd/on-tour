@@ -2,7 +2,7 @@ import { Button, Icon, Text, useTheme } from "@ui-kitten/components";
 import { LinearGradient } from "expo-linear-gradient";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, useColorScheme } from "react-native";
 
 import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
@@ -12,6 +12,7 @@ export default function Login() {
   const { isLoading, session, signIn, refreshSession } = useAuth();
   const theme = useTheme();
   const { status }: { status: string } = useLocalSearchParams();
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     if (status === "401") refreshSession();
@@ -21,9 +22,12 @@ export default function Login() {
 
   return (
     <LinearGradient
-      colors={[theme["color-primary-200"], theme["color-primary-300"]]}
+      colors={[
+        theme["background-basic-color-1"],
+        colorScheme === "dark" ? theme["color-primary-900"] : theme["color-primary-500"],
+      ]}
       style={styles.container}>
-      <FocusAwareStatusBar backgroundColor={theme["color-primary-200"]} />
+      <FocusAwareStatusBar backgroundColor={theme["background-basic-color-1"]} />
 
       <View style={{ gap: 8, justifyContent: "center", alignItems: "center" }}>
         <Text category="h1" style={{ color: theme["text-basic-color"] }}>
