@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "on-tour",
+    "name": "On Tour",
     "slug": "on-tour",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -10,7 +10,7 @@
     "splash": {
       "image": "./src/assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#1f1f1f"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
@@ -19,7 +19,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#1f1f1f"
       },
       "package": "on.tour"
     },
