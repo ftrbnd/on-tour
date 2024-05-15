@@ -12,7 +12,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#1f1f1f"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
@@ -34,7 +36,9 @@
       [
         "expo-font",
         {
-          "fonts": ["./src/assets/fonts/InterVariable.ttf"]
+          "fonts": [
+            "./src/assets/fonts/InterVariable.ttf"
+          ]
         }
       ],
       [
@@ -46,6 +50,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "45a7329a-1de4-4a35-9935-9b3dfefd6260"
+      }
     }
   }
 }
