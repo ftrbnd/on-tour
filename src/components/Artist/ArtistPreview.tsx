@@ -1,4 +1,4 @@
-import { Avatar, Card, Icon, Text } from "@ui-kitten/components";
+import { Avatar, Card, Icon, Text, useTheme } from "@ui-kitten/components";
 import { useRouter, useSegments } from "expo-router";
 import { View } from "react-native";
 
@@ -15,6 +15,7 @@ interface ArtistPreviewProps {
 export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewProps) {
   const segments = useSegments<NestedSegment>();
   const router = useRouter();
+  const theme = useTheme();
 
   const openArtistPage = () => {
     router.push(
@@ -37,7 +38,13 @@ export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewP
           </Text>
         </View>
 
-        {isSearchResult && <Icon name="chevron-right-outline" style={{ height: 24, width: 24 }} />}
+        {isSearchResult && (
+          <Icon
+            name="chevron-right-outline"
+            style={{ height: 24, width: 24 }}
+            fill={theme["text-basic-color"]}
+          />
+        )}
       </View>
     </Card>
   );

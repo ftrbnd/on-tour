@@ -7,17 +7,13 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_FASTIFY_SERVER_URL": "https://on-tour-server.onrender.com/api"
+        "EXPO_PUBLIC_FASTIFY_SERVER_URL": "http://localhost:3000/api"
       }
     },
     "preview": {
-      "extends": "development"
+      "distribution": "internal"
     },
-    "production": {
-      "env": {
-        "EXPO_PUBLIC_FASTIFY_SERVER_URL": "https://on-tour-server.onrender.com/api"
-      }
-    }
+    "production": {}
   },
   "submit": {
     "production": {}
