@@ -31,15 +31,7 @@ export default function Library() {
             <Skeletons />
           ) : (
             <Card style={{ marginHorizontal: 16 }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 4,
-                }}>
-                <Text category="s1">You have no upcoming shows.</Text>
-              </View>
+              <Text category="s1">You have no upcoming shows.</Text>
             </Card>
           )
         }
@@ -55,30 +47,25 @@ const Header = memo(function HeaderComponent() {
 
   const Skeletons = () => [...Array(3).keys()].map((i) => <VerticalPlaylistItemSkeleton key={i} />);
 
+  const hasNoPlaylists = playlists.length === 0 && !isPending;
+
   return (
     <View style={{ flex: 1, marginTop: 8 }}>
       <Title
         title="My Playlists"
-        icon="chevron-right-outline"
+        icon={hasNoPlaylists ? "search-outline" : "chevron-right-outline"}
         onPress={() =>
-          router.push(`/${segments[0]}/${segments[1]}/${segments[2]}/createdPlaylists`)
+          router.push(
+            hasNoPlaylists
+              ? `/${segments[0]}/${segments[1]}/explore`
+              : `/${segments[0]}/${segments[1]}/${segments[2]}/createdPlaylists`,
+          )
         }
       />
 
-      {playlists.length === 0 && !isPending ? (
+      {hasNoPlaylists ? (
         <Card style={{ marginHorizontal: 16 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 4,
-            }}>
-            <Text category="s1">Check out some setlists to get started!</Text>
-            <Button appearance="ghost" onPress={() => router.replace("/explore")}>
-              Explore
-            </Button>
-          </View>
+          <Text category="s1">Check out some setlists to get started!</Text>
         </Card>
       ) : (
         <FlashList
