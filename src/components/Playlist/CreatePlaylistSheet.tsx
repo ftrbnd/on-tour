@@ -159,7 +159,9 @@ export default function CreatePlaylistSheet() {
           <Button
             appearance="filled"
             onPress={handlePress}
-            accessoryLeft={playlist.mutationsPending ? LoadingIndicator : undefined}
+            accessoryLeft={
+              playlist.mutationsPending || !playlist.tracksExist ? LoadingIndicator : undefined
+            }
             disabled={playlist.mutationsPending || !playlist.tracksExist || warning !== null}>
             {playlist.mutationsPending ? playlist.currentOperation : "Create"}
           </Button>
