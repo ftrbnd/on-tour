@@ -45,25 +45,31 @@ export default function Settings() {
   };
 
   return (
-    <Layout level="2" style={{ flex: 1, padding: 16, gap: 32 }}>
-      <ProfileCard />
-      <Card disabled>
-        <View style={{ gap: 16 }}>
-          <SettingsItem
-            title={`Theme: ${usingSystemTheme ? "System" : capitalizedThemeName}`}
-            subtitle="Change app appearance"
-            icon={colorScheme === "dark" ? "moon-outline" : "sun-outline"}
-            onPress={handleThemePress}
-          />
-          <Divider />
-          <SettingsItem
-            title="Cache"
-            subtitle="Clear the app's storage"
-            icon="trash-outline"
-            onPress={handleCachePress}
-          />
-        </View>
-      </Card>
+    <Layout level="2" style={{ flex: 1, justifyContent: "space-between" }}>
+      <View style={{ padding: 16, gap: 32 }}>
+        <ProfileCard />
+        <Card disabled>
+          <View style={{ gap: 16 }}>
+            <SettingsItem
+              title={`Theme: ${usingSystemTheme ? "System" : capitalizedThemeName}`}
+              subtitle="Change app appearance"
+              icon={colorScheme === "dark" ? "moon-outline" : "sun-outline"}
+              onPress={handleThemePress}
+            />
+            <Divider />
+            <SettingsItem
+              title="Cache"
+              subtitle="Clear the app's storage"
+              icon="trash-outline"
+              onPress={handleCachePress}
+            />
+          </View>
+        </Card>
+      </View>
+
+      <Text category="c2" appearance="hint" style={{ alignSelf: "center", padding: 16 }}>
+        © {new Date().getFullYear()} giosalad
+      </Text>
     </Layout>
   );
 }
