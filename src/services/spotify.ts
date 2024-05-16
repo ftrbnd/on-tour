@@ -152,7 +152,6 @@ export async function getTrackFromSetlistFmSong(
 
     return track;
   } catch (error) {
-    console.log(`No Spotify track found for "${artistToSearch} - ${song.name}"`);
     throw error;
   }
 }
