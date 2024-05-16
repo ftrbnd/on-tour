@@ -2,12 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Layout, Text, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { openBrowserAsync } from "expo-web-browser";
-import { NativeSyntheticEvent, View } from "react-native";
+import { NativeSyntheticEvent, Pressable, View } from "react-native";
 import ContextMenu, {
   ContextMenuAction,
   ContextMenuOnPressNativeEvent,
 } from "react-native-context-menu-view";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 import useCreatedPlaylists from "../../hooks/useCreatedPlaylists";
 import { CreatedPlaylist } from "../../services/createdPlaylists";
@@ -47,8 +46,8 @@ function VerticalPlaylistItem({ playlist, openWebPage, handleDelete, spotifyPlay
   };
 
   return (
-    <TouchableOpacity onPress={openWebPage} onLongPress={() => null}>
-      <ContextMenu actions={ACTIONS} onPress={handleContextMenuPress}>
+    <ContextMenu actions={ACTIONS} onPress={handleContextMenuPress}>
+      <Pressable onPress={openWebPage} onLongPress={() => null}>
         <Layout
           style={{
             height: 250,
@@ -77,8 +76,8 @@ function VerticalPlaylistItem({ playlist, openWebPage, handleDelete, spotifyPlay
             {playlist.title}
           </Text>
         </Layout>
-      </ContextMenu>
-    </TouchableOpacity>
+      </Pressable>
+    </ContextMenu>
   );
 }
 

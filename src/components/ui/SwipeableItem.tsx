@@ -1,7 +1,7 @@
 import { Text } from "@ui-kitten/components";
 import { ReactNode, useRef } from "react";
-import { Animated, StyleSheet, View } from "react-native";
-import { RectButton, Swipeable, TouchableOpacity } from "react-native-gesture-handler";
+import { Animated, Pressable, StyleSheet, View } from "react-native";
+import { RectButton, Swipeable } from "react-native-gesture-handler";
 
 function renderRightAction(
   text: string,
@@ -58,7 +58,7 @@ export default function SwipeableItem({
       leftThreshold={30}
       rightThreshold={40}
       overshootRight={false}>
-      <TouchableOpacity onPress={onEdit}>{children}</TouchableOpacity>
+      <Pressable onPress={onEdit}>{children}</Pressable>
     </Swipeable>
   );
 }
