@@ -1,39 +1,39 @@
+import * as Sentry from "@sentry/react-native";
 import { Layout } from "@ui-kitten/components";
-import { useFonts } from "expo-font";
-import { Stack, router } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
+import { isRunningInExpoGo } from "expo";
+import { Stack, router, useNavigationContainerRef } from "expo-router";
 import { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import FocusAwareStatusBar from "../components/ui/FocusAwareStatusBar";
 import Providers from "../providers";
 import { useAuth } from "../providers/AuthProvider";
+import { env } from "../utils/env";
 
-SplashScreen.preventAutoHideAsync();
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
-export default function RootLayout() {
-  const [loaded, error] = useFonts({
-    InterVariable: require("../assets/fonts/InterVariable.ttf"),
-  });
+Sentry.init({
+  dsn: env.EXPO_PUBLIC_SENTRY_DSN,
+  debug: true,
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      routingInstrumentation,
+      enableNativeFramesTracking: !isRunningInExpoGo(),
+    }),
+  ],
+});
+
+export default Sentry.wrap(RootLayout);
+
+function RootLayout() {
+  const ref = useNavigationContainerRef();
 
   useEffect(() => {
-    if (error) throw error;
-  }, [error]);
-
-  useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    if (ref) {
+      routingInstrumentation.registerNavigationContainer(ref);
     }
-  }, [loaded]);
+  }, [ref]);
 
-  if (!loaded) {
-    return null;
-  }
-
-  return <RootLayoutNav />;
-}
-
-function RootLayoutNav() {
   return (
     <Providers>
       <RoutingSetup />
