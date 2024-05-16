@@ -1,10 +1,12 @@
-import { Spinner, SpinnerProps } from "@ui-kitten/components";
-import { View } from "react-native";
+import { useTheme } from "@ui-kitten/components";
+import { ActivityIndicator, View, ViewProps } from "react-native";
 
-export default function LoadingIndicator(props?: SpinnerProps) {
+export default function LoadingIndicator(props?: ViewProps) {
+  const theme = useTheme();
+
   return (
     <View style={{ justifyContent: "center", alignItems: "center" }}>
-      <Spinner size="small" status="basic" {...props} />
+      <ActivityIndicator color={theme["color-primary-default"]} size="small" {...props} />
     </View>
   );
 }

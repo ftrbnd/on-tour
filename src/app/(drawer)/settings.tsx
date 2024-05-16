@@ -87,7 +87,7 @@ function ProfileCard() {
           status="primary"
           accessoryLeft={
             isLoading ? (
-              <LoadingIndicator status="primary" />
+              <LoadingIndicator />
             ) : (
               <Icon name="log-out-outline" style={{ height: 24, width: 24 }} />
             )
