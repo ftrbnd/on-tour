@@ -100,11 +100,7 @@ function HorizontalPlaylistItem({
             borderRadius: BORDER_RADIUS,
           }}>
           <Image
-            source={
-              spotifyPlaylist
-                ? { uri: spotifyPlaylist.images[0].url, height: 100, width: 100 }
-                : PlaylistIcon
-            }
+            source={spotifyPlaylist ? { uri: spotifyPlaylist.images[0].url } : PlaylistIcon}
             style={{
               borderTopLeftRadius: BORDER_RADIUS,
               borderBottomLeftRadius: BORDER_RADIUS,
