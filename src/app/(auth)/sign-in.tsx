@@ -3,19 +3,24 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Redirect, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { StyleSheet, View, useColorScheme } from "react-native";
+import { useToast } from "react-native-toast-notifications";
 
 import FocusAwareStatusBar from "@/src/components/ui/FocusAwareStatusBar";
 import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
 import { useAuth } from "@/src/providers/AuthProvider";
 
 export default function Login() {
-  const { isLoading, session, signIn, refreshSession } = useAuth();
+  const { isLoading, session, signIn, signOut } = useAuth();
   const theme = useTheme();
   const { status }: { status: string } = useLocalSearchParams();
   const colorScheme = useColorScheme();
+  const toast = useToast();
 
   useEffect(() => {
-    if (status === "401") refreshSession();
+    if (status === "401") {
+      signOut();
+      toast.show("Spotify session expired");
+    }
   }, [status]);
 
   if (session) return <Redirect href="/home" />;
