@@ -70,8 +70,6 @@ export function AuthProvider(props: PropsWithChildren) {
   const refreshSession = async () => {
     try {
       setIsLoading(true);
-      const now = new Date();
-      console.log(`Refreshing session at ${now.toLocaleTimeString()}`);
 
       const sessionToken = await SecureStore.getItemAsync("session_token");
 

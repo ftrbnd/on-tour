@@ -2,8 +2,8 @@ import { Icon, Text, useTheme } from "@ui-kitten/components";
 import { Image } from "expo-image";
 import { openBrowserAsync } from "expo-web-browser";
 import { Skeleton } from "moti/skeleton";
+import { Pressable } from "react-native";
 import ContextMenu from "react-native-context-menu-view";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
 import { Song } from "@/src/utils/setlist-fm-types";
 import { Image as SpotifyImage } from "@/src/utils/spotify-types";
@@ -30,7 +30,7 @@ export default function SongItem({ item, loading, image, link }: Props) {
     <ContextMenu
       actions={[{ title: link ? "View on Spotify" : "Track not found", disabled: !link }]}
       onPress={openSongLink}>
-      <TouchableOpacity
+      <Pressable
         style={{
           flexDirection: "row",
           alignItems: "center",
@@ -51,7 +51,7 @@ export default function SongItem({ item, loading, image, link }: Props) {
           <Icon name="music-outline" style={{ height: 48, width: 48 }} />
         )}
         <Text category="s1">{item.name}</Text>
-      </TouchableOpacity>
+      </Pressable>
     </ContextMenu>
   );
 }

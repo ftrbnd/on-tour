@@ -152,7 +152,6 @@ export async function getTrackFromSetlistFmSong(
 
     return track;
   } catch (error) {
-    console.log(`No Spotify track found for "${artistToSearch} - ${song.name}"`);
     throw error;
   }
 }
@@ -191,7 +190,7 @@ export async function addSongsToPlaylist(
 
 export async function getOnePlaylist(
   token: string | null | undefined,
-  id: string | undefined,
+  id: string | null | undefined,
 ): Promise<Playlist> {
   try {
     if (!token) throw new Error("Access token required");

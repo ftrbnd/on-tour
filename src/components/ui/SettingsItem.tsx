@@ -15,8 +15,8 @@ export default function SettingsItem({ title, subtitle, icon, onPress }: Props) 
   return (
     <TouchableOpacity onPress={onPress}>
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <Icon fill={theme["text-basic-color"]} name={icon} style={{ height: 36, width: 36 }} />
-        <View style={{ marginLeft: 8, gap: 4 }}>
+        <Icon fill={theme["text-basic-color"]} name={icon} style={{ height: 30, width: 30 }} />
+        <View style={{ marginLeft: 16, gap: 4 }}>
           <Text category="h6">{title}</Text>
           {subtitle && (
             <Text category="s2" appearance="hint">
