@@ -9,13 +9,17 @@ import {
   useTheme,
   Divider,
   Layout,
+  Button,
 } from "@ui-kitten/components";
 import { Drawer } from "expo-router/drawer";
 
 import DrawerHeaderIcon from "@/src/components/ui/DrawerHeaderIcon";
+import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
+import { useAuth } from "@/src/providers/AuthProvider";
 
 const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => {
   const theme = useTheme();
+  const { isLoading, signOut } = useAuth();
 
   return (
     <UIKittenDrawer
@@ -28,6 +32,25 @@ const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => {
           </Layout>
           <Divider />
         </>
+      }
+      footer={
+        <Layout>
+          <Button
+            appearance="ghost"
+            status="basic"
+            accessoryRight={
+              isLoading ? (
+                <LoadingIndicator />
+              ) : (
+                <Icon name="log-out-outline" style={{ height: 24, width: 24 }} />
+              )
+            }
+            disabled={isLoading}
+            style={{ justifyContent: "space-between" }}
+            onPress={signOut}>
+            {isLoading ? "Signing out..." : "Sign Out"}
+          </Button>
+        </Layout>
       }
       selectedIndex={new IndexPath(state.index)}
       onSelect={(index) => navigation.navigate(state.routeNames[index.row])}>
