@@ -17,6 +17,7 @@
   "dependencies": {
     "@eva-design/eva": "^2.2.0",
     "@react-native-community/datetimepicker": "7.6.1",
+    "@react-native-community/netinfo": "11.1.0",
     "@react-native-picker/picker": "2.6.1",
     "@react-navigation/drawer": "^6.6.15",
     "@react-navigation/material-top-tabs": "^6.6.12",

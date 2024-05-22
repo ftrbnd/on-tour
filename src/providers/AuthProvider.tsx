@@ -1,24 +1,11 @@
+import { useQuery } from "@tanstack/react-query";
 import * as Linking from "expo-linking";
 import * as SecureStore from "expo-secure-store";
 import * as WebBrowser from "expo-web-browser";
-import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
+import { PropsWithChildren, createContext, useContext } from "react";
 
+import { getCurrentUser } from "../services/auth";
 import { env } from "../utils/env";
-
-interface ServerResponse {
-  session: {
-    id: string;
-  };
-  account: {
-    providerId: string;
-    accessToken: string;
-  };
-  user: {
-    displayName: string | null;
-    avatar: string | null;
-    id: string | null;
-  };
-}
 
 interface AuthSession {
   token: string;
@@ -37,7 +24,6 @@ interface AuthContextProps {
   user: AuthUser | null;
   isLoading: boolean;
   isLoaded: boolean;
-  refreshSession: () => Promise<void>;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -47,7 +33,6 @@ const AuthContext = createContext<AuthContextProps>({
   user: null,
   isLoading: false,
   isLoaded: false,
-  refreshSession: async () => {},
   signIn: async () => {},
   signOut: async () => {},
 });
@@ -55,55 +40,16 @@ const AuthContext = createContext<AuthContextProps>({
 const API_URL = env.EXPO_PUBLIC_FASTIFY_SERVER_URL;
 
 export function AuthProvider(props: PropsWithChildren) {
-  const [session, setSession] = useState<AuthSession | null>(null);
-  const [user, setUser] = useState<AuthUser | null>(null);
-
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoaded, setIsLoaded] = useState<boolean>(false);
-
   const redirectURL = Linking.createURL("(auth)/sign-in");
 
-  useEffect(() => {
-    refreshSession();
-  }, []);
-
-  const refreshSession = async () => {
-    try {
-      setIsLoading(true);
-
-      const sessionToken = await SecureStore.getItemAsync("session_token");
-
-      if (sessionToken) {
-        const res = await fetch(`${API_URL}/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${sessionToken}`,
-          },
-        });
-        if (!res.ok) throw new Error("Invalid session token");
-
-        const { session, user, account }: ServerResponse = await res.json();
-
-        setSession({
-          token: session.id,
-          accessToken: account.accessToken,
-        });
-        setUser({
-          displayName: user.displayName,
-          providerId: account.providerId,
-          avatar: user.avatar,
-          id: user.id,
-        });
-      } else {
-        setSession(null);
-        setUser(null);
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
-      setIsLoaded(true);
-    }
-  };
+  const { data, status, isLoading, refetch } = useQuery({
+    queryKey: ["auth"],
+    queryFn: getCurrentUser,
+    refetchInterval: 3 * 60 * 1000, // 3 minutes
+    // refetchOnMount: true by default
+    // refetchOnReconnect: true by default
+    // refetchOnWindowFocus: true by default
+  });
 
   const signIn = async () => {
     try {
@@ -120,7 +66,7 @@ export function AuthProvider(props: PropsWithChildren) {
 
       await SecureStore.setItemAsync("session_token", sessionToken);
 
-      await refreshSession();
+      await refetch();
     } catch (e) {
       console.error(e);
     }
@@ -141,10 +87,8 @@ export function AuthProvider(props: PropsWithChildren) {
 
       await SecureStore.deleteItemAsync("session_token");
 
-      await refreshSession();
+      await refetch();
     } catch (e) {
-      setSession(null);
-      setUser(null);
       console.error(e);
     }
   };
@@ -152,11 +96,22 @@ export function AuthProvider(props: PropsWithChildren) {
   return (
     <AuthContext.Provider
       value={{
-        session,
-        user,
+        session: data
+          ? {
+              token: data.session.id,
+              accessToken: data.account.accessToken,
+            }
+          : null,
+        user: data
+          ? {
+              avatar: data.user.avatar,
+              displayName: data.user.displayName,
+              id: data.user.id,
+              providerId: data.account.providerId,
+            }
+          : null,
         isLoading,
-        isLoaded,
-        refreshSession,
+        isLoaded: status !== "pending",
         signIn,
         signOut,
       }}>
