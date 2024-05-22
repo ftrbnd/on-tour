@@ -2,7 +2,7 @@ import { FlashList } from "@shopify/flash-list";
 import { Button, Card, Icon, Layout, Text } from "@ui-kitten/components";
 import { useRouter, useSegments } from "expo-router";
 import { memo } from "react";
-import { View, useColorScheme } from "react-native";
+import { View } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 
 import CreatedPlaylistItem from "@/src/components/Playlist/CreatedPlaylistItem";
@@ -90,8 +90,6 @@ const Header = memo(function HeaderComponent() {
 });
 
 const Title = ({ title, icon, onPress }: { title: string; icon: string; onPress: () => void }) => {
-  const colorScheme = useColorScheme();
-
   return (
     <View
       style={{
@@ -104,7 +102,7 @@ const Title = ({ title, icon, onPress }: { title: string; icon: string; onPress:
       </Text>
       <Button
         appearance="ghost"
-        status={colorScheme === "dark" ? "basic" : "primary"}
+        status="primary"
         accessoryLeft={<Icon name={icon} />}
         onPress={onPress}
       />
