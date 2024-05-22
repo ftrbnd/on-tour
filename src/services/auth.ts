@@ -22,8 +22,6 @@ export interface ServerResponse {
 export async function getCurrentUser() {
   try {
     const sessionToken = await SecureStore.getItemAsync("session_token");
-    console.log({ sessionToken }, new Date().toLocaleTimeString());
-
     if (!sessionToken) return null;
 
     const res = await fetch(`${API_URL}/auth/me`, {

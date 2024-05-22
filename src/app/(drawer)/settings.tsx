@@ -67,9 +67,6 @@ export default function Settings() {
 
   const { mutateAsync } = useMutation({
     mutationFn: async () => deleteUserData(session?.token, user?.id),
-    onMutate: () => {
-      console.log("Deleting");
-    },
     onError: () => {
       toast.show("Failed to delete your data", {
         type: "danger",
