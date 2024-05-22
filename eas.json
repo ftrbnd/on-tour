@@ -14,10 +14,10 @@
     "production": {
       "autoIncrement": true,
       "android": {
-        "image": "auto"
+        "image": "latest"
       },
       "ios": {
-        "image": "auto"
+        "image": "latest"
       }
     }
   },
