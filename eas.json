@@ -15,16 +15,12 @@
       }
     },
     "preview": {
-      "distribution": "internal"
+      "extends": "development",
+      "developmentClient": false
     },
     "production": {
-      "autoIncrement": true,
-      "android": {
-        "image": "latest"
-      },
-      "ios": {
-        "image": "latest"
-      }
+      "extends": "preview",
+      "autoIncrement": true
     }
   },
   "submit": {
