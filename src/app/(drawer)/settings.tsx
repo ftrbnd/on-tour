@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Avatar, Card, Divider, Icon, Layout, Text, useTheme } from "@ui-kitten/components";
+import * as Application from "expo-application";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Alert, View, useColorScheme } from "react-native";
@@ -134,6 +135,9 @@ function ProfileCard() {
 
         <Text category="h3" numberOfLines={1} ellipsizeMode="head" style={{ margin: 8 }}>
           {user?.displayName ?? user?.providerId}
+        </Text>
+        <Text category="c2" appearance="hint" style={{ alignSelf: "center", padding: 16 }}>
+          {`On Tour v${Application.nativeApplicationVersion ?? "x.x.x"}`}
         </Text>
       </View>
     </Card>
