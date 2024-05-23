@@ -1,7 +1,11 @@
 import { useTheme } from "@ui-kitten/components";
 import { ActivityIndicator, View, ViewProps } from "react-native";
 
-export default function LoadingIndicator(props?: ViewProps) {
+interface Props extends ViewProps {
+  color?: string;
+}
+
+export default function LoadingIndicator(props?: Props) {
   const theme = useTheme();
 
   return (
