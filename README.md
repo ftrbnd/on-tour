@@ -83,8 +83,6 @@ Log in with Spotify to get your favorite artists' recent shows!
 * [![Expo][Expo]][Expo-url]
 * [![Typescript][Typescript]][Typescript-url]
 * [![UiKitten][UiKitten]][UiKitten-url]
-* [![Drizzle][Drizzle]][Drizzle-url]
-* [![NeonDb][NeonDb]][NeonDb-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -204,7 +202,3 @@ Project Link: [https://github.com/ftrbnd/on-tour](https://github.com/ftrbnd/on-t
 [Typescript-url]: https://www.typescriptlang.org/
 [UiKitten]: https://img.shields.io/badge/ui%20kitten-ff6721?style=for-the-badge
 [UiKitten-url]: https://akveo.github.io/react-native-ui-kitten/
-[Drizzle]: https://img.shields.io/badge/drizzle-000000?style=for-the-badge&logo=drizzle&logoColor=C5F74F
-[Drizzle-url]: https://orm.drizzle.team
-[NeonDb]: https://img.shields.io/badge/neon-00e599?style=for-the-badge
-[NeonDb-url]: https://neon.tech/
