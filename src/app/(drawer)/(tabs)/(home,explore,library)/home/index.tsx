@@ -18,20 +18,21 @@ export default function Recent() {
   const {
     data: recentShows,
     isPending,
+    isFetching,
     isLoading,
     refetch,
     isRefetching,
   } = useQuery({
     queryKey: ["setlists"],
     queryFn: () => getRecentShows(data?.topArtists),
-    enabled: data !== undefined && data.topArtists.length > 0,
+    enabled: data?.topArtists !== undefined && data?.topArtists.length > 0,
   });
 
   return (
     <Layout level="2" style={{ flex: 1 }}>
       <SetlistList
         setlists={recentShows ?? []}
-        isPending={isPending}
+        isPending={isPending && isFetching}
         loading={isLoading}
         onRefresh={refetch}
         refreshing={isRefetching}

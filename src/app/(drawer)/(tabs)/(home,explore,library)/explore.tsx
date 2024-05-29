@@ -54,6 +54,10 @@ export default function Explore() {
     inputRef.current?.blur();
   };
 
+  const focusSearch = () => {
+    inputRef.current?.focus();
+  };
+
   return (
     <Layout level="2" style={{ flex: 1 }}>
       <Input
@@ -85,6 +89,7 @@ export default function Explore() {
         onRefresh={() => (searchResults.length > 0 ? null : refetch())}
         refreshing={isRefetching}
         isSearchResult={searchResults.length > 0}
+        focusSearch={focusSearch}
       />
     </Layout>
   );

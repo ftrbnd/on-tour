@@ -1,5 +1,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { Button, Card } from "@ui-kitten/components";
+import { usePathname, useRouter } from "expo-router";
+import { View } from "react-native";
 
 import ArtistPreviewSkeleton from "../ui/skeletons/ArtistPreviewSkeleton";
 
@@ -16,6 +18,7 @@ interface Props {
   onRefresh?: () => void;
   refreshing?: boolean;
   isSearchResult?: boolean;
+  focusSearch?: () => void;
 }
 
 export default function ArtistList({
@@ -28,7 +31,16 @@ export default function ArtistList({
   onRefresh,
   refreshing,
   isSearchResult,
+  focusSearch,
 }: Props) {
+  const pathname = usePathname();
+  const router = useRouter();
+
+  const handlePress = () => {
+    if (pathname !== "/explore") router.replace("/explore");
+    else if (focusSearch !== undefined) focusSearch();
+  };
+
   const handleEndReached = () => (!isPlaceholderData && next && setNext ? setNext(next) : null);
 
   const Skeletons = () => [...Array(10).keys()].map((i) => <ArtistPreviewSkeleton key={i} />);
@@ -47,7 +59,12 @@ export default function ArtistList({
           <Skeletons />
         ) : (
           <Card>
-            <Button disabled>No artists were found.</Button>
+            <View style={{ gap: 4 }}>
+              <Button disabled>No artists were found.</Button>
+              <Button appearance="ghost" onPress={handlePress}>
+                {pathname === "/explore" ? "Search to get started!" : "Explore to get started!"}
+              </Button>
+            </View>
           </Card>
         )
       }
