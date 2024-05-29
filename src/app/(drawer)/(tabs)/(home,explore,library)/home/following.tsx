@@ -1,42 +1,27 @@
-import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Layout } from "@ui-kitten/components";
-import { useState, useEffect } from "react";
 
 import ArtistList from "@/src/components/Artist/ArtistList";
-import { useAuth } from "@/src/providers/AuthProvider";
-import { getTopArtists } from "@/src/services/spotify";
-import { Artist } from "@/src/utils/spotify-types";
+import useFollowingArtists from "@/src/hooks/useFollowingArtists";
+import useTopArtists from "@/src/hooks/useTopArtists";
 
 export default function Following() {
-  const [next, setNext] = useState<string | null>(null);
-  const [topArtists, setTopArtists] = useState<Artist[]>([]);
+  const top = useTopArtists();
+  const following = useFollowingArtists();
 
-  const { session } = useAuth();
-
-  const { data, isPending, isPlaceholderData, refetch, isRefetching } = useQuery({
-    queryKey: ["top-artists", next],
-    queryFn: () => getTopArtists(session?.accessToken, next),
-    enabled: session !== null,
-    placeholderData: keepPreviousData,
-  });
-
-  useEffect(() => {
-    if (data?.topArtists) {
-      setTopArtists((prev) => prev.concat(data.topArtists));
-    }
-  }, [data?.topArtists]);
+  // prioritize showing Top Artists on this page
+  const dataToUse = top.topArtists.length > 0 ? top : following;
 
   return (
     <Layout level="2" style={{ flex: 1 }}>
       <ArtistList
-        artists={topArtists}
-        isPending={isPending}
-        isPlaceholderData={isPlaceholderData}
+        artists={dataToUse.type === "top" ? top.topArtists : following.followingArtists}
+        isPending={dataToUse.isPending}
+        isPlaceholderData={dataToUse.isPlaceholderData}
         showsVerticalScrollIndicator={false}
-        next={data?.next}
-        setNext={setNext}
-        onRefresh={refetch}
-        refreshing={isRefetching}
+        next={dataToUse.next}
+        setNext={dataToUse.setNext}
+        onRefresh={dataToUse.refetch}
+        refreshing={dataToUse.isRefetching}
       />
     </Layout>
   );

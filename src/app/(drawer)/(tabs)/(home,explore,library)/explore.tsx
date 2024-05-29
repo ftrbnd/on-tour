@@ -4,8 +4,9 @@ import { useMemo, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 
 import ArtistList from "@/src/components/Artist/ArtistList";
+import useFollowingArtists from "@/src/hooks/useFollowingArtists";
 import { useAuth } from "@/src/providers/AuthProvider";
-import { getRelatedArtists, getTopArtists, searchForArtists } from "@/src/services/spotify";
+import { getRelatedArtists, searchForArtists } from "@/src/services/spotify";
 import { Artist } from "@/src/utils/spotify-types";
 
 export default function Explore() {
@@ -21,11 +22,7 @@ export default function Explore() {
     setSearchResults(results);
   }, 1000);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["top-artists"],
-    queryFn: () => getTopArtists(session?.accessToken),
-    enabled: session !== null,
-  });
+  const { followingArtists, isLoading } = useFollowingArtists();
 
   const {
     data: relatedArtists,
@@ -37,9 +34,9 @@ export default function Explore() {
     queryFn: () =>
       getRelatedArtists(
         session?.accessToken,
-        data?.topArtists ? data?.topArtists[Math.floor(Math.random() * 10)].id : null,
+        followingArtists.length > 0 ? followingArtists[Math.floor(Math.random() * 10)].id : null,
       ),
-    enabled: session !== null && data?.topArtists !== undefined,
+    enabled: session !== null,
   });
 
   const shuffledArtists = useMemo(

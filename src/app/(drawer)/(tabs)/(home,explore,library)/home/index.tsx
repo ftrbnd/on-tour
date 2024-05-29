@@ -2,18 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@ui-kitten/components";
 
 import SetlistList from "@/src/components/Setlist/SetlistList";
-import { useAuth } from "@/src/providers/AuthProvider";
+import useFollowingArtists from "@/src/hooks/useFollowingArtists";
 import { getRecentShows } from "@/src/services/setlist-fm";
-import { getTopArtists } from "@/src/services/spotify";
 
 export default function Recent() {
-  const { session } = useAuth();
-
-  const { data } = useQuery({
-    queryKey: ["top-artists"],
-    queryFn: () => getTopArtists(session?.accessToken),
-    enabled: session !== null,
-  });
+  const { followingArtists } = useFollowingArtists();
 
   const {
     data: recentShows,
@@ -24,8 +17,8 @@ export default function Recent() {
     isRefetching,
   } = useQuery({
     queryKey: ["setlists"],
-    queryFn: () => getRecentShows(data?.topArtists),
-    enabled: data?.topArtists !== undefined && data?.topArtists.length > 0,
+    queryFn: () => getRecentShows(followingArtists),
+    enabled: followingArtists.length > 0,
   });
 
   return (
