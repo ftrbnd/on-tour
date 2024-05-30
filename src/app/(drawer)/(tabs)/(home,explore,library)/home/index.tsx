@@ -2,36 +2,30 @@ import { useQuery } from "@tanstack/react-query";
 import { Layout } from "@ui-kitten/components";
 
 import SetlistList from "@/src/components/Setlist/SetlistList";
-import { useAuth } from "@/src/providers/AuthProvider";
+import useFollowingArtists from "@/src/hooks/useFollowingArtists";
 import { getRecentShows } from "@/src/services/setlist-fm";
-import { getTopArtists } from "@/src/services/spotify";
 
 export default function Recent() {
-  const { session } = useAuth();
-
-  const { data } = useQuery({
-    queryKey: ["top-artists"],
-    queryFn: () => getTopArtists(session?.accessToken),
-    enabled: session !== null,
-  });
+  const { followingArtists } = useFollowingArtists();
 
   const {
     data: recentShows,
     isPending,
+    isFetching,
     isLoading,
     refetch,
     isRefetching,
   } = useQuery({
     queryKey: ["setlists"],
-    queryFn: () => getRecentShows(data?.topArtists),
-    enabled: data !== undefined && data.topArtists.length > 0,
+    queryFn: () => getRecentShows(followingArtists),
+    enabled: followingArtists.length > 0,
   });
 
   return (
     <Layout level="2" style={{ flex: 1 }}>
       <SetlistList
         setlists={recentShows ?? []}
-        isPending={isPending}
+        isPending={isPending && isFetching}
         loading={isLoading}
         onRefresh={refetch}
         refreshing={isRefetching}

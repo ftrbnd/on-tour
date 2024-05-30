@@ -26,6 +26,33 @@ export async function getTopArtists(
   }
 }
 
+export async function getFollowingArtists(
+  token: string | null | undefined,
+  next?: string | null | undefined,
+): Promise<{ followingArtists: Artist[]; next: string | null }> {
+  try {
+    if (!token) throw new Error("Access token required");
+
+    const res = await fetch(next ?? `${ENDPOINT}/me/following?type=artist&limit=50`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.status === 401) throw new Error("Unauthorized");
+    if (!res.ok) throw new Error(`Failed to fetch your following artists`);
+
+    const { artists }: { artists: Page<Artist> } = await res.json();
+
+    const sortedArtists = artists.items.sort((a, b) =>
+      a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
+    );
+
+    return { followingArtists: sortedArtists, next: artists.next };
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function getOneArtist(token: string | null | undefined, id: string): Promise<Artist> {
   try {
     if (!token) throw new Error("Access token required");
