@@ -48,7 +48,11 @@ export default function SongItem({ item, loading, image, link }: Props) {
         ) : image ? (
           <Image source={{ uri: image.url }} style={{ height: 48, width: 48, borderRadius: 25 }} />
         ) : (
-          <Icon name="music-outline" style={{ height: 48, width: 48 }} />
+          <Icon
+            name="music-outline"
+            style={{ height: 48, width: 48 }}
+            fill={theme["text-basic-color"]}
+          />
         )}
         <Text category="s1">{item.name}</Text>
       </Pressable>
