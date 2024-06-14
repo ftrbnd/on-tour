@@ -10,8 +10,10 @@ import {
   Divider,
   Layout,
   Button,
+  Avatar,
 } from "@ui-kitten/components";
 import { Drawer } from "expo-router/drawer";
+import { View } from "react-native";
 
 import DrawerHeaderIcon from "@/src/components/ui/DrawerHeaderIcon";
 import LoadingIndicator from "@/src/components/ui/LoadingIndicator";
@@ -19,16 +21,26 @@ import { useAuth } from "@/src/providers/AuthProvider";
 
 const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => {
   const theme = useTheme();
-  const { isLoading, signOut } = useAuth();
+  const { isLoading, signOut, user } = useAuth();
 
   return (
     <UIKittenDrawer
       header={
         <>
           <Layout style={{ padding: 16 }}>
-            <Text category="h3" status="primary">
-              On Tour
-            </Text>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}>
+              <Text category="h3" status="primary">
+                On Tour
+              </Text>
+              {user?.avatar && <Avatar source={{ uri: user.avatar }} size="small" />}
+            </View>
+
+            <Text appearance="hint">{user?.displayName ?? user?.providerId}</Text>
           </Layout>
           <Divider />
         </>
