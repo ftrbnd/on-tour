@@ -95,6 +95,25 @@ export async function getRelatedArtists(
   }
 }
 
+export async function getPopularArtists(token: string | null | undefined) {
+  try {
+    if (!token) throw new Error("Access token required");
+
+    const res = await fetch(`${ENDPOINT}/artists`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (res.status === 401) throw new Error("Unauthorized");
+    if (!res.ok) throw new Error(`Failed to get popular artists`);
+
+    const { artists }: { artists: Page<Artist> } = await res.json();
+    return artists.items;
+  } catch (error) {
+    throw error;
+  }
+}
+
 export async function searchForArtists(
   token: string | null | undefined,
   query: string | undefined,

@@ -1,6 +1,6 @@
 import { Button, Icon, Text, useTheme } from "@ui-kitten/components";
 import { LinearGradient } from "expo-linear-gradient";
-import { Redirect, useLocalSearchParams } from "expo-router";
+import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 import { StyleSheet, View, useColorScheme } from "react-native";
 import { useToast } from "react-native-toast-notifications";
@@ -47,6 +47,9 @@ export default function Login() {
         accessoryLeft={isLoading ? <LoadingIndicator /> : <Icon name="log-in-outline" />}
         onPress={signIn}>
         {isLoading ? "Authenticating..." : "Sign in with Spotify"}
+      </Button>
+      <Button appearance="ghost" status="control" size="small" onPress={() => router.push("/home")}>
+        Continue without an account
       </Button>
     </LinearGradient>
   );

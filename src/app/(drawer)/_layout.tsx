@@ -21,7 +21,7 @@ import { useAuth } from "@/src/providers/AuthProvider";
 
 const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => {
   const theme = useTheme();
-  const { isLoading, signOut, user } = useAuth();
+  const { session, isLoading, signIn, signOut, user } = useAuth();
 
   return (
     <UIKittenDrawer
@@ -54,13 +54,16 @@ const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => {
               isLoading ? (
                 <LoadingIndicator />
               ) : (
-                <Icon name="log-out-outline" style={{ height: 24, width: 24 }} />
+                <Icon
+                  name={session ? "log-out-outline" : "log-in-outline"}
+                  style={{ height: 24, width: 24 }}
+                />
               )
             }
             disabled={isLoading}
             style={{ justifyContent: "space-between" }}
-            onPress={signOut}>
-            {isLoading ? "Signing out..." : "Sign Out"}
+            onPress={session ? signOut : signIn}>
+            {session ? "Sign Out" : "Sign In"}
           </Button>
         </Layout>
       }

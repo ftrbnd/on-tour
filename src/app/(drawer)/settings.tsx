@@ -82,7 +82,17 @@ export default function Settings() {
   return (
     <Layout level="2" style={{ flex: 1, justifyContent: "space-between" }}>
       <View style={{ padding: 16, gap: 32 }}>
-        <ProfileCard />
+        {session ? (
+          <ProfileCard />
+        ) : (
+          <Card>
+            <View>
+              <Text category="s1" appearance="hint" style={{ alignSelf: "center", padding: 16 }}>
+                {`On Tour v${Application.nativeApplicationVersion ?? "x.x.x"}`}
+              </Text>
+            </View>
+          </Card>
+        )}
         <Card disabled>
           <View style={{ gap: 16 }}>
             <SettingsItem
@@ -99,12 +109,14 @@ export default function Settings() {
               onPress={handleCachePress}
             />
             <Divider />
-            <SettingsItem
-              title="Deactivate Account"
-              subtitle="Delete all my data"
-              icon="close-circle-outline"
-              onPress={handleDeactivatePress}
-            />
+            {session && (
+              <SettingsItem
+                title="Deactivate Account"
+                subtitle="Delete all my data"
+                icon="close-circle-outline"
+                onPress={handleDeactivatePress}
+              />
+            )}
           </View>
         </Card>
       </View>
