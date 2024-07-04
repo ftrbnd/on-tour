@@ -19,6 +19,12 @@ export interface ServerResponse {
   };
 }
 
+interface AnonSession {
+  access_token: string;
+  expires_in: number;
+  token_type: string;
+}
+
 export async function getCurrentUser() {
   try {
     const sessionToken = await SecureStore.getItemAsync("session_token");
@@ -33,6 +39,18 @@ export async function getCurrentUser() {
 
     const data: ServerResponse = await res.json();
     return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getTokenFromServer() {
+  try {
+    const res = await fetch(`${API_URL}/auth/client_credentials`);
+    if (!res.ok) throw new Error("Failed to get token from server");
+
+    const { access_token }: AnonSession = await res.json();
+    return access_token;
   } catch (error) {
     throw error;
   }

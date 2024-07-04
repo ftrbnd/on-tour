@@ -48,7 +48,11 @@ export default function Login() {
         onPress={signIn}>
         {isLoading ? "Authenticating..." : "Sign in with Spotify"}
       </Button>
-      <Button appearance="ghost" status="control" size="small" onPress={() => router.push("/home")}>
+      <Button
+        appearance="ghost"
+        status="control"
+        size="small"
+        onPress={() => router.push("/popular")}>
         Continue without an account
       </Button>
     </LinearGradient>

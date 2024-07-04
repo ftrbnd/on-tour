@@ -2,6 +2,13 @@ import { Setlist, Song } from "../utils/setlist-fm-types";
 import { Artist, Page, Playlist, SnapshotReference, Track } from "../utils/spotify-types";
 
 const ENDPOINT = `https://api.spotify.com/v1`;
+const SAMPLE_ARTISTS: string[] = [
+  "1t20wYnTiAT0Bs7H1hv9Wt",
+  "2sSGPbdZJkaSE2AbcGOACx",
+  "5szilpXHcwOqnyKLqGco5j",
+  "7gW0r5CkdEUMm42w9XpyZO",
+  "2HkSsS8O2U2gPhnCGVN5vn",
+];
 
 export async function getTopArtists(
   token: string | null | undefined,
@@ -95,20 +102,20 @@ export async function getRelatedArtists(
   }
 }
 
-export async function getPopularArtists(token: string | null | undefined) {
+export async function getSampleArtists(token: string | null | undefined) {
   try {
     if (!token) throw new Error("Access token required");
 
-    const res = await fetch(`${ENDPOINT}/artists`, {
+    const res = await fetch(`${ENDPOINT}/artists?ids=${SAMPLE_ARTISTS.join(",")}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     if (res.status === 401) throw new Error("Unauthorized");
-    if (!res.ok) throw new Error(`Failed to get popular artists`);
+    if (!res.ok) throw new Error(`Failed to fetch sample artists`);
 
-    const { artists }: { artists: Page<Artist> } = await res.json();
-    return artists.items;
+    const { artists }: { artists: Artist[] } = await res.json();
+    return artists;
   } catch (error) {
     throw error;
   }

@@ -69,20 +69,37 @@ const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => {
       }
       selectedIndex={new IndexPath(state.index)}
       onSelect={(index) => navigation.navigate(state.routeNames[index.row])}>
-      <DrawerItem
-        title={() => (
-          <Text category="h6" style={{ flex: 1, marginLeft: 8 }}>
-            Home
-          </Text>
-        )}
-        accessoryLeft={() => (
-          <Icon
-            name="home-outline"
-            fill={theme["text-basic-color"]}
-            style={{ height: 18, width: 18, marginLeft: 8 }}
-          />
-        )}
-      />
+      {session ? (
+        <DrawerItem
+          title={() => (
+            <Text category="h6" style={{ flex: 1, marginLeft: 8 }}>
+              Home
+            </Text>
+          )}
+          accessoryLeft={() => (
+            <Icon
+              name="home-outline"
+              fill={theme["text-basic-color"]}
+              style={{ height: 18, width: 18, marginLeft: 8 }}
+            />
+          )}
+        />
+      ) : (
+        <DrawerItem
+          title={() => (
+            <Text category="h6" style={{ flex: 1, marginLeft: 8 }}>
+              Popular
+            </Text>
+          )}
+          accessoryLeft={() => (
+            <Icon
+              name="home-outline"
+              fill={theme["text-basic-color"]}
+              style={{ height: 18, width: 18, marginLeft: 8 }}
+            />
+          )}
+        />
+      )}
       <DrawerItem
         title={() => (
           <Text category="h6" style={{ flex: 1, marginLeft: 8 }}>
@@ -102,9 +119,27 @@ const DrawerContent = ({ navigation, state }: DrawerContentComponentProps) => {
 };
 
 export default function DrawerLayout() {
+  const { session } = useAuth();
+
   return (
     <Drawer drawerContent={(props) => <DrawerContent {...props} />}>
-      <Drawer.Screen name="(tabs)" options={{ drawerLabel: "On Tour", headerShown: false }} />
+      {session ? (
+        <Drawer.Screen name="(tabs)" options={{ drawerLabel: "On Tour", headerShown: false }} />
+      ) : (
+        <Drawer.Screen
+          name="popular"
+          options={{
+            drawerLabel: "Popular",
+            header: () => (
+              <TopNavigation
+                title={() => <Text category="h6">On Tour</Text>}
+                accessoryLeft={() => <DrawerHeaderIcon iconOnly />}
+                alignment="center"
+              />
+            ),
+          }}
+        />
+      )}
       <Drawer.Screen
         name="settings"
         options={{
