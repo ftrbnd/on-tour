@@ -10,9 +10,10 @@ import { ArtistIcon } from "@/src/assets/icons";
 interface ArtistPreviewProps {
   artist: Artist;
   isSearchResult?: boolean;
+  tapDisabled?: boolean;
 }
 
-export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewProps) {
+export default function ArtistPreview({ artist, isSearchResult, tapDisabled }: ArtistPreviewProps) {
   const segments = useSegments<NestedSegment>();
   const router = useRouter();
   const theme = useTheme();
@@ -24,7 +25,7 @@ export default function ArtistPreview({ artist, isSearchResult }: ArtistPreviewP
   };
 
   return (
-    <Card onPress={openArtistPage} style={{ margin: 8 }}>
+    <Card disabled={tapDisabled} onPress={openArtistPage} style={{ margin: 8 }}>
       <View
         style={{
           flexDirection: "row",

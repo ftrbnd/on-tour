@@ -18,6 +18,7 @@ interface Props {
   loading?: boolean;
   refreshing?: boolean;
   onRefresh?: () => void;
+  tapDisabled?: boolean;
 }
 
 export default function SetlistList({
@@ -29,6 +30,7 @@ export default function SetlistList({
   loading,
   refreshing,
   onRefresh,
+  tapDisabled,
 }: Props) {
   const { upcomingShows } = useUpcomingShows();
 
@@ -47,6 +49,7 @@ export default function SetlistList({
           setlist={item}
           displayArtist
           isUpcomingShow={isUpcomingShow(item, upcomingShows)}
+          tapDisabled={tapDisabled}
         />
       )}
       showsVerticalScrollIndicator={false}

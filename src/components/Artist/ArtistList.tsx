@@ -19,6 +19,7 @@ interface Props {
   refreshing?: boolean;
   isSearchResult?: boolean;
   focusSearch?: () => void;
+  tapDisabled?: boolean;
 }
 
 export default function ArtistList({
@@ -32,6 +33,7 @@ export default function ArtistList({
   refreshing,
   isSearchResult,
   focusSearch,
+  tapDisabled,
 }: Props) {
   const pathname = usePathname();
   const router = useRouter();
@@ -50,7 +52,9 @@ export default function ArtistList({
       estimatedItemSize={75}
       contentContainerStyle={{ padding: 8 }}
       data={artists}
-      renderItem={({ item }) => <ArtistPreview artist={item} isSearchResult={isSearchResult} />}
+      renderItem={({ item }) => (
+        <ArtistPreview artist={item} isSearchResult={isSearchResult} tapDisabled={tapDisabled} />
+      )}
       onEndReached={handleEndReached}
       onEndReachedThreshold={next ? 0.5 : null}
       showsVerticalScrollIndicator={showsVerticalScrollIndicator}
