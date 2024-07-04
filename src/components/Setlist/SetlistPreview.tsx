@@ -13,6 +13,7 @@ interface SetlistProps {
   displayArtist?: boolean;
   artistImage?: string;
   isUpcomingShow?: UpcomingShow;
+  tapDisabled?: boolean;
 }
 
 export default function SetlistPreview({
@@ -20,6 +21,7 @@ export default function SetlistPreview({
   displayArtist,
   artistImage,
   isUpcomingShow,
+  tapDisabled,
 }: SetlistProps) {
   const router = useRouter();
   const segments = useSegments<NestedSegment>();
@@ -35,7 +37,7 @@ export default function SetlistPreview({
   };
 
   return (
-    <Card style={{ margin: 4 }} onPress={openSetlistPage}>
+    <Card disabled={tapDisabled} style={{ margin: 4 }} onPress={openSetlistPage}>
       <View style={{ gap: 8 }}>
         <View
           style={{
