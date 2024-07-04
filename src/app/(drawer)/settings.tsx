@@ -3,6 +3,7 @@ import { Avatar, Card, Divider, Icon, Layout, Text, useTheme } from "@ui-kitten/
 import * as Application from "expo-application";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { openBrowserAsync } from "expo-web-browser";
 import { Alert, View, useColorScheme } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { useToast } from "react-native-toast-notifications";
@@ -79,6 +80,10 @@ export default function Settings() {
     },
   });
 
+  const handleWebsitePress = async () => {
+    await openBrowserAsync("https://on-tour.fm");
+  };
+
   return (
     <Layout level="2" style={{ flex: 1, justifyContent: "space-between" }}>
       <View style={{ padding: 16, gap: 32 }}>
@@ -101,22 +106,37 @@ export default function Settings() {
               icon={colorScheme === "dark" ? "moon-outline" : "sun-outline"}
               onPress={handleThemePress}
             />
+
             <Divider />
+
             <SettingsItem
               title="Cache"
               subtitle="Clear the app's storage"
               icon="trash-outline"
               onPress={handleCachePress}
             />
+
             <Divider />
+
             {session && (
-              <SettingsItem
-                title="Deactivate Account"
-                subtitle="Delete all my data"
-                icon="close-circle-outline"
-                onPress={handleDeactivatePress}
-              />
+              <>
+                <SettingsItem
+                  title="Deactivate Account"
+                  subtitle="Delete all my data"
+                  icon="close-circle-outline"
+                  onPress={handleDeactivatePress}
+                />
+
+                <Divider />
+              </>
             )}
+
+            <SettingsItem
+              title="Visit Website"
+              subtitle="on-tour.fm"
+              icon="browser-outline"
+              onPress={handleWebsitePress}
+            />
           </View>
         </Card>
       </View>
